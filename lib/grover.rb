@@ -43,6 +43,6 @@ class Grover
   private
 
   def root_path
-    @root_path ||= File.expand_path(__dir__)
+    @root_path ||= Dir.pwd
   end
 end
