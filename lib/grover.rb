@@ -2,6 +2,7 @@ require 'grover/version'
 
 require 'grover/utils'
 require 'grover/processor'
+require 'grover/middleware'
 
 #
 # Grover interface for converting HTML to PDF
@@ -27,7 +28,7 @@ class Grover
   def to_pdf(path = nil)
     options = @options.dup
     options[:path] = path if path
-    result = Grover::Processor.new(root_path).convert_pdf(@url, options)
+    result = processor.convert_pdf @url, options
     result['data'].pack('c*')
   end
 
@@ -44,5 +45,9 @@ class Grover
 
   def root_path
     @root_path ||= Dir.pwd
+  end
+
+  def processor
+    Grover::Processor.new(root_path)
   end
 end

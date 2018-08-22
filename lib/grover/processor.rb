@@ -18,7 +18,11 @@ class Grover
         try {
           browser = await puppeteer.launch(#{launch_params});
           const page = await browser.newPage();
-          await page.goto(url, { waitUntil: 'networkidle2' });
+          if (url.match(/^http/i)) {
+            await page.goto(url, { waitUntil: 'networkidle2' });
+          } else {
+            await page.setContent(url);
+          }
           return await page.pdf(options);
         } finally {
           if (browser) {

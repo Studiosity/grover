@@ -29,8 +29,28 @@ describe Grover do
   end
 
   describe '#to_pdf' do
-    subject(:to_pdf) { Grover.new('https://www.google.com').to_pdf }
+    subject(:to_pdf) { Grover.new(url_or_html).to_pdf }
 
-    it { is_expected.to start_with "%PDF-1.4\n" }
+    context 'when passing through a valid URL' do
+      let(:url_or_html) { 'https://www.google.com' }
+
+      it { is_expected.to start_with "%PDF-1.4\n" }
+    end
+
+    context 'when passing through an invalid URL' do
+      let(:url_or_html) { 'https://fake.invalid' }
+
+      it do
+        expect do
+          subject
+        end.to raise_error Schmooze::JavaScript::Error, %r{net::ERR_NAME_NOT_RESOLVED at https://fake.invalid}
+      end
+    end
+
+    context 'when passing through html' do
+      let(:url_or_html) { '<html><body><h1>Hey there</h1></body></html>' }
+
+      it { is_expected.to start_with "%PDF-1.4\n" }
+    end
   end
 end
