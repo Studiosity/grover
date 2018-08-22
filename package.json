@@ -1,0 +1,26 @@
+{
+  "name": "grover",
+  "version": "0.1.0",
+  "description": "A Ruby gem to transform HTML into PDFs using Google Puppeteer/Chromium",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Studiosity/grover.git"
+  },
+  "keywords": [
+    "PDF",
+    "puppeteer",
+    "chromium"
+  ],
+  "author": "abromwich@studiosity.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Studiosity/grover/issues"
+  },
+  "homepage": "https://github.com/Studiosity/grover#readme",
+  "devDependencies": {
+    "puppeteer": "^1.7.0"
+  },
+  "dependencies": {
+    "logging": "^3.2.0"
+  }
+}
