@@ -9,6 +9,7 @@ class Grover
   #
   def initialize(url, options = {})
     @url = url
+    @root_path = options.delete :root_path
     @options = options
   end
 
@@ -37,6 +38,6 @@ class Grover
   private
 
   def root_path
-    File.expand_path(__dir__)
+    @root_path ||= File.expand_path(__dir__)
   end
 end

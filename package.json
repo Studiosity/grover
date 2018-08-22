@@ -1,6 +1,6 @@
 {
   "name": "grover",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A Ruby gem to transform HTML into PDFs using Google Puppeteer/Chromium",
   "repository": {
     "type": "git",
@@ -19,8 +19,5 @@
   "homepage": "https://github.com/Studiosity/grover#readme",
   "devDependencies": {
     "puppeteer": "^1.7.0"
-  },
-  "dependencies": {
-    "logging": "^3.2.0"
   }
 }
