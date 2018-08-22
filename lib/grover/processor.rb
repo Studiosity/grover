@@ -7,11 +7,16 @@ class Grover
   class Processor < Schmooze::Base
     dependencies puppeteer: 'puppeteer'
 
+    def self.launch_params
+      ENV['CI'] == 'true' ? "{args: ['--no-sandbox', '--disable-setuid-sandbox']}" : ''
+    end
+    private_class_method :launch_params
+
     method :convert_pdf, Utils.squish(<<-FUNCTION)
       async (url, options) => {
         let browser;
         try {
-          browser = await puppeteer.launch();
+          browser = await puppeteer.launch(#{launch_params});
           const page = await browser.newPage();
           await page.goto(url, { waitUntil: 'networkidle2' });
           return await page.pdf(options);
