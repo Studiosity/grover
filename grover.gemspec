@@ -9,11 +9,11 @@ Gem::Specification.new do |spec|
   spec.authors     = ['Andrew Bromwich']
   spec.email       = %w[abromwich@studiosity.com]
   spec.description = 'A Ruby gem to transform HTML into PDFs using Google Puppeteer/Chromium'
-  spec.summary     = 'A Ruby gem to transform HTML into PDFs wrapper the NodeJS Google Puppeteer project using Chromium'
+  spec.summary     = 'A Ruby gem to transform HTML into PDFs wrapper the NodeJS Google Puppeteer driver for Chromium'
   spec.homepage    = 'http://github.com/Studiosity/grover'
   spec.license     = 'MIT'
 
-  spec.files         = `git ls-files lib bin`.split("\n")
+  spec.files         = `git ls-files lib`.split("\n")
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^spec/})
   spec.require_paths = ['lib']
