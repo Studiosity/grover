@@ -1,0 +1,128 @@
+require 'spec_helper'
+
+describe Grover::HTMLPreprocessor do
+  describe '.process' do
+    subject(:process) { described_class.process html, root_url, protocol }
+
+    let(:root_url) { 'http://example.com/' }
+    let(:protocol) { 'http' }
+
+    context 'html is empty' do
+      let(:html) { '' }
+
+      it { is_expected.to eq '' }
+    end
+
+    context 'html doesnt have any relative URLs' do
+      let(:html) { '<html><body>Some Content</body></html>' }
+
+      it { is_expected.to eq html }
+    end
+
+    context 'host-relative URL with single quotes' do
+      let(:html) do
+        <<-HTML.strip_heredoc
+          <html>
+            <head>
+              <link href='/stylesheets/application.css' rel='stylesheet' type='text/css' />
+            </head>
+            <body>
+              <img alt='test' src='/test.png' />
+            </body>
+          </html>
+        HTML
+      end
+
+      it do
+        is_expected.to eq <<-HTML.strip_heredoc
+          <html>
+            <head>
+              <link href='http://example.com/stylesheets/application.css' rel='stylesheet' type='text/css' />
+            </head>
+            <body>
+              <img alt='test' src='http://example.com/test.png' />
+            </body>
+          </html>
+        HTML
+      end
+    end
+
+    context 'host-relative URL with double quotes' do
+      let(:html) { '<link href="/stylesheets/application.css" media="screen" rel="stylesheet" type="text/css" />' }
+
+      it do
+        is_expected.to eq <<-HTML.strip_heredoc.delete "\n"
+          <link href="http://example.com/stylesheets/application.css" media="screen" rel="stylesheet" type="text/css" />
+        HTML
+      end
+    end
+
+    context 'protocol-relative URL with single quotes' do
+      let(:html) do
+        "<link href='//fonts.googleapis.com/css?family=Open+Sans:400,600' rel='stylesheet' type='text/css'>"
+      end
+
+      it do
+        is_expected.to eq <<-HTML.strip_heredoc.delete "\n"
+          <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600' rel='stylesheet' type='text/css'>
+        HTML
+      end
+    end
+
+    context 'protocol-relative URL with double quotes' do
+      let(:html) do
+        '<link href="//fonts.googleapis.com/css?family=Open+Sans:400,600" rel="stylesheet" type="text/css">'
+      end
+
+      it do
+        is_expected.to eq <<-HTML.strip_heredoc.delete "\n"
+          <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600" rel="stylesheet" type="text/css">
+        HTML
+      end
+    end
+
+    context 'host-relative root URL' do
+      let(:html) { "<a href='/'><img src='/logo.jpg' ></a>" }
+
+      it { is_expected.to eq "<a href='http://example.com/'><img src='http://example.com/logo.jpg' ></a>" }
+    end
+
+    context 'when options not set' do
+      let(:html) do
+        <<-HTML.strip_heredoc
+          <link href='//fonts.googleapis.com/css?family=Open+Sans:400,600' rel='stylesheet' type='text/css'>
+          <a href='/'><img src='/logo.jpg'></a>
+        HTML
+      end
+
+      context 'root_url is nil' do
+        let(:root_url) { nil }
+
+        it do
+          is_expected.to eq <<-HTML.strip_heredoc
+            <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600' rel='stylesheet' type='text/css'>
+            <a href='/'><img src='/logo.jpg'></a>
+          HTML
+        end
+      end
+
+      context 'protocol is nil' do
+        let(:protocol) { nil }
+
+        it do
+          is_expected.to eq <<-HTML.strip_heredoc
+            <link href='//fonts.googleapis.com/css?family=Open+Sans:400,600' rel='stylesheet' type='text/css'>
+            <a href='http://example.com/'><img src='http://example.com/logo.jpg'></a>
+          HTML
+        end
+      end
+
+      context 'both root_url and protocol are nil' do
+        let(:root_url) { nil }
+        let(:protocol) { nil }
+
+        it { is_expected.to eq html }
+      end
+    end
+  end
+end

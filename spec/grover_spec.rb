@@ -53,4 +53,12 @@ describe Grover do
       it { is_expected.to start_with "%PDF-1.4\n" }
     end
   end
+
+  describe '#inspect' do
+    subject(:inspect) { grover.inspect }
+
+    let(:grover) { Grover.new('http://google.com') }
+
+    it { is_expected.to eq "#<Grover:0x#{grover.object_id} @url=\"http://google.com\">" }
+  end
 end

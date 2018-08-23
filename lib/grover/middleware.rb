@@ -29,12 +29,14 @@ class Grover
 
     private
 
+    PDF_REGEX = /\.pdf$/i
+
     def rendering_pdf?
       @render_pdf
     end
 
     def render_as_pdf?
-      @request.path.end_with?('.pdf')
+      !@request.path.match(PDF_REGEX).nil?
     end
 
     def html_content?(headers)
@@ -61,7 +63,7 @@ class Grover
     def configure_env_for_pdf_request(env)
       @render_pdf = true
 
-      path = @request.path.sub(/\.pdf$/, '')
+      path = @request.path.sub(PDF_REGEX, '')
       path = path.sub(@request.script_name, '')
 
       %w[PATH_INFO REQUEST_URI].each { |e| env[e] = path }

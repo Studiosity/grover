@@ -38,7 +38,7 @@ class Grover
       '#<%<class_name>s:0x%<object_id>p @url="%<url>s">',
       class_name: self.class.name,
       object_id: object_id,
-      url: url
+      url: @url
     )
   end
 
