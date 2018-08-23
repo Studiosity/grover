@@ -19,8 +19,9 @@ class Grover
       status, headers, response = @app.call(env)
 
       if rendering_pdf? && html_content?(headers)
-        response = convert_to_pdf response
-        update_headers headers, body
+        pdf = convert_to_pdf response
+        response = [pdf]
+        update_headers headers, pdf
       end
 
       [status, headers, response]
@@ -45,8 +46,7 @@ class Grover
       body = body.join if body.is_a?(Array)
 
       body = HTMLPreprocessor.process body, request_url, protocol
-      body = Grover.new(body).to_pdf
-      [body]
+      Grover.new(body).to_pdf
     end
 
     def update_headers(headers, body)
@@ -79,6 +79,10 @@ class Grover
 
     def protocol
       env['rack.url_scheme']
+    end
+
+    def env
+      @request.env
     end
   end
 end
