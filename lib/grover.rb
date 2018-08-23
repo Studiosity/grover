@@ -2,6 +2,7 @@ require 'grover/version'
 
 require 'grover/utils'
 require 'grover/processor'
+require 'grover/html_preprocessor'
 require 'grover/middleware'
 
 #

@@ -34,6 +34,26 @@ pdf = grover.to_pdf
 ```
 
 
+## Middleware
+Grover comes with a middleware that allows users to get a PDF view of
+any page on your site by appending .pdf to the URL.
+
+### Middleware Setup
+**Non-Rails Rack apps**
+```ruby
+# in config.ru
+require 'pdfkit'
+use Grover::Middleware
+```
+
+**Rails apps**
+```ruby
+# in application.rb
+require 'pdfkit'
+config.middleware.use Grover::Middleware
+```
+
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/Studiosity/grover.
@@ -49,6 +69,11 @@ and
 $ rubocop
 ```
 both succeed
+
+
+## Special mention
+Thanks are given to the great work done in the [PDFKit project](https://github.com/pdfkit/pdfkit).
+The middleware and HTML preprocessing components were used heavily in the implementation of Grover.  
 
 
 ## License

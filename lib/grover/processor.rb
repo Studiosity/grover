@@ -21,7 +21,7 @@ class Grover
           if (url.match(/^http/i)) {
             await page.goto(url, { waitUntil: 'networkidle2' });
           } else {
-            await page.setContent(url);
+            await page.goto(`data:text/html,${url}`, { waitUntil: 'networkidle0' });
           }
           return await page.pdf(options);
         } finally {
