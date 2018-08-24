@@ -34,6 +34,25 @@ pdf = grover.to_pdf
 ```
 
 
+## Configuration
+Grover can be configured to adjust the layout the resulting PDF. 
+For available options, see https://github.com/GoogleChrome/puppeteer/blob/v1.7.0/docs/api.md#pagepdfoptions
+ 
+```ruby
+# config/initializers/grover.rb
+Grover.configure do |config|
+  config.options = {
+    format: 'A4',
+    margin: {
+      top: '5px',
+      bottom: '10cm'
+    },
+    prefer_css_page_size: true
+  }
+end
+```
+
+
 ## Middleware
 Grover comes with a middleware that allows users to get a PDF view of
 any page on your site by appending .pdf to the URL.

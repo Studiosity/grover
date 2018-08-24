@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe Grover::Middleware do
+  # rubocop:disable RSpec/MultipleExpectations
+
   subject(:mock_app) do
     upstream = lambda do |env|
       @env = env
@@ -26,7 +28,7 @@ describe Grover::Middleware do
   let(:response) { ['Grover McGroveryface'] }
 
   describe '#call' do
-    context 'response content type' do
+    describe 'response content type' do
       context 'when requesting a PDF' do
         it 'returns PDF content type' do
           get 'http://www.example.org/test.pdf'
@@ -64,7 +66,8 @@ describe Grover::Middleware do
       end
     end
 
-    context 'rack environment' do
+    describe 'rack environment' do
+      # rubocop:disable RSpec/InstanceVariable
       context 'when requesting a PDF' do
         it 'removes PDF extension from PATH_INFO and REQUEST_URI' do
           get 'http://www.example.org/test.pdf'
@@ -80,9 +83,10 @@ describe Grover::Middleware do
           expect(@env['REQUEST_URI']).to be_nil
         end
       end
+      # rubocop:enable RSpec/InstanceVariable
     end
 
-    context 'caching' do
+    describe 'caching' do
       context 'when requesting a PDF' do
         it 'deletes the cache headers' do
           get 'http://www.example.org/test.pdf'
@@ -100,8 +104,8 @@ describe Grover::Middleware do
       end
     end
 
-    context 'response' do
-      context 'response is a Rack::Response' do
+    describe 'response' do
+      context 'when response is a Rack::Response' do
         let(:response) { Rack::Response.new(['Rackalicious'], 200) }
 
         it 'returns response as PDF' do
@@ -111,7 +115,7 @@ describe Grover::Middleware do
         end
       end
 
-      context 'response has multiple parts' do
+      context 'when response has multiple parts' do
         let(:response) { ['Part 1', 'Part 2'] }
 
         it 'returns response as PDF' do
@@ -124,19 +128,20 @@ describe Grover::Middleware do
 
     it 'does not get stuck rendering each request as pdf' do
       # false by default. No requests.
-      expect(subject.send(:rendering_pdf?)).to eq false
+      expect(mock_app.send(:rendering_pdf?)).to eq false
 
       # Remain false on a normal request
       get 'http://www.example.org/test.html'
-      expect(subject.send(:rendering_pdf?)).to eq false
+      expect(mock_app.send(:rendering_pdf?)).to eq false
 
       # Return true on a pdf request.
       get 'http://www.example.org/test.pdf'
-      expect(subject.send(:rendering_pdf?)).to eq true
+      expect(mock_app.send(:rendering_pdf?)).to eq true
 
       # Restore to false on any non-pdf request.
       get 'http://www.example.org/test.html'
-      expect(subject.send(:rendering_pdf?)).to eq false
+      expect(mock_app.send(:rendering_pdf?)).to eq false
     end
   end
+  # rubocop:enable RSpec/MultipleExpectations
 end

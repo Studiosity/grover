@@ -7,19 +7,19 @@ describe Grover::HTMLPreprocessor do
     let(:root_url) { 'http://example.com/' }
     let(:protocol) { 'http' }
 
-    context 'html is empty' do
+    context 'when html is empty' do
       let(:html) { '' }
 
       it { is_expected.to eq '' }
     end
 
-    context 'html doesnt have any relative URLs' do
+    context 'when html doesnt have any relative URLs' do
       let(:html) { '<html><body>Some Content</body></html>' }
 
       it { is_expected.to eq html }
     end
 
-    context 'host-relative URL with single quotes' do
+    context 'with host-relative URL with single quotes' do
       let(:html) do
         <<-HTML.strip_heredoc
           <html>
@@ -47,7 +47,7 @@ describe Grover::HTMLPreprocessor do
       end
     end
 
-    context 'host-relative URL with double quotes' do
+    context 'with host-relative URL with double quotes' do
       let(:html) { '<link href="/stylesheets/application.css" media="screen" rel="stylesheet" type="text/css" />' }
 
       it do
@@ -57,7 +57,7 @@ describe Grover::HTMLPreprocessor do
       end
     end
 
-    context 'protocol-relative URL with single quotes' do
+    context 'with protocol-relative URL with single quotes' do
       let(:html) do
         "<link href='//fonts.googleapis.com/css?family=Open+Sans:400,600' rel='stylesheet' type='text/css'>"
       end
@@ -69,7 +69,7 @@ describe Grover::HTMLPreprocessor do
       end
     end
 
-    context 'protocol-relative URL with double quotes' do
+    context 'with protocol-relative URL with double quotes' do
       let(:html) do
         '<link href="//fonts.googleapis.com/css?family=Open+Sans:400,600" rel="stylesheet" type="text/css">'
       end
@@ -81,7 +81,7 @@ describe Grover::HTMLPreprocessor do
       end
     end
 
-    context 'host-relative root URL' do
+    context 'with host-relative root URL' do
       let(:html) { "<a href='/'><img src='/logo.jpg' ></a>" }
 
       it { is_expected.to eq "<a href='http://example.com/'><img src='http://example.com/logo.jpg' ></a>" }
@@ -95,7 +95,7 @@ describe Grover::HTMLPreprocessor do
         HTML
       end
 
-      context 'root_url is nil' do
+      context 'when root_url is nil' do
         let(:root_url) { nil }
 
         it do
@@ -106,7 +106,7 @@ describe Grover::HTMLPreprocessor do
         end
       end
 
-      context 'protocol is nil' do
+      context 'when protocol is nil' do
         let(:protocol) { nil }
 
         it do
@@ -117,7 +117,7 @@ describe Grover::HTMLPreprocessor do
         end
       end
 
-      context 'both root_url and protocol are nil' do
+      context 'when both root_url and protocol are nil' do
         let(:root_url) { nil }
         let(:protocol) { nil }
 
