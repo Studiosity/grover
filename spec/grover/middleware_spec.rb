@@ -126,6 +126,33 @@ describe Grover::Middleware do
       end
     end
 
+    describe 'preprocessor' do
+      it 'calls to the HTML preprocessor with the original HTML' do
+        expect(Grover::HTMLPreprocessor).to(
+          receive(:process).
+            with('Grover McGroveryface', 'http://www.example.org/', 'http').
+            and_return('Processed McProcessyface')
+        )
+        get 'http://www.example.org/test.pdf'
+        expect(last_response.body.bytesize).to eq Grover.new('Processed McProcessyface').to_pdf.bytesize
+      end
+    end
+
+    describe 'pdf conversion' do
+      let(:grover) { instance_double Grover }
+
+      it 'passes through the request URL (sans extension) to Grover' do
+        expect(Grover).to(
+          receive(:new).
+            with('Grover McGroveryface', display_url: 'http://www.example.org/test').
+            and_return(grover)
+        )
+        expect(grover).to receive(:to_pdf).with(no_args).and_return 'A converted PDF'
+        get 'http://www.example.org/test.pdf'
+        expect(last_response.body).to eq 'A converted PDF'
+      end
+    end
+
     it 'does not get stuck rendering each request as pdf' do
       # false by default. No requests.
       expect(mock_app.send(:rendering_pdf?)).to eq false

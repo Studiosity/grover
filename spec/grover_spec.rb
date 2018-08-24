@@ -30,10 +30,16 @@ describe Grover do
   describe '#to_pdf' do
     subject(:to_pdf) { described_class.new(url_or_html).to_pdf }
 
+    let(:pdf_reader) { PDF::Reader.new pdf_io }
+    let(:pdf_io) { StringIO.new to_pdf }
+    let(:pdf_text_content) { Grover::Utils.squish(pdf_reader.pages.first.text) }
+
     context 'when passing through a valid URL' do
       let(:url_or_html) { 'https://www.google.com' }
 
       it { is_expected.to start_with "%PDF-1.4\n" }
+      it { expect(pdf_reader.page_count).to eq 1 }
+      it { expect(pdf_reader.pages.first.text).to include "I'm Feeling Lucky" }
     end
 
     context 'when passing through an invalid URL' do
@@ -48,8 +54,129 @@ describe Grover do
 
     context 'when passing through html' do
       let(:url_or_html) { '<html><body><h1>Hey there</h1></body></html>' }
+      let(:nbsp) { [160].pack('U*') } # &nbsp;
 
       it { is_expected.to start_with "%PDF-1.4\n" }
+      it { expect(pdf_reader.page_count).to eq 1 }
+      it { expect(pdf_reader.pages.first.text).to eq "Hey#{nbsp}there" }
+    end
+
+    context 'when passing through options to Grover' do
+      subject(:to_pdf) { described_class.new(url_or_html, options).to_pdf }
+
+      let(:url_or_html) { '<html><head><title>Paaage</title></head><body><h1>Hey there</h1></body></html>' }
+
+      context 'when options includes A4 page format' do
+        let(:options) { { format: 'A4' } }
+
+        it { expect(pdf_reader.pages.first.attributes).to include(MediaBox: [0, 0, 594.95996, 841.91998]) }
+      end
+
+      context 'when options includes Letter page format' do
+        let(:options) { { format: 'Letter' } }
+
+        it { expect(pdf_reader.pages.first.attributes).to include(MediaBox: [0, 0, 612, 792]) }
+      end
+
+      context 'when options include header and footer enabled' do
+        let(:options) do
+          {
+            display_header_footer: true,
+            display_url: 'http://www.examples.net/foo/bar'
+          }
+        end
+
+        it do
+          date = Date.today.strftime '%-m/%-d/%Y'
+          expect(pdf_text_content).to eq "#{date} Paaage Hey there http://www.examples.net/foo/bar 1/1"
+        end
+      end
+
+      context 'when options override header template' do
+        let(:options) do
+          {
+            display_header_footer: true,
+            display_url: 'http://www.examples.net/foo/bar',
+            header_template: 'Excellente'
+          }
+        end
+
+        it { expect(pdf_text_content).to eq 'Excellente Hey there http://www.examples.net/foo/bar 1/1' }
+      end
+
+      context 'when header template includes the display url marker' do
+        let(:options) do
+          {
+            display_header_footer: true,
+            display_url: 'http://www.examples.net/foo/bar',
+            header_template: 'abc{{display_url}}def'
+          }
+        end
+
+        it do
+          expect(pdf_text_content).to(
+            eq('abchttp://www.examples.net/foo/bardef Hey there http://www.examples.net/foo/bar 1/1')
+          )
+        end
+      end
+
+      context 'when options override footer template' do
+        let(:options) do
+          {
+            display_header_footer: true,
+            display_url: 'http://www.examples.net/foo/bar',
+            footer_template: 'great {{display_url}} page'
+          }
+        end
+
+        it do
+          date = Date.today.strftime '%-m/%-d/%Y'
+          expect(pdf_text_content).to eq "#{date} Paaage Hey there great http://www.examples.net/foo/bar page"
+        end
+      end
+    end
+
+    context 'when global options are defined' do
+      let(:url_or_html) { '<html><body><h1>Hey there</h1></body></html>' }
+      let(:options) do
+        {
+          display_header_footer: true,
+          display_url: 'http://www.examples.net/foo/bar',
+          header_template: 'Header!'
+        }
+      end
+
+      before { allow(described_class.configuration).to receive(:options).and_return(options) }
+
+      it { expect(pdf_text_content).to eq 'Header! Hey there http://www.examples.net/foo/bar 1/1' }
+    end
+
+    context 'when HTML includes screen only content' do
+      let(:url_or_html) do
+        <<-HTML
+          <html>
+            <head>
+              <style>
+                @media not screen {
+                  .screen-only { display: none }
+                }
+              </style>
+            </head>
+            <body>
+              <h1>Hey there</h1>
+              <div class="screen-only">This should only display for screen media</div>
+            </body>
+          </html>
+        HTML
+      end
+
+      it { expect(pdf_text_content).to eq 'Hey there' }
+
+      context 'with emulate_media set to `screen`' do
+        before { allow(described_class.configuration).to receive(:options).and_return(emulate_media: 'screen') }
+
+        it { expect(pdf_text_content).to eq 'Hey there This should only display for screen media' }
+      end
     end
   end
 

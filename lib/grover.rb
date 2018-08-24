@@ -104,9 +104,30 @@ class Grover
     Processor.new(root_path)
   end
 
+  def options_with_template_fix
+    options = @options.dup
+    display_url = options.delete :display_url
+    if display_url
+      options[:footer_template] ||= DEFAULT_FOOTER_TEMPLATE
+
+      %i[header_template footer_template].each do |key|
+        next unless options[key].is_a? String
+        options[key] = options[key].gsub(DISPLAY_URL_PLACEHOLDER, display_url)
+      end
+    end
+    options
+  end
+
   def normalized_options(path)
-    options = Utils.normalize_object @options
+    options = Utils.normalize_object options_with_template_fix
     options['path'] = path if path
     options
   end
+
+  DISPLAY_URL_PLACEHOLDER = '{{display_url}}'.freeze
+
+  DEFAULT_FOOTER_TEMPLATE = Utils.strip_heredoc(<<-HTML).freeze
+    <div class='text left grow'>#{DISPLAY_URL_PLACEHOLDER}</div>
+    <div class='text right'><span class='pageNumber'></span>/<span class='totalPages'></span></div>
+  HTML
 end

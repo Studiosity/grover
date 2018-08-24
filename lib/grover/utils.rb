@@ -21,6 +21,16 @@ class Grover
     end
 
     #
+    # Remove minimum spaces from the front of all lines within a string
+    #
+    # Based on active_support/core_ext/string/strip.rb
+    #
+    def self.strip_heredoc(string, inline: false)
+      string = string.gsub(/^#{string.scan(/^[ \t]*(?=\S)/).min}/, ''.freeze)
+      inline ? string.delete("\n") : string
+    end
+
+    #
     # Recursively normalizes hash objects with camelized string keys
     #
     def self.normalize_object(object)

@@ -13,5 +13,8 @@ Metrics/LineLength:
 RSpec/ExampleLength:
   Max: 10
 
+RSpec/MessageSpies:
+  EnforcedStyle: receive
+
 RSpec/NestedGroups:
   Max: 4
