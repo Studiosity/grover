@@ -37,6 +37,8 @@ pdf = grover.to_pdf
 ## Configuration
 Grover can be configured to adjust the layout the resulting PDF. 
 For available options, see https://github.com/GoogleChrome/puppeteer/blob/v1.7.0/docs/api.md#pagepdfoptions
+
+Also available is the `emulate_screen` option.
  
 ```ruby
 # config/initializers/grover.rb
@@ -47,7 +49,8 @@ Grover.configure do |config|
       top: '5px',
       bottom: '10cm'
     },
-    prefer_css_page_size: true
+    prefer_css_page_size: true,
+    emulate_media: 'screen'
   }
 end
 ```

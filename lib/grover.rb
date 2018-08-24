@@ -32,6 +32,12 @@ class Grover
           } else {
             await page.goto(`data:text/html,${url}`, { waitUntil: 'networkidle0' });
           }
+
+          const emulateMedia = options.emulateMedia; delete options.emulateMedia;
+          if (emulateMedia) {
+            await page.emulateMedia(emulateMedia);
+          }
+
           return await page.pdf(options);
         } finally {
           if (browser) {
