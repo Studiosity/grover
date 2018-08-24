@@ -39,7 +39,7 @@ describe Grover do
 
       it { is_expected.to start_with "%PDF-1.4\n" }
       it { expect(pdf_reader.page_count).to eq 1 }
-      it { expect(pdf_reader.pages.first.text).to include "I'm Feeling Lucky" }
+      it { expect(pdf_text_content).to include "I'm Feeling Lucky" }
     end
 
     context 'when passing through an invalid URL' do
@@ -81,6 +81,7 @@ describe Grover do
       context 'when options include header and footer enabled' do
         let(:options) do
           {
+            scale: 2, # To help PDFReader parse the documents better
             display_header_footer: true,
             display_url: 'http://www.examples.net/foo/bar'
           }
@@ -95,6 +96,7 @@ describe Grover do
       context 'when options override header template' do
         let(:options) do
           {
+            scale: 2, # To help PDFReader parse the documents better
             display_header_footer: true,
             display_url: 'http://www.examples.net/foo/bar',
             header_template: 'Excellente'
@@ -107,6 +109,7 @@ describe Grover do
       context 'when header template includes the display url marker' do
         let(:options) do
           {
+            scale: 2, # To help PDFReader parse the documents better
             display_header_footer: true,
             display_url: 'http://www.examples.net/foo/bar',
             header_template: 'abc{{display_url}}def'
@@ -123,6 +126,7 @@ describe Grover do
       context 'when options override footer template' do
         let(:options) do
           {
+            scale: 2, # To help PDFReader parse the documents better
             display_header_footer: true,
             display_url: 'http://www.examples.net/foo/bar',
             footer_template: 'great {{display_url}} page'
@@ -140,6 +144,7 @@ describe Grover do
       let(:url_or_html) { '<html><body><h1>Hey there</h1></body></html>' }
       let(:options) do
         {
+          scale: 2, # To help PDFReader parse the documents better
           display_header_footer: true,
           display_url: 'http://www.examples.net/foo/bar',
           header_template: 'Header!'

@@ -57,12 +57,14 @@ end
 
 #### Header/Footer templates and the 'url' tag
 When using the Rack middleware, Grover passes the HTML response through to Puppeteer as inline HTML.
-As such, if the header/footer flag is enabled, by default Chromium will render the url (inline HTML) in the footer. Eep!
+As such, if the header/footer flag is enabled, by default Chromium will render the url
+(the entire HTML document as plain text) in the footer. Eep!
 
 To get around this it is recommended to not use the 'url' class in either template.
-Instead, place the text `{{display_url}}` where you would like the request URL to display
+Instead, place the text `{{display_url}}` where you would like the request URL to display.
+Grover will look for that text, and replace it with the request URL before converting the HTML to PDF
 
-To assist in this process, if the footer template has not been specified, the following HTML template is used:
+To assist in this process, if the footer template has not been specified, the following default template is used:
 ```HTML
 <div class='text left grow'>{{display_url}}</div>
 <div class='text right'>
