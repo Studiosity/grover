@@ -33,6 +33,7 @@ describe Grover do
     let(:pdf_reader) { PDF::Reader.new pdf_io }
     let(:pdf_io) { StringIO.new to_pdf }
     let(:pdf_text_content) { Grover::Utils.squish(pdf_reader.pages.first.text) }
+    let(:large_text) { '<style>.text { font-size: 18px; }</style>' }
 
     context 'when passing through a valid URL' do
       let(:url_or_html) { 'https://www.google.com' }
@@ -81,44 +82,42 @@ describe Grover do
       context 'when options include header and footer enabled' do
         let(:options) do
           {
-            scale: 2, # To help PDFReader parse the documents better
             display_header_footer: true,
-            display_url: 'http://www.examples.net/foo/bar'
+            footer_template: large_text
           }
         end
 
         it do
           date = Date.today.strftime '%-m/%-d/%Y'
-          expect(pdf_text_content).to eq "#{date} Paaage Hey there http://www.examples.net/foo/bar 1/1"
+          expect(pdf_text_content).to eq "Hey there #{date} Paaage"
         end
       end
 
       context 'when options override header template' do
         let(:options) do
           {
-            scale: 2, # To help PDFReader parse the documents better
             display_header_footer: true,
-            display_url: 'http://www.examples.net/foo/bar',
-            header_template: 'Excellente'
+            header_template: 'Excellente',
+            footer_template: large_text
           }
         end
 
-        it { expect(pdf_text_content).to eq 'Excellente Hey there http://www.examples.net/foo/bar 1/1' }
+        it { expect(pdf_text_content).to eq 'Excellente Hey there' }
       end
 
       context 'when header template includes the display url marker' do
         let(:options) do
           {
-            scale: 2, # To help PDFReader parse the documents better
             display_header_footer: true,
             display_url: 'http://www.examples.net/foo/bar',
-            header_template: 'abc{{display_url}}def'
+            header_template: 'abc{{display_url}}def',
+            footer_template: large_text
           }
         end
 
         it do
           expect(pdf_text_content).to(
-            eq('abchttp://www.examples.net/foo/bardef Hey there http://www.examples.net/foo/bar 1/1')
+            eq('abchttp://www.examples.net/foo/bardef Hey there')
           )
         end
       end
@@ -126,17 +125,14 @@ describe Grover do
       context 'when options override footer template' do
         let(:options) do
           {
-            scale: 2, # To help PDFReader parse the documents better
             display_header_footer: true,
             display_url: 'http://www.examples.net/foo/bar',
-            footer_template: 'great {{display_url}} page'
+            footer_template: 'great {{display_url}} page',
+            header_template: large_text
           }
         end
 
-        it do
-          date = Date.today.strftime '%-m/%-d/%Y'
-          expect(pdf_text_content).to eq "#{date} Paaage Hey there great http://www.examples.net/foo/bar page"
-        end
+        it { expect(pdf_text_content).to eq "Hey there great http://www.examples.net/foo/bar page" }
       end
     end
 
@@ -144,16 +140,15 @@ describe Grover do
       let(:url_or_html) { '<html><body><h1>Hey there</h1></body></html>' }
       let(:options) do
         {
-          scale: 2, # To help PDFReader parse the documents better
           display_header_footer: true,
           display_url: 'http://www.examples.net/foo/bar',
-          header_template: 'Header!'
+          header_template: large_text
         }
       end
 
       before { allow(described_class.configuration).to receive(:options).and_return(options) }
 
-      it { expect(pdf_text_content).to eq 'Header! Hey there http://www.examples.net/foo/bar 1/1' }
+      it { expect(pdf_text_content).to eq 'Hey there http://www.examples.net/foo/bar 1/1' }
     end
 
     context 'when HTML includes screen only content' do
