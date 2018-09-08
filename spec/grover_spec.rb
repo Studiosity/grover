@@ -113,7 +113,8 @@ describe Grover do
           Grover::Utils.squish(<<-HTML)
             <html>
               <head>
-                <meta name="grover-footer_template" content="Footer with &quot;quotes&quot; in it" />
+                <meta name="grover-footer_template"
+                      content="<div class='text'>Footer with &quot;quotes&quot; in it</div>" />
               </head>
               <body>
                 <h1>Hey there</h1>
