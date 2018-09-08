@@ -31,6 +31,11 @@ grover = Grover.new('https://google.com', page_size: 'A4')
 # Get an inline PDF
 pdf = grover.to_pdf
 
+# Options can be provided through meta tags
+Grover.new('<html><head><meta name="grover-page_ranges" content="1-3"')
+Grover.new('<html><head><meta name="grover-margin-top" content="10px"')
+# N.B. options are underscore case, and sub-options separated with a dash
+# N.B. #2 all options can be overwritten, including `emulate_media` and `display_url` 
 ```
 
 

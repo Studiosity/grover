@@ -11,4 +11,16 @@ describe Grover::Configuration do
     configuration.options = { foo: 'bar' }
     expect(configuration.options[:foo]).to eq 'bar'
   end
+
+  describe '#meta_tag_prefix' do
+    subject(:meta_tag_prefix) { configuration.meta_tag_prefix }
+
+    it { is_expected.to eq 'grover-' }
+
+    context 'when configured differently' do
+      before { configuration.meta_tag_prefix = 'fooPrefix-' }
+
+      it { is_expected.to eq 'fooPrefix-' }
+    end
+  end
 end
