@@ -38,7 +38,7 @@ pdf = grover.to_pdf
 Grover can be configured to adjust the layout the resulting PDF. 
 For available options, see https://github.com/GoogleChrome/puppeteer/blob/v1.7.0/docs/api.md#pagepdfoptions
 
-Also available is the `emulate_screen` option.
+Also available is the `emulate_media` option.
  
 ```ruby
 # config/initializers/grover.rb
@@ -72,6 +72,9 @@ To assist in this process, if the footer template has not been specified, the fo
 </div>    
 ```
 _N.B._ the `url` class is *not* used
+
+I've raised [an issue](https://github.com/GoogleChrome/puppeteer/issues/3133) in the Google Puppeteer project regarding
+a longer term solution to this, however it would need to be resolved upstream in the Chromium project first 
 
 
 ## Middleware

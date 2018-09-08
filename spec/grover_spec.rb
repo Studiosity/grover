@@ -132,7 +132,7 @@ describe Grover do
           }
         end
 
-        it { expect(pdf_text_content).to eq "Hey there great http://www.examples.net/foo/bar page" }
+        it { expect(pdf_text_content).to eq 'Hey there great http://www.examples.net/foo/bar page' }
       end
     end
 
