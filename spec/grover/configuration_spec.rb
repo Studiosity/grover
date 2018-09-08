@@ -13,7 +13,7 @@ describe Grover::Configuration do
   end
 
   describe '#meta_tag_prefix' do
-    subject(meta_tag_prefix) { configuration.meta_tag_prefix }
+    subject(:meta_tag_prefix) { configuration.meta_tag_prefix }
 
     it { is_expected.to eq 'grover-' }
 
