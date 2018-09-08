@@ -6,6 +6,7 @@ require 'grover/middleware'
 require 'grover/configuration'
 
 require 'schmooze'
+require 'nokogiri'
 
 #
 # Grover interface for converting HTML to PDF
@@ -114,6 +115,7 @@ class Grover
 
   def options_with_template_fix
     options = @options.dup
+    options.merge! meta_options unless url_source?
     display_url = options.delete :display_url
     if display_url
       options[:footer_template] ||= DEFAULT_FOOTER_TEMPLATE
@@ -128,9 +130,24 @@ class Grover
 
   def normalized_options(path)
     options = Utils.normalize_object options_with_template_fix
-    options.merge! meta_options unless url_source?
+    fix_boolean_options! options
+    fix_numeric_options! options
     options['path'] = path if path
     options
+  end
+
+  def fix_boolean_options!(options)
+    %w[displayHeaderFooter printBackground landscape preferCSSPageSize].each do |opt|
+      next unless options.key? opt
+      options[opt] = !FALSE_VALUES.include?(options[opt])
+    end
+  end
+
+  FALSE_VALUES = [false, 0, '0', 'f', 'F', 'false', 'FALSE', 'off', 'OFF']
+
+  def fix_numeric_options!(options)
+    return unless options.key? 'scale'
+    options['scale'] = options['scale'].to_f
   end
 
   #
@@ -139,11 +156,13 @@ class Grover
   def meta_options
     meta_opts = {}
 
-    @url.scan(/<meta [^>]*>/) do |meta|
-      tag_name = meta[/name=["']#{Grover.configuration.meta_tag_prefix}([a-z_-]+)["']/, 1]
+    Nokogiri::HTML(@url).xpath('//meta').each do |meta|
+      next unless meta.key? 'name'
+
+      tag_name = meta['name'][/#{Grover.configuration.meta_tag_prefix}([a-z_-]+)/, 1]
       next if tag_name.nil?
 
-      Utils.deep_assign meta_opts, tag_name.split('-'), meta[/content=["']([^"']+)["']/, 1]
+      Utils.deep_assign meta_opts, tag_name.split('-'), meta['content']
     end
 
     meta_opts
