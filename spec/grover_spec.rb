@@ -34,6 +34,7 @@ describe Grover do
     let(:pdf_io) { StringIO.new to_pdf }
     let(:pdf_text_content) { Grover::Utils.squish(pdf_reader.pages.first.text) }
     let(:large_text) { '<style>.text { font-size: 14px; }</style>' }
+    let(:default_header) { "<div class='date text left'></div><div class='title text center'></div>" }
 
     context 'when passing through a valid URL' do
       let(:url_or_html) { 'https://www.google.com' }
@@ -82,17 +83,18 @@ describe Grover do
         let(:options) do
           {
             display_header_footer: true,
+            display_url: 'http://www.example.net/bar',
             margin: {
-              top: '4cm',
-              bottom: '4cm'
+              top: '1in',
+              bottom: '1in'
             },
-            footer_template: large_text
+            header_template: "#{large_text}#{default_header}"
           }
         end
 
         it do
           date = Date.today.strftime '%-m/%-d/%Y'
-          expect(pdf_text_content).to eq "#{date} Paaage Hey there"
+          expect(pdf_text_content).to eq "#{date} Paaage Hey there http://www.example.net/bar 1/1"
         end
       end
 
@@ -102,8 +104,8 @@ describe Grover do
             display_header_footer: true,
             display_url: 'http://www.examples.net/foo/baz',
             margin: {
-              top: '4cm',
-              bottom: '4cm'
+              top: '1in',
+              bottom: '1in'
             },
             header_template: "#{large_text}Excellente"
           }
@@ -118,8 +120,8 @@ describe Grover do
             display_header_footer: true,
             display_url: 'http://www.examples.net/foo/bar',
             margin: {
-              top: '4cm',
-              bottom: '4cm'
+              top: '1in',
+              bottom: '1in'
             },
             header_template: "#{large_text}abc{{display_url}}def"
           }
@@ -138,8 +140,8 @@ describe Grover do
             display_header_footer: true,
             display_url: 'http://www.examples.net/foo/bar',
             margin: {
-              top: '4cm',
-              bottom: '4cm'
+              top: '1in',
+              bottom: '1in'
             },
             footer_template: "#{large_text}great {{display_url}} page"
           }
