@@ -143,7 +143,7 @@ class Grover
     end
   end
 
-  FALSE_VALUES = [false, 0, '0', 'f', 'F', 'false', 'FALSE', 'off', 'OFF']
+  FALSE_VALUES = [nil, false, 0, '0', 'f', 'F', 'false', 'FALSE', 'off', 'OFF']
 
   def fix_numeric_options!(options)
     return unless options.key? 'scale'
