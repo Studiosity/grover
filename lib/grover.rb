@@ -113,9 +113,14 @@ class Grover
     Processor.new(root_path)
   end
 
-  def options_with_template_fix
+  def base_options
     options = @options.dup
     options.merge! meta_options unless url_source?
+    options
+  end
+
+  def options_with_template_fix
+    options = base_options
     display_url = options.delete :display_url
     if display_url
       options[:footer_template] ||= DEFAULT_FOOTER_TEMPLATE
@@ -143,7 +148,7 @@ class Grover
     end
   end
 
-  FALSE_VALUES = [nil, false, 0, '0', 'f', 'F', 'false', 'FALSE', 'off', 'OFF']
+  FALSE_VALUES = [nil, false, 0, '0', 'f', 'F', 'false', 'FALSE', 'off', 'OFF'].freeze
 
   def fix_numeric_options!(options)
     return unless options.key? 'scale'

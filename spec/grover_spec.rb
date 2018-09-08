@@ -101,19 +101,19 @@ describe Grover do
       context 'when the page contains meta options with escaped content' do
         let(:options) do
           {
+            display_header_footer: true,
             margin: {
               top: '1in',
               bottom: '1in'
             },
-            footer_template: ' '
+            header_template: large_text
           }
         end
         let(:url_or_html) do
           Grover::Utils.squish(<<-HTML)
             <html>
               <head>
-                <meta name="grover-header_template" content="#{large_text}Header with &quot;quotes&quot; in it" />
-                <meta name="grover-display_header_footer" content='true' />
+                <meta name="grover-footer_template" content="Footer with &quot;quotes&quot; in it" />
               </head>
               <body>
                 <h1>Hey there</h1>
@@ -122,7 +122,7 @@ describe Grover do
           HTML
         end
 
-        it { expect(pdf_text_content).to eq 'Header with "quotes" in it Hey there' }
+        it { expect(pdf_text_content).to eq 'Hey there Footer with "quotes" in it' }
       end
 
       context 'when the page contains meta options with boolean content' do
