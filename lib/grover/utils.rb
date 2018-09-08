@@ -31,6 +31,19 @@ class Grover
     end
 
     #
+    # Assign value to a hash using an array of keys to traverse
+    #
+    def self.deep_assign(hash, keys, value)
+      if keys.length == 1
+        hash[keys.first] = value
+      else
+        key = keys.shift
+        hash[key] ||= {}
+        deep_assign hash[key], keys, value
+      end
+    end
+
+    #
     # Recursively normalizes hash objects with camelized string keys
     #
     def self.normalize_object(object)

@@ -34,7 +34,7 @@ describe Grover do
     let(:pdf_io) { StringIO.new to_pdf }
     let(:pdf_text_content) { Grover::Utils.squish(pdf_reader.pages.first.text) }
     let(:large_text) { '<style>.text { font-size: 14px; }</style>' }
-    let(:default_header) { "<div class='date text left'></div><div class='title text center'></div>" }
+    let(:default_header) { Grover::DEFAULT_HEADER_TEMPLATE }
 
     context 'when passing through a valid URL' do
       let(:url_or_html) { 'https://www.google.com' }
@@ -77,6 +77,48 @@ describe Grover do
         let(:options) { { format: 'Letter' } }
 
         it { expect(pdf_reader.pages.first.attributes).to include(MediaBox: [0, 0, 612, 792]) }
+      end
+
+      context 'when the page contains valid meta options' do
+        let(:options) { {} }
+        let(:url_or_html) do
+          Grover::Utils.squish(<<-HTML)
+            <html>
+              <head>
+                <title>Paaage</title>
+                <meta name="grover-format" content="A3" />
+              </head>
+              <body>
+                <h1>Hey there</h1>
+              </body>
+            </html>
+          HTML
+        end
+
+        it { expect(pdf_reader.pages.first.attributes).to include(MediaBox: [0, 0, 841.91998, 1188]) }
+      end
+
+      context 'when the page contains invalid meta options' do
+        let(:options) { {} }
+        let(:url_or_html) do
+          Grover::Utils.squish(<<-HTML)
+            <html>
+              <head>
+                <title>Paaage</title>
+                <meta name="grover-margin-top" content="totes-invalid" />
+              </head>
+              <body>
+                <h1>Hey there</h1>
+              </body>
+            </html>
+          HTML
+        end
+
+        it do
+          expect do
+            to_pdf
+          end.to raise_error Schmooze::JavaScript::Error, /Failed to parse parameter value: totes-invalid/
+        end
       end
 
       context 'when options include header and footer enabled' do

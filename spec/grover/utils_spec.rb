@@ -85,6 +85,52 @@ describe Grover::Utils do
     end
   end
 
+  describe '.deep_assign' do
+    subject(:deep_assign) { described_class.deep_assign(hash, keys, value) }
+
+    let(:value) { 'baz' }
+
+    context 'when hash is empty' do
+      let(:hash) { {} }
+      let(:keys) { ['foo'] }
+
+      it do
+        deep_assign
+        expect(hash).to eq('foo' => 'baz')
+      end
+    end
+
+    context 'when hash already contains matching key' do
+      let(:hash) { { 'foo' => 'bar' } }
+      let(:keys) { ['foo'] }
+
+      it do
+        deep_assign
+        expect(hash).to eq('foo' => 'baz')
+      end
+    end
+
+    context 'with multiple keys provided' do
+      let(:hash) { {} }
+      let(:keys) { %w[foo bar] }
+
+      it do
+        deep_assign
+        expect(hash).to eq('foo' => { 'bar' => 'baz' })
+      end
+    end
+
+    context 'with symbol keys' do
+      let(:hash) { {} }
+      let(:keys) { %i[foo bar] }
+
+      it do
+        deep_assign
+        expect(hash).to eq(foo: { bar: 'baz' })
+      end
+    end
+  end
+
   describe '.normalize_object' do
     subject(:normalize_object) { described_class.normalize_object(object) }
 

@@ -49,6 +49,14 @@ class Grover
   end
   private_constant :Processor
 
+  DISPLAY_URL_PLACEHOLDER = '{{display_url}}'.freeze
+
+  DEFAULT_HEADER_TEMPLATE = "<div class='date text left'></div><div class='title text center'></div>".freeze
+  DEFAULT_FOOTER_TEMPLATE = Utils.strip_heredoc(<<-HTML).freeze
+    <div class='text left grow'>#{DISPLAY_URL_PLACEHOLDER}</div>
+    <div class='text right'><span class='pageNumber'></span>/<span class='totalPages'></span></div>
+  HTML
+
   #
   # @param [String] url URL of the page to convert
   # @param [Hash] options Optional parameters to pass to PDF processor
@@ -120,14 +128,28 @@ class Grover
 
   def normalized_options(path)
     options = Utils.normalize_object options_with_template_fix
+    options.merge! meta_options unless url_source?
     options['path'] = path if path
     options
   end
 
-  DISPLAY_URL_PLACEHOLDER = '{{display_url}}'.freeze
+  #
+  # Extract out options from meta tags in the source - based on code from PDFKit project
+  #
+  def meta_options
+    meta_opts = {}
 
-  DEFAULT_FOOTER_TEMPLATE = Utils.strip_heredoc(<<-HTML).freeze
-    <div class='text left grow'>#{DISPLAY_URL_PLACEHOLDER}</div>
-    <div class='text right'><span class='pageNumber'></span>/<span class='totalPages'></span></div>
-  HTML
+    @url.scan(/<meta [^>]*>/) do |meta|
+      tag_name = meta[/name=["']#{Grover.configuration.meta_tag_prefix}([a-z_-]+)["']/, 1]
+      next if tag_name.nil?
+
+      Utils.deep_assign meta_opts, tag_name.split('-'), meta[/content=["']([^"']+)["']/, 1]
+    end
+
+    meta_opts
+  end
+
+  def url_source?
+    @url.match(/^http/i)
+  end
 end
