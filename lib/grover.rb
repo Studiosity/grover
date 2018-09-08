@@ -161,16 +161,18 @@ class Grover
   def meta_options
     meta_opts = {}
 
-    Nokogiri::HTML(@url).xpath('//meta').each do |meta|
-      next unless meta.key? 'name'
-
-      tag_name = meta['name'][/#{Grover.configuration.meta_tag_prefix}([a-z_-]+)/, 1]
-      next if tag_name.nil?
+    meta_tags.each do |meta|
+      tag_name = meta['name'] && meta['name'][/#{Grover.configuration.meta_tag_prefix}([a-z_-]+)/, 1]
+      next unless tag_name
 
       Utils.deep_assign meta_opts, tag_name.split('-'), meta['content']
     end
 
     meta_opts
+  end
+
+  def meta_tags
+    Nokogiri::HTML(@url).xpath('//meta')
   end
 
   def url_source?
