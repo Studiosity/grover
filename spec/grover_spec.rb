@@ -107,7 +107,7 @@ describe Grover do
               top: '1in',
               bottom: '1in'
             },
-            header_template: "#{large_text}Excellente"
+            header_template: "#{large_text}<div class='text'>Excellente</div>"
           }
         end
 
@@ -123,7 +123,7 @@ describe Grover do
               top: '1in',
               bottom: '1in'
             },
-            header_template: "#{large_text}abc{{display_url}}def"
+            header_template: "#{large_text}<div class='text'>abc{{display_url}}def</div>"
           }
         end
 
@@ -143,7 +143,7 @@ describe Grover do
               top: '1in',
               bottom: '1in'
             },
-            footer_template: "#{large_text}great {{display_url}} page"
+            footer_template: "#{large_text}<div class='text'>great {{display_url}} page</div>"
           }
         end
 
