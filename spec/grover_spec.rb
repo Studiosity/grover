@@ -33,7 +33,8 @@ describe Grover do
     let(:pdf_reader) { PDF::Reader.new pdf_io }
     let(:pdf_io) { StringIO.new to_pdf }
     let(:pdf_text_content) { Grover::Utils.squish(pdf_reader.pages.first.text) }
-    let(:large_text) { '<style>.text { font-size: 18px; }</style>' }
+    let(:large_text) { '<style>.text { font-size: 14px; }</style>' }
+    let(:default_header) { "<div class='date text left'></div><div class='title text center'></div>" }
 
     context 'when passing through a valid URL' do
       let(:url_or_html) { 'https://www.google.com' }
@@ -55,11 +56,10 @@ describe Grover do
 
     context 'when passing through html' do
       let(:url_or_html) { '<html><body><h1>Hey there</h1></body></html>' }
-      let(:nbsp) { [160].pack('U*') } # &nbsp;
 
       it { is_expected.to start_with "%PDF-1.4\n" }
       it { expect(pdf_reader.page_count).to eq 1 }
-      it { expect(pdf_reader.pages.first.text).to eq "Hey#{nbsp}there" }
+      it { expect(pdf_text_content).to eq 'Hey there' }
     end
 
     context 'when passing through options to Grover' do
@@ -83,13 +83,18 @@ describe Grover do
         let(:options) do
           {
             display_header_footer: true,
-            footer_template: large_text
+            display_url: 'http://www.example.net/bar',
+            margin: {
+              top: '1in',
+              bottom: '1in'
+            },
+            header_template: "#{large_text}#{default_header}"
           }
         end
 
         it do
           date = Date.today.strftime '%-m/%-d/%Y'
-          expect(pdf_text_content).to eq "Hey there #{date} Paaage"
+          expect(pdf_text_content).to eq "#{date} Paaage Hey there http://www.example.net/bar 1/1"
         end
       end
 
@@ -97,12 +102,16 @@ describe Grover do
         let(:options) do
           {
             display_header_footer: true,
-            header_template: 'Excellente',
-            footer_template: large_text
+            display_url: 'http://www.examples.net/foo/baz',
+            margin: {
+              top: '1in',
+              bottom: '1in'
+            },
+            header_template: "#{large_text}<div class='text'>Excellente</div>"
           }
         end
 
-        it { expect(pdf_text_content).to eq 'Excellente Hey there' }
+        it { expect(pdf_text_content).to eq 'Excellente Hey there http://www.examples.net/foo/baz 1/1' }
       end
 
       context 'when header template includes the display url marker' do
@@ -110,14 +119,17 @@ describe Grover do
           {
             display_header_footer: true,
             display_url: 'http://www.examples.net/foo/bar',
-            header_template: 'abc{{display_url}}def',
-            footer_template: large_text
+            margin: {
+              top: '1in',
+              bottom: '1in'
+            },
+            header_template: "#{large_text}<div class='text'>abc{{display_url}}def</div>"
           }
         end
 
         it do
           expect(pdf_text_content).to(
-            eq('abchttp://www.examples.net/foo/bardef Hey there')
+            eq('abchttp://www.examples.net/foo/bardef Hey there http://www.examples.net/foo/bar 1/1')
           )
         end
       end
@@ -127,12 +139,18 @@ describe Grover do
           {
             display_header_footer: true,
             display_url: 'http://www.examples.net/foo/bar',
-            footer_template: 'great {{display_url}} page',
-            header_template: large_text
+            margin: {
+              top: '1in',
+              bottom: '1in'
+            },
+            footer_template: "#{large_text}<div class='text'>great {{display_url}} page</div>"
           }
         end
 
-        it { expect(pdf_text_content).to eq 'Hey there great http://www.examples.net/foo/bar page' }
+        it do
+          date = Date.today.strftime '%-m/%-d/%Y'
+          expect(pdf_text_content).to eq "#{date} Paaage Hey there great http://www.examples.net/foo/bar page"
+        end
       end
     end
 
