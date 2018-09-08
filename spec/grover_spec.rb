@@ -33,7 +33,7 @@ describe Grover do
     let(:pdf_reader) { PDF::Reader.new pdf_io }
     let(:pdf_io) { StringIO.new to_pdf }
     let(:pdf_text_content) { Grover::Utils.squish(pdf_reader.pages.first.text) }
-    let(:large_text) { '<style>.text { font-size: 12px; }</style>' }
+    let(:large_text) { '<style>.text { font-size: 14px; }</style>' }
 
     context 'when passing through a valid URL' do
       let(:url_or_html) { 'https://www.google.com' }
@@ -101,6 +101,10 @@ describe Grover do
           {
             display_header_footer: true,
             display_url: 'http://www.examples.net/foo/baz',
+            margin: {
+              top: '4cm',
+              bottom: '4cm'
+            },
             header_template: "#{large_text}Excellente"
           }
         end
@@ -113,6 +117,10 @@ describe Grover do
           {
             display_header_footer: true,
             display_url: 'http://www.examples.net/foo/bar',
+            margin: {
+              top: '4cm',
+              bottom: '4cm'
+            },
             header_template: "#{large_text}abc{{display_url}}def"
           }
         end
