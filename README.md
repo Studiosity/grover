@@ -26,7 +26,7 @@ npm install puppeteer
 ## Usage
 ```ruby
 # Grover.new accepts a URL and optional parameters for `puppeteer`
-grover = Grover.new('https://google.com', page_size: 'A4')
+grover = Grover.new('https://google.com', format: 'A4')
 
 # Get an inline PDF
 pdf = grover.to_pdf
