@@ -98,6 +98,61 @@ describe Grover do
         it { expect(pdf_reader.pages.first.attributes).to include(MediaBox: [0, 0, 841.91998, 1188]) }
       end
 
+      context 'when the page contains meta options with escaped content' do
+        let(:options) do
+          {
+            display_header_footer: true,
+            margin: {
+              top: '1in',
+              bottom: '1in'
+            },
+            header_template: large_text
+          }
+        end
+        let(:url_or_html) do
+          Grover::Utils.squish(<<-HTML)
+            <html>
+              <head>
+                <meta name="grover-footer_template"
+                      content="<div class='text'>Footer with &quot;quotes&quot; in it</div>" />
+              </head>
+              <body>
+                <h1>Hey there</h1>
+              </body>
+            </html>
+          HTML
+        end
+
+        it { expect(pdf_text_content).to eq 'Hey there Footer with "quotes" in it' }
+      end
+
+      context 'when the page contains meta options with boolean content' do
+        let(:options) do
+          {
+            margin: {
+              top: '1in',
+              bottom: '1in'
+            },
+            display_header_footer: true,
+            header_template: 'We dont expect to see this...'
+          }
+        end
+        let(:url_or_html) do
+          Grover::Utils.squish(<<-HTML)
+            <html>
+              <head>
+                <meta name="grover-display_header_footer" content='false' />
+              </head>
+              <body>
+                <h1>Hey there</h1>
+              </body>
+            </html>
+          HTML
+        end
+
+        it { expect(pdf_text_content).to eq 'Hey there' }
+      end
+
       context 'when the page contains invalid meta options' do
         let(:options) { {} }
         let(:url_or_html) do
