@@ -127,6 +127,7 @@ class Grover
 
       %i[header_template footer_template].each do |key|
         next unless options[key].is_a? String
+
         options[key] = options[key].gsub(DISPLAY_URL_PLACEHOLDER, display_url)
       end
     end
@@ -144,6 +145,7 @@ class Grover
   def fix_boolean_options!(options)
     %w[displayHeaderFooter printBackground landscape preferCSSPageSize].each do |opt|
       next unless options.key? opt
+
       options[opt] = !FALSE_VALUES.include?(options[opt])
     end
   end
@@ -152,6 +154,7 @@ class Grover
 
   def fix_numeric_options!(options)
     return unless options.key? 'scale'
+
     options['scale'] = options['scale'].to_f
   end
 

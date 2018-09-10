@@ -83,6 +83,7 @@ class Grover
 
     def path_without_extension
       return @path_without_extension if defined? @path_without_extension
+
       path = @request.path.sub(PDF_REGEX, '')
       @path_without_extension = path.sub(@request.script_name, '')
     end
