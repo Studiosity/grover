@@ -73,6 +73,7 @@ describe Grover::Middleware do
           get 'http://www.example.org/test.pdf'
           expect(@env['PATH_INFO']).to eq '/test'
           expect(@env['REQUEST_URI']).to eq '/test'
+          expect(@env['Rack-Middleware-Grover']).to eq 'true'
         end
       end
 
@@ -81,6 +82,7 @@ describe Grover::Middleware do
           get 'http://www.example.org/test.html'
           expect(@env['PATH_INFO']).to eq '/test.html'
           expect(@env['REQUEST_URI']).to be_nil
+          expect(@env['Rack-Middleware-Grover']).to be_nil
         end
       end
       # rubocop:enable RSpec/InstanceVariable
@@ -111,7 +113,7 @@ describe Grover::Middleware do
         it 'returns response as PDF' do
           get 'http://www.example.org/test.pdf'
           expect(last_response.headers['Content-Type']).to eq 'application/pdf'
-          expect(last_response.body.bytesize).to eq(Grover.new('Rackalicious').to_pdf.bytesize)
+          expect(last_response.body.bytesize).to eq Grover.new('Rackalicious').to_pdf.bytesize
         end
       end
 
@@ -121,7 +123,7 @@ describe Grover::Middleware do
         it 'returns response as PDF' do
           get 'http://www.example.org/test.pdf'
           expect(last_response.headers['Content-Type']).to eq 'application/pdf'
-          expect(last_response.body.bytesize).to eq(Grover.new('Part 1Part 2').to_pdf.bytesize)
+          expect(last_response.body.bytesize).to eq Grover.new('Part 1Part 2').to_pdf.bytesize
         end
       end
     end

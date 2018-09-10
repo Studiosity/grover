@@ -66,6 +66,7 @@ class Grover
       env['PATH_INFO'] = path_without_extension
       env['REQUEST_URI'] = path_without_extension
       env['HTTP_ACCEPT'] = concat(env['HTTP_ACCEPT'], Rack::Mime.mime_type('.html'))
+      env['Rack-Middleware-Grover'] = 'true'
     end
 
     def concat(accepts, type)
