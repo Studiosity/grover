@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.version     = Grover::VERSION
   spec.authors     = ['Andrew Bromwich']
   spec.email       = %w[abromwich@studiosity.com]
-  spec.description = 'A Ruby gem to transform HTML into PDFs using Google Puppeteer/Chromium'
+  spec.description = 'Transform HTML into PDFs using Google Puppeteer/Chromium'
   spec.summary     = 'A Ruby gem to transform HTML into PDFs wrapper the NodeJS Google Puppeteer driver for Chromium'
   spec.homepage    = 'http://github.com/Studiosity/grover'
   spec.license     = 'MIT'
@@ -18,7 +18,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^spec/})
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'nokogiri', '~> 1.8.4'
+  spec.add_dependency 'nokogiri', '~> 1.0'
   spec.add_dependency 'schmooze', '~> 0.2'
 
   spec.add_development_dependency 'bundler', '~> 1.3'
