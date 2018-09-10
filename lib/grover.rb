@@ -114,48 +114,10 @@ class Grover
   end
 
   def base_options
-    options = @options.dup
+    options = {}
+    @options.each { |k, v| options[k.to_s] = v }
     options.merge! meta_options unless url_source?
     options
-  end
-
-  def options_with_template_fix
-    options = base_options
-    display_url = options.delete :display_url
-    if display_url
-      options[:footer_template] ||= DEFAULT_FOOTER_TEMPLATE
-
-      %i[header_template footer_template].each do |key|
-        next unless options[key].is_a? String
-
-        options[key] = options[key].gsub(DISPLAY_URL_PLACEHOLDER, display_url)
-      end
-    end
-    options
-  end
-
-  def normalized_options(path)
-    options = Utils.normalize_object options_with_template_fix
-    fix_boolean_options! options
-    fix_numeric_options! options
-    options['path'] = path if path
-    options
-  end
-
-  def fix_boolean_options!(options)
-    %w[displayHeaderFooter printBackground landscape preferCSSPageSize].each do |opt|
-      next unless options.key? opt
-
-      options[opt] = !FALSE_VALUES.include?(options[opt])
-    end
-  end
-
-  FALSE_VALUES = [nil, false, 0, '0', 'f', 'F', 'false', 'FALSE', 'off', 'OFF'].freeze
-
-  def fix_numeric_options!(options)
-    return unless options.key? 'scale'
-
-    options['scale'] = options['scale'].to_f
   end
 
   #
@@ -180,5 +142,45 @@ class Grover
 
   def url_source?
     @url.match(/^http/i)
+  end
+
+  def normalized_options(path)
+    options = base_options
+
+    fix_templates! options
+    fix_boolean_options! options
+    fix_numeric_options! options
+    options['path'] = path if path
+
+    Utils.normalize_object options
+  end
+
+  def fix_templates!(options)
+    display_url = options.delete 'display_url'
+    return unless display_url
+
+    options['footer_template'] ||= DEFAULT_FOOTER_TEMPLATE
+
+    %w[header_template footer_template].each do |key|
+      next unless options[key].is_a? String
+
+      options[key] = options[key].gsub(DISPLAY_URL_PLACEHOLDER, display_url)
+    end
+  end
+
+  def fix_boolean_options!(options)
+    %w[display_header_footer print_background landscape prefer_css_page_size].each do |opt|
+      next unless options.key? opt
+
+      options[opt] = !FALSE_VALUES.include?(options[opt])
+    end
+  end
+
+  FALSE_VALUES = [nil, false, 0, '0', 'f', 'F', 'false', 'FALSE', 'off', 'OFF'].freeze
+
+  def fix_numeric_options!(options)
+    return unless options.key? 'scale'
+
+    options['scale'] = options['scale'].to_f
   end
 end

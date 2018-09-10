@@ -102,6 +102,7 @@ describe Grover do
         let(:options) do
           {
             display_header_footer: true,
+            display_url: 'http://www.example.net/bar',
             margin: {
               top: '1in',
               bottom: '1in'
