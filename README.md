@@ -8,6 +8,7 @@
 A Ruby gem to transform HTML into PDFs using [Google Puppeteer](https://github.com/GoogleChrome/puppeteer)
 and [Chromium](https://www.chromium.org/Home).
 
+![Grover](/Grover.jpg "Grover")
 
 ## Installation
 
