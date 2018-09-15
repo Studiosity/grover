@@ -1,12 +1,16 @@
 # Changelog
 
+## Unreleased
+### Added
+- Support for front/back cover pages for middleware (combined with the original request PDF)
+
 ## [0.4.4](releases/tag/v0.4.4) - 2018-09-10
 ### Fixed
 - Bug with options containing mixed symbol/string keys (and how they merge with the parsed meta options)
 
 ## [0.4.3](releases/tag/v0.4.3) - 2018-09-10
 ### Added
-- Pass through flag to indicate to downstream middleware/app that Grover has interacted with the environment 
+- Pass through flag to indicate to upstream middleware/app that Grover has interacted with the environment 
 
 ## [0.4.2](releases/tag/v0.4.2) - 2018-09-09
 ### Fixed

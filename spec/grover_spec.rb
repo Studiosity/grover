@@ -1,6 +1,10 @@
 require 'spec_helper'
 
 describe Grover do
+  let(:grover) { described_class.new(url_or_html, options) }
+  let(:url_or_html) { 'http://google.com' }
+  let(:options) { {} }
+
   describe '.new' do
     subject(:new) { described_class.new('http://google.com') }
 
@@ -28,7 +32,7 @@ describe Grover do
   end
 
   describe '#to_pdf' do
-    subject(:to_pdf) { described_class.new(url_or_html).to_pdf }
+    subject(:to_pdf) { grover.to_pdf }
 
     let(:pdf_reader) { PDF::Reader.new pdf_io }
     let(:pdf_io) { StringIO.new to_pdf }
@@ -63,7 +67,7 @@ describe Grover do
     end
 
     context 'when passing through options to Grover' do
-      subject(:to_pdf) { described_class.new(url_or_html, options).to_pdf }
+      subject(:to_pdf) { grover.to_pdf }
 
       let(:url_or_html) { '<html><head><title>Paaage</title></head><body><h1>Hey there</h1></body></html>' }
 
@@ -80,7 +84,6 @@ describe Grover do
       end
 
       context 'when the page contains valid meta options' do
-        let(:options) { {} }
         let(:url_or_html) do
           Grover::Utils.squish(<<-HTML)
             <html>
@@ -155,7 +158,6 @@ describe Grover do
       end
 
       context 'when the page contains invalid meta options' do
-        let(:options) { {} }
         let(:url_or_html) do
           Grover::Utils.squish(<<-HTML)
             <html>
@@ -296,10 +298,116 @@ describe Grover do
     end
   end
 
+  describe '#front_cover_path' do
+    subject(:front_cover_path) { grover.front_cover_path }
+
+    it { is_expected.to be_nil }
+
+    context 'when option specified in global configuration' do
+      before { allow(described_class.configuration).to receive(:options).and_return(front_cover_path: '/foo/bar') }
+
+      it { is_expected.to eq '/foo/bar' }
+    end
+
+    context 'when option specified in initialiser options' do
+      let(:options) { { front_cover_path: '/baz' } }
+
+      it { is_expected.to eq '/baz' }
+    end
+
+    context 'when passed through via meta tag' do
+      let(:url_or_html) do
+        Grover::Utils.squish(<<-HTML)
+          <html>
+            <head>
+              <title>Paaage</title>
+              <meta name="grover-front_cover_path" content="/meta/path" />
+            </head>
+            <body>
+              <h1>Hey there</h1>
+            </body>
+          </html>
+        HTML
+      end
+
+      it { is_expected.to eq '/meta/path' }
+    end
+  end
+
+  describe '#back_cover_path' do
+    subject(:back_cover_path) { grover.back_cover_path }
+
+    it { is_expected.to be_nil }
+
+    context 'when option specified in global configuration' do
+      before { allow(described_class.configuration).to receive(:options).and_return(back_cover_path: '/foo/bar') }
+
+      it { is_expected.to eq '/foo/bar' }
+    end
+
+    context 'when option specified in initialiser options' do
+      let(:options) { { back_cover_path: '/baz' } }
+
+      it { is_expected.to eq '/baz' }
+    end
+
+    context 'when passed through via meta tag' do
+      let(:url_or_html) do
+        Grover::Utils.squish(<<-HTML)
+          <html>
+            <head>
+              <title>Paaage</title>
+              <meta name="grover-back_cover_path" content="/meta/path" />
+            </head>
+            <body>
+              <h1>Hey there</h1>
+            </body>
+          </html>
+        HTML
+      end
+
+      it { is_expected.to eq '/meta/path' }
+    end
+  end
+
+  describe '#show_front_cover?' do
+    subject(:show_front_cover?) { grover.show_front_cover? }
+
+    it { is_expected.to eq false }
+
+    context 'when option specified' do
+      let(:options) { { front_cover_path: '/baz' } }
+
+      it { is_expected.to eq true }
+    end
+
+    context 'when the option isnt a path' do
+      let(:options) { { front_cover_path: 'http://example.com/baz' } }
+
+      it { is_expected.to eq false }
+    end
+  end
+
+  describe '#show_back_cover?' do
+    subject(:show_back_cover?) { grover.show_back_cover? }
+
+    it { is_expected.to eq false }
+
+    context 'when option specified' do
+      let(:options) { { back_cover_path: '/baz' } }
+
+      it { is_expected.to eq true }
+    end
+
+    context 'when the option isnt a path' do
+      let(:options) { { back_cover_path: 'http://example.com/baz' } }
+
+      it { is_expected.to eq false }
+    end
+  end
+
   describe '#inspect' do
     subject(:inspect) { grover.inspect }
-
-    let(:grover) { described_class.new('http://google.com') }
 
     it { is_expected.to eq "#<Grover:0x#{grover.object_id} @url=\"http://google.com\">" }
   end

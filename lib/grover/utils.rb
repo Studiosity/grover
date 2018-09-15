@@ -63,6 +63,9 @@ class Grover
       end
     end
 
+    #
+    # Deep transform the keys in the hash to strings
+    #
     def self.deep_stringify_keys(hash)
       deep_transform_keys_in_object hash, &:to_s
     end
@@ -70,15 +73,13 @@ class Grover
     #
     # Deep merge a hash with another hash
     #
-    # Copied from active support
+    # Based on active support
     # @see active_support/core_ext/hash/deep_merge.rb
     #
-    def self.deep_merge!(hash, other_hash, &block)
-      hash.merge!(other_hash) do |key, this_val, other_val|
+    def self.deep_merge!(hash, other_hash)
+      hash.merge!(other_hash) do |_, this_val, other_val|
         if this_val.is_a?(Hash) && other_val.is_a?(Hash)
-          deep_merge!(this_val.dup, other_val, &block)
-        elsif block_given?
-          block.call(key, this_val, other_val)
+          deep_merge! this_val.dup, other_val
         else
           other_val
         end

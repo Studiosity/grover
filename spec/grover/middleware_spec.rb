@@ -4,17 +4,19 @@ describe Grover::Middleware do
   # rubocop:disable RSpec/MultipleExpectations
 
   subject(:mock_app) do
-    upstream = lambda do |env|
+    builder = Rack::Builder.new
+    builder.use described_class
+    builder.run upstream
+    builder.to_app
+  end
+
+  let(:upstream) do
+    lambda do |env|
       @env = env
       response_size = 0
       response.each { |part| response_size += part.length }
       [200, headers.merge('Content-Length' => response_size.to_s), response]
     end
-
-    builder = Rack::Builder.new
-    builder.use described_class
-    builder.run upstream
-    builder.to_app
   end
 
   let(:app) { Rack::Lint.new(subject) }
@@ -152,6 +154,77 @@ describe Grover::Middleware do
         expect(grover).to receive(:to_pdf).with(no_args).and_return 'A converted PDF'
         get 'http://www.example.org/test.pdf'
         expect(last_response.body).to eq 'A converted PDF'
+      end
+    end
+
+    describe 'front and back cover pages' do
+      let(:pdf_reader) { PDF::Reader.new pdf_io }
+      let(:pdf_io) { StringIO.new last_response.body }
+
+      before { get 'http://www.example.org/test.pdf' }
+
+      context 'when the upstream response includes front cover page configuration' do
+        let(:upstream) do
+          lambda do |env|
+            @env = env
+            response =
+              if env['PATH_INFO'] == '/front/page/meta'
+                "This is the cover page - #{env['QUERY_STRING']}"
+              else
+                Grover::Utils.squish(<<-HTML)
+                  <html>
+                    <head>
+                      <title>Paaage</title>
+                      <meta name="grover-front_cover_path" content="/front/page/meta?and-a-query=baz" />
+                    </head>
+                    <body>
+                      <h1>Hey there</h1>
+                    </body>
+                  </html>
+                HTML
+              end
+
+            [200, headers.merge('Content-Length' => response.length.to_s), [response]]
+          end
+        end
+
+        it { expect(pdf_reader.page_count).to eq 2 }
+        it do
+          expect(Grover::Utils.squish(pdf_reader.pages[0].text)).to eq 'This is the cover page ­ and­a­query=baz'
+        end
+        it { expect(Grover::Utils.squish(pdf_reader.pages[1].text)).to eq 'Hey there' }
+      end
+
+      context 'when the upstream response includes back cover page configuration' do
+        let(:upstream) do
+          lambda do |env|
+            @env = env
+            response =
+              if env['PATH_INFO'] == '/back/page/meta'
+                "This is the back page - #{env['QUERY_STRING']}"
+              else
+                Grover::Utils.squish(<<-HTML)
+                  <html>
+                    <head>
+                      <title>Paaage</title>
+                      <meta name="grover-back_cover_path" content="/back/page/meta?another-query=foo" />
+                    </head>
+                    <body>
+                      <h1>Hey there</h1>
+                    </body>
+                  </html>
+                HTML
+              end
+
+            [200, headers.merge('Content-Length' => response.length.to_s), [response]]
+          end
+        end
+
+        it { expect(pdf_reader.page_count).to eq 2 }
+        it { expect(Grover::Utils.squish(pdf_reader.pages[0].text)).to eq 'Hey there' }
+        it do
+          expect(Grover::Utils.squish(pdf_reader.pages[1].text)).to eq 'This is the back page ­ another­query=foo'
+        end
       end
     end
 

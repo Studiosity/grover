@@ -91,17 +91,50 @@ any page on your site by appending .pdf to the URL.
 **Non-Rails Rack apps**
 ```ruby
 # in config.ru
-require 'pdfkit'
+require 'grover'
 use Grover::Middleware
 ```
 
 **Rails apps**
 ```ruby
 # in application.rb
-require 'pdfkit'
+require 'grover'
 config.middleware.use Grover::Middleware
 ```
 
+
+## Cover pages
+Since the header/footer for Puppeteer is configured globally, displaying of front/back cover
+pages (with potentially different headers/footers etc) is not possible.
+
+To get around this, Grover's middleware allows you to specify relative paths for the cover page contents
+via `front_cover_path` and `back_cover_path` either via the global configuration, or via meta tags.
+These paths (with query parameters) are then requested from the upstream app.
+
+The cover pages are converted to PDF in isolation, and then combined together with the original PDF response,
+before being returned back down through the Rack stack. 
+ 
+_N.B_ To simplify things, the same request method and body are used for the cover page requests.
+
+```ruby
+# config/initializers/grover.rb
+Grover.configure do |config|
+  config.options = {
+    front_cover_path: '/some/global/cover/page?foo=bar'
+  }
+end
+```
+
+Or via the meta tags in the original response:
+```HTML
+<html>
+  <head>
+    <meta name="grover-back_cover_path" content="/back/cover/page?bar=baz" />
+  </head>
+  ...
+</html>    
+```
+ 
 
 ## Contributing
 

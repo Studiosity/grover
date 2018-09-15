@@ -69,10 +69,10 @@ class Grover
       pdf.to_pdf
     end
 
-    def fetch_cover_pdf(url)
+    def fetch_cover_pdf(path)
       temp_env = env.deep_dup
-      temp_env['PATH_INFO'], temp_env['QUERY_STRING'] = url.split '?'
-      _, _, response = @app.call(env)
+      temp_env['PATH_INFO'], temp_env['QUERY_STRING'] = path.split '?'
+      _, _, response = @app.call(temp_env)
       response.close if response.respond_to? :close
       grover = create_grover_for_response response
       CombinePDF.parse grover.to_pdf
