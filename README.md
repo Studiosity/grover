@@ -26,7 +26,7 @@ npm install puppeteer
 
 ## Usage
 ```ruby
-# Grover.new accepts a URL and optional parameters for `puppeteer`
+# Grover.new accepts a URL or inline HTML and optional parameters for Puppeteer
 grover = Grover.new('https://google.com', format: 'A4')
 
 # Get an inline PDF
@@ -41,7 +41,7 @@ Grover.new('<html><head><meta name="grover-margin-top" content="10px"')
 
 
 ## Configuration
-Grover can be configured to adjust the layout the resulting PDF. 
+Grover can be configured to adjust the layout of the resulting PDF. 
 For available options, see https://github.com/GoogleChrome/puppeteer/blob/v1.7.0/docs/api.md#pagepdfoptions
 
 Also available is the `emulate_media` option.
