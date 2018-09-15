@@ -18,3 +18,7 @@ RSpec/MessageSpies:
 
 RSpec/NestedGroups:
   Max: 4
+
+Style/Documentation:
+  Exclude:
+    - "lib/active_support_ext/**/*.rb"

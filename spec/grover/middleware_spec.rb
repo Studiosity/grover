@@ -141,7 +141,7 @@ describe Grover::Middleware do
     end
 
     describe 'pdf conversion' do
-      let(:grover) { instance_double Grover }
+      let(:grover) { instance_double Grover, show_front_cover?: false, show_back_cover?: false }
 
       it 'passes through the request URL (sans extension) to Grover' do
         expect(Grover).to(

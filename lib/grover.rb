@@ -1,12 +1,14 @@
 require 'grover/version'
 
 require 'grover/utils'
+require 'active_support_ext/object/deep_dup'
+
 require 'grover/html_preprocessor'
 require 'grover/middleware'
 require 'grover/configuration'
 
-require 'schmooze'
 require 'nokogiri'
+require 'schmooze'
 
 #
 # Grover interface for converting HTML to PDF
@@ -58,6 +60,8 @@ class Grover
     <div class='text right'><span class='pageNumber'></span>/<span class='totalPages'></span></div>
   HTML
 
+  attr_reader :front_cover_path, :back_cover_path
+
   #
   # @param [String] url URL of the page to convert
   # @param [Hash] options Optional parameters to pass to PDF processor
@@ -65,8 +69,11 @@ class Grover
   #
   def initialize(url, options = {})
     @url = url
-    @options = Grover.configuration.options.merge options
-    @root_path = @options.delete :root_path
+    @options = combine_options options
+
+    @root_path = @options.delete 'root_path'
+    @front_cover_path = @options.delete 'front_cover_path'
+    @back_cover_path = @options.delete 'back_cover_path'
   end
 
   #
@@ -76,8 +83,28 @@ class Grover
   # @return [String] The resulting PDF data
   #
   def to_pdf(path = nil)
-    result = processor.convert_pdf @url, normalized_options(path)
+    normalized_options = Utils.normalize_object @options
+    normalized_options['path'] = path if path.is_a? ::String
+    result = processor.convert_pdf @url, normalized_options
     result['data'].pack('c*')
+  end
+
+  #
+  # Returns whether a front cover (request) path has been specified in the options
+  #
+  # @return [Boolean] Front cover path is configured
+  #
+  def show_front_cover?
+    front_cover_path.is_a?(::String) && front_cover_path.start_with?('/')
+  end
+
+  #
+  # Returns whether a back cover (request) path has been specified in the options
+  #
+  # @return [Boolean] Back cover path is configured
+  #
+  def show_back_cover?
+    back_cover_path.is_a?(::String) && back_cover_path.start_with?('/')
   end
 
   #
@@ -113,11 +140,16 @@ class Grover
     Processor.new(root_path)
   end
 
-  def base_options
-    options = {}
-    @options.each { |k, v| options[k.to_s] = v }
-    options.merge! meta_options unless url_source?
-    options
+  def combine_options(options)
+    combined = Utils.deep_stringify_keys Grover.configuration.options
+    Utils.deep_merge! combined, Utils.deep_stringify_keys(options)
+    Utils.deep_merge! combined, meta_options unless url_source?
+
+    fix_templates! combined
+    fix_boolean_options! combined
+    fix_numeric_options! combined
+
+    combined
   end
 
   #
@@ -144,17 +176,6 @@ class Grover
     @url.match(/^http/i)
   end
 
-  def normalized_options(path)
-    options = base_options
-
-    fix_templates! options
-    fix_boolean_options! options
-    fix_numeric_options! options
-    options['path'] = path if path
-
-    Utils.normalize_object options
-  end
-
   def fix_templates!(options)
     display_url = options.delete 'display_url'
     return unless display_url
@@ -162,7 +183,7 @@ class Grover
     options['footer_template'] ||= DEFAULT_FOOTER_TEMPLATE
 
     %w[header_template footer_template].each do |key|
-      next unless options[key].is_a? String
+      next unless options[key].is_a? ::String
 
       options[key] = options[key].gsub(DISPLAY_URL_PLACEHOLDER, display_url)
     end

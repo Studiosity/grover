@@ -15,14 +15,14 @@ describe Grover do
 
       it { expect(new.instance_variable_get('@url')).to eq 'http://happyfuntimes.com' }
       it { expect(new.instance_variable_get('@root_path')).to be_nil }
-      it { expect(new.instance_variable_get('@options')).to eq(page_size: 'A4') }
+      it { expect(new.instance_variable_get('@options')).to eq('page_size' => 'A4') }
 
       context 'with root path specified' do
         let(:options) { { page_size: 'A4', root_path: 'foo/bar/baz' } }
 
         it { expect(new.instance_variable_get('@url')).to eq 'http://happyfuntimes.com' }
         it { expect(new.instance_variable_get('@root_path')).to eq 'foo/bar/baz' }
-        it { expect(new.instance_variable_get('@options')).to eq(page_size: 'A4') }
+        it { expect(new.instance_variable_get('@options')).to eq('page_size' => 'A4') }
       end
     end
   end
