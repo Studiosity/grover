@@ -131,6 +131,155 @@ describe Grover::Utils do
     end
   end
 
+  describe '.deep_transform_keys_in_object' do
+    subject(:deep_transform_keys_in_object) do
+      described_class.deep_transform_keys_in_object(hash) { |key| key.to_s.upcase }
+    end
+
+    context 'when hash is empty' do
+      let(:hash) { {} }
+
+      it { is_expected.to eq({}) }
+    end
+
+    context 'when hash has basic keys' do
+      let(:hash) { { foo: 'bar' } }
+
+      it { is_expected.to eq('FOO' => 'bar') }
+
+      it 'doesnt modify the original hash' do
+        deep_transform_keys_in_object
+        expect(hash).to eq(foo: 'bar')
+      end
+    end
+
+    context 'when hash contains an array of hashes' do
+      let(:hash) { { foo: [{ bar: 'baz' }] } }
+
+      it { is_expected.to eq('FOO' => [{ 'BAR' => 'baz' }]) }
+
+      it 'doesnt modify the original hash' do
+        deep_transform_keys_in_object
+        expect(hash).to eq(foo: [{ bar: 'baz' }])
+      end
+    end
+  end
+
+  describe '.deep_stringify_keys' do
+    subject(:deep_stringify_keys) { described_class.deep_stringify_keys(hash) }
+
+    context 'when hash is empty' do
+      let(:hash) { {} }
+
+      it { is_expected.to eq({}) }
+    end
+
+    context 'when hash has keys' do
+      let(:hash) { { foo: 'bar' } }
+
+      it { is_expected.to eq('foo' => 'bar') }
+
+      it 'doesnt modify the original hash' do
+        deep_stringify_keys
+        expect(hash).to eq(foo: 'bar')
+      end
+    end
+  end
+
+  describe '.deep_merge!' do
+    subject(:deep_merge!) { described_class.deep_merge! hash1, hash2 }
+
+    context 'when both hashes are empty' do
+      let(:hash1) { {} }
+      let(:hash2) { {} }
+
+      it { is_expected.to eq({}) }
+      it do
+        deep_merge!
+        expect(hash1).to eq({})
+      end
+      it do
+        deep_merge!
+        expect(hash2).to eq({})
+      end
+    end
+
+    context 'when hash1 has some keys' do
+      let(:hash1) { { foo: 'bar' } }
+      let(:hash2) { {} }
+
+      it { is_expected.to eq(foo: 'bar') }
+      it do
+        deep_merge!
+        expect(hash1).to eq(foo: 'bar')
+      end
+      it do
+        deep_merge!
+        expect(hash2).to eq({})
+      end
+    end
+
+    context 'when hash2 has some keys' do
+      let(:hash1) { {} }
+      let(:hash2) { { foo: 'bar' } }
+
+      it { is_expected.to eq(foo: 'bar') }
+      it do
+        deep_merge!
+        expect(hash1).to eq(foo: 'bar')
+      end
+      it do
+        deep_merge!
+        expect(hash2).to eq(foo: 'bar')
+      end
+    end
+
+    context 'when both hashes have keys (different)' do
+      let(:hash1) { { bar: 'baz' } }
+      let(:hash2) { { foo: 'bar' } }
+
+      it { is_expected.to eq(foo: 'bar', bar: 'baz') }
+      it do
+        deep_merge!
+        expect(hash1).to eq(foo: 'bar', bar: 'baz')
+      end
+      it do
+        deep_merge!
+        expect(hash2).to eq(foo: 'bar')
+      end
+    end
+
+    context 'when both hashes have keys (same)' do
+      let(:hash1) { { foo: 'baz', baz: 'foo' } }
+      let(:hash2) { { foo: 'bar' } }
+
+      it { is_expected.to eq(foo: 'bar', baz: 'foo') }
+      it do
+        deep_merge!
+        expect(hash1).to eq(foo: 'bar', baz: 'foo')
+      end
+      it do
+        deep_merge!
+        expect(hash2).to eq(foo: 'bar')
+      end
+    end
+
+    context 'when both hashes have keys (same/deep)' do
+      let(:hash1) { { foo: { bar: 'baz' }, fizz: 'buzz' } }
+      let(:hash2) { { foo: { baz: 'bar', bar: 'foo' } } }
+
+      it { is_expected.to eq(foo: { bar: 'foo', baz: 'bar' }, fizz: 'buzz') }
+      it do
+        deep_merge!
+        expect(hash1).to eq(foo: { bar: 'foo', baz: 'bar' }, fizz: 'buzz')
+      end
+      it do
+        deep_merge!
+        expect(hash2).to eq(foo: { baz: 'bar', bar: 'foo' })
+      end
+    end
+  end
+
   describe '.normalize_object' do
     subject(:normalize_object) { described_class.normalize_object(object) }
 

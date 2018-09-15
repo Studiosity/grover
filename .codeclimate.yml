@@ -1,0 +1,2 @@
+exclude_patterns:
+  - "lib/active_support_ext/**/*.rb"

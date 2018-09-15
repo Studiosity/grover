@@ -23,7 +23,8 @@ class Grover
     #
     # Remove minimum spaces from the front of all lines within a string
     #
-    # Based on active_support/core_ext/string/strip.rb
+    # Based on active support
+    # @see active_support/core_ext/string/strip.rb
     #
     def self.strip_heredoc(string, inline: false)
       string = string.gsub(/^#{string.scan(/^[ \t]*(?=\S)/).min}/, ''.freeze)
@@ -44,16 +45,52 @@ class Grover
     end
 
     #
-    # Recursively normalizes hash objects with camelized string keys
+    # Deep transform the keys in an object (Hash/Array)
     #
-    def self.normalize_object(object)
-      if object.is_a? Hash
-        object.each_with_object({}) do |(k, v), acc|
-          acc[normalize_key(k)] = normalize_object(v)
+    # Copied from active support
+    # @see active_support/core_ext/hash/keys.rb
+    #
+    def self.deep_transform_keys_in_object(object, &block)
+      case object
+      when Hash
+        object.each_with_object({}) do |(key, value), result|
+          result[yield(key)] = deep_transform_keys_in_object(value, &block)
         end
+      when Array
+        object.map { |e| deep_transform_keys_in_object(e, &block) }
       else
         object
       end
+    end
+
+    #
+    # Deep transform the keys in the hash to strings
+    #
+    def self.deep_stringify_keys(hash)
+      deep_transform_keys_in_object hash, &:to_s
+    end
+
+    #
+    # Deep merge a hash with another hash
+    #
+    # Based on active support
+    # @see active_support/core_ext/hash/deep_merge.rb
+    #
+    def self.deep_merge!(hash, other_hash)
+      hash.merge!(other_hash) do |_, this_val, other_val|
+        if this_val.is_a?(Hash) && other_val.is_a?(Hash)
+          deep_merge! this_val.dup, other_val
+        else
+          other_val
+        end
+      end
+    end
+
+    #
+    # Recursively normalizes hash objects with camelized string keys
+    #
+    def self.normalize_object(object)
+      deep_transform_keys_in_object(object) { |k| normalize_key(k) }
     end
 
     #

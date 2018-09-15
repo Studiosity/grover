@@ -1,6 +1,10 @@
 require 'spec_helper'
 
 describe Grover do
+  let(:grover) { described_class.new(url_or_html, options) }
+  let(:url_or_html) { 'http://google.com' }
+  let(:options) { {} }
+
   describe '.new' do
     subject(:new) { described_class.new('http://google.com') }
 
@@ -15,26 +19,36 @@ describe Grover do
 
       it { expect(new.instance_variable_get('@url')).to eq 'http://happyfuntimes.com' }
       it { expect(new.instance_variable_get('@root_path')).to be_nil }
-      it { expect(new.instance_variable_get('@options')).to eq(page_size: 'A4') }
+      it { expect(new.instance_variable_get('@options')).to eq('page_size' => 'A4') }
 
       context 'with root path specified' do
         let(:options) { { page_size: 'A4', root_path: 'foo/bar/baz' } }
 
         it { expect(new.instance_variable_get('@url')).to eq 'http://happyfuntimes.com' }
         it { expect(new.instance_variable_get('@root_path')).to eq 'foo/bar/baz' }
-        it { expect(new.instance_variable_get('@options')).to eq(page_size: 'A4') }
+        it { expect(new.instance_variable_get('@options')).to eq('page_size' => 'A4') }
       end
     end
   end
 
   describe '#to_pdf' do
-    subject(:to_pdf) { described_class.new(url_or_html).to_pdf }
+    subject(:to_pdf) { grover.to_pdf }
 
     let(:pdf_reader) { PDF::Reader.new pdf_io }
     let(:pdf_io) { StringIO.new to_pdf }
     let(:pdf_text_content) { Grover::Utils.squish(pdf_reader.pages.first.text) }
     let(:large_text) { '<style>.text { font-size: 14px; }</style>' }
     let(:default_header) { Grover::DEFAULT_HEADER_TEMPLATE }
+    let(:basic_header_footer_options) do
+      {
+        display_header_footer: true,
+        display_url: 'http://www.example.net/foo/bar',
+        margin: {
+          top: '1in',
+          bottom: '1in'
+        }
+      }
+    end
 
     context 'when passing through a valid URL' do
       let(:url_or_html) { 'https://www.google.com' }
@@ -63,7 +77,7 @@ describe Grover do
     end
 
     context 'when passing through options to Grover' do
-      subject(:to_pdf) { described_class.new(url_or_html, options).to_pdf }
+      subject(:to_pdf) { grover.to_pdf }
 
       let(:url_or_html) { '<html><head><title>Paaage</title></head><body><h1>Hey there</h1></body></html>' }
 
@@ -80,7 +94,6 @@ describe Grover do
       end
 
       context 'when the page contains valid meta options' do
-        let(:options) { {} }
         let(:url_or_html) do
           Grover::Utils.squish(<<-HTML)
             <html>
@@ -99,17 +112,7 @@ describe Grover do
       end
 
       context 'when the page contains meta options with escaped content' do
-        let(:options) do
-          {
-            display_header_footer: true,
-            display_url: 'http://www.example.net/bar',
-            margin: {
-              top: '1in',
-              bottom: '1in'
-            },
-            header_template: large_text
-          }
-        end
+        let(:options) { basic_header_footer_options.merge(header_template: large_text) }
         let(:url_or_html) do
           Grover::Utils.squish(<<-HTML)
             <html>
@@ -128,16 +131,7 @@ describe Grover do
       end
 
       context 'when the page contains meta options with boolean content' do
-        let(:options) do
-          {
-            margin: {
-              top: '1in',
-              bottom: '1in'
-            },
-            display_header_footer: true,
-            header_template: 'We dont expect to see this...'
-          }
-        end
+        let(:options) { basic_header_footer_options.merge(header_template: 'We dont expect to see this...') }
         let(:url_or_html) do
           Grover::Utils.squish(<<-HTML)
             <html>
@@ -155,7 +149,6 @@ describe Grover do
       end
 
       context 'when the page contains invalid meta options' do
-        let(:options) { {} }
         let(:url_or_html) do
           Grover::Utils.squish(<<-HTML)
             <html>
@@ -178,93 +171,57 @@ describe Grover do
       end
 
       context 'when options include header and footer enabled' do
-        let(:options) do
-          {
-            display_header_footer: true,
-            display_url: 'http://www.example.net/bar',
-            margin: {
-              top: '1in',
-              bottom: '1in'
-            },
-            header_template: "#{large_text}#{default_header}"
-          }
-        end
+        let(:options) { basic_header_footer_options.merge(header_template: "#{large_text}#{default_header}") }
 
         it do
           date = Date.today.strftime '%-m/%-d/%Y'
-          expect(pdf_text_content).to eq "#{date} Paaage Hey there http://www.example.net/bar 1/1"
+          expect(pdf_text_content).to eq "#{date} Paaage Hey there http://www.example.net/foo/bar 1/1"
         end
       end
 
       context 'when options override header template' do
         let(:options) do
-          {
-            display_header_footer: true,
-            display_url: 'http://www.examples.net/foo/baz',
-            margin: {
-              top: '1in',
-              bottom: '1in'
-            },
-            header_template: "#{large_text}<div class='text'>Excellente</div>"
-          }
+          basic_header_footer_options.merge(header_template: "#{large_text}<div class='text'>Excellente</div>")
         end
 
-        it { expect(pdf_text_content).to eq 'Excellente Hey there http://www.examples.net/foo/baz 1/1' }
+        it { expect(pdf_text_content).to eq 'Excellente Hey there http://www.example.net/foo/bar 1/1' }
       end
 
       context 'when header template includes the display url marker' do
         let(:options) do
-          {
-            display_header_footer: true,
-            display_url: 'http://www.examples.net/foo/bar',
-            margin: {
-              top: '1in',
-              bottom: '1in'
-            },
+          basic_header_footer_options.merge(
             header_template: "#{large_text}<div class='text'>abc{{display_url}}def</div>"
-          }
+          )
         end
 
         it do
           expect(pdf_text_content).to(
-            eq('abchttp://www.examples.net/foo/bardef Hey there http://www.examples.net/foo/bar 1/1')
+            eq('abchttp://www.example.net/foo/bardef Hey there http://www.example.net/foo/bar 1/1')
           )
         end
       end
 
       context 'when options override footer template' do
         let(:options) do
-          {
-            display_header_footer: true,
-            display_url: 'http://www.examples.net/foo/bar',
-            margin: {
-              top: '1in',
-              bottom: '1in'
-            },
+          basic_header_footer_options.merge(
             footer_template: "#{large_text}<div class='text'>great {{display_url}} page</div>"
-          }
+          )
         end
 
         it do
           date = Date.today.strftime '%-m/%-d/%Y'
-          expect(pdf_text_content).to eq "#{date} Paaage Hey there great http://www.examples.net/foo/bar page"
+          expect(pdf_text_content).to eq "#{date} Paaage Hey there great http://www.example.net/foo/bar page"
         end
       end
     end
 
     context 'when global options are defined' do
       let(:url_or_html) { '<html><body><h1>Hey there</h1></body></html>' }
-      let(:options) do
-        {
-          display_header_footer: true,
-          display_url: 'http://www.examples.net/foo/bar',
-          header_template: large_text
-        }
-      end
+      let(:options) { basic_header_footer_options.merge(header_template: large_text) }
 
       before { allow(described_class.configuration).to receive(:options).and_return(options) }
 
-      it { expect(pdf_text_content).to eq 'Hey there http://www.examples.net/foo/bar 1/1' }
+      it { expect(pdf_text_content).to eq 'Hey there http://www.example.net/foo/bar 1/1' }
     end
 
     context 'when HTML includes screen only content' do
@@ -296,10 +253,116 @@ describe Grover do
     end
   end
 
+  describe '#front_cover_path' do
+    subject(:front_cover_path) { grover.front_cover_path }
+
+    it { is_expected.to be_nil }
+
+    context 'when option specified in global configuration' do
+      before { allow(described_class.configuration).to receive(:options).and_return(front_cover_path: '/foo/bar') }
+
+      it { is_expected.to eq '/foo/bar' }
+    end
+
+    context 'when option specified in initialiser options' do
+      let(:options) { { front_cover_path: '/baz' } }
+
+      it { is_expected.to eq '/baz' }
+    end
+
+    context 'when passed through via meta tag' do
+      let(:url_or_html) do
+        Grover::Utils.squish(<<-HTML)
+          <html>
+            <head>
+              <title>Paaage</title>
+              <meta name="grover-front_cover_path" content="/meta/path" />
+            </head>
+            <body>
+              <h1>Hey there</h1>
+            </body>
+          </html>
+        HTML
+      end
+
+      it { is_expected.to eq '/meta/path' }
+    end
+  end
+
+  describe '#back_cover_path' do
+    subject(:back_cover_path) { grover.back_cover_path }
+
+    it { is_expected.to be_nil }
+
+    context 'when option specified in global configuration' do
+      before { allow(described_class.configuration).to receive(:options).and_return(back_cover_path: '/foo/bar') }
+
+      it { is_expected.to eq '/foo/bar' }
+    end
+
+    context 'when option specified in initialiser options' do
+      let(:options) { { back_cover_path: '/baz' } }
+
+      it { is_expected.to eq '/baz' }
+    end
+
+    context 'when passed through via meta tag' do
+      let(:url_or_html) do
+        Grover::Utils.squish(<<-HTML)
+          <html>
+            <head>
+              <title>Paaage</title>
+              <meta name="grover-back_cover_path" content="/meta/path" />
+            </head>
+            <body>
+              <h1>Hey there</h1>
+            </body>
+          </html>
+        HTML
+      end
+
+      it { is_expected.to eq '/meta/path' }
+    end
+  end
+
+  describe '#show_front_cover?' do
+    subject(:show_front_cover?) { grover.show_front_cover? }
+
+    it { is_expected.to eq false }
+
+    context 'when option specified' do
+      let(:options) { { front_cover_path: '/baz' } }
+
+      it { is_expected.to eq true }
+    end
+
+    context 'when the option isnt a path' do
+      let(:options) { { front_cover_path: 'http://example.com/baz' } }
+
+      it { is_expected.to eq false }
+    end
+  end
+
+  describe '#show_back_cover?' do
+    subject(:show_back_cover?) { grover.show_back_cover? }
+
+    it { is_expected.to eq false }
+
+    context 'when option specified' do
+      let(:options) { { back_cover_path: '/baz' } }
+
+      it { is_expected.to eq true }
+    end
+
+    context 'when the option isnt a path' do
+      let(:options) { { back_cover_path: 'http://example.com/baz' } }
+
+      it { is_expected.to eq false }
+    end
+  end
+
   describe '#inspect' do
     subject(:inspect) { grover.inspect }
-
-    let(:grover) { described_class.new('http://google.com') }
 
     it { is_expected.to eq "#<Grover:0x#{grover.object_id} @url=\"http://google.com\">" }
   end

@@ -1,3 +1,5 @@
+require 'combine_pdf'
+
 class Grover
   #
   # Rack middleware for catching PDF requests and returning the upstream HTML as a PDF
@@ -44,11 +46,36 @@ class Grover
     end
 
     def convert_to_pdf(response)
+      grover = create_grover_for_response(response)
+      if grover.show_front_cover? || grover.show_back_cover?
+        add_cover_content grover
+      else
+        grover.to_pdf
+      end
+    end
+
+    def create_grover_for_response(response)
       body = response.respond_to?(:body) ? response.body : response.join
       body = body.join if body.is_a?(Array)
 
       body = HTMLPreprocessor.process body, root_url, protocol
-      Grover.new(body, display_url: request_url).to_pdf
+      Grover.new(body, display_url: request_url)
+    end
+
+    def add_cover_content(grover)
+      pdf = CombinePDF.parse grover.to_pdf
+      pdf >> fetch_cover_pdf(grover.front_cover_path) if grover.show_front_cover?
+      pdf << fetch_cover_pdf(grover.back_cover_path) if grover.show_back_cover?
+      pdf.to_pdf
+    end
+
+    def fetch_cover_pdf(path)
+      temp_env = env.deep_dup
+      temp_env['PATH_INFO'], temp_env['QUERY_STRING'] = path.split '?'
+      _, _, response = @app.call(temp_env)
+      response.close if response.respond_to? :close
+      grover = create_grover_for_response response
+      CombinePDF.parse grover.to_pdf
     end
 
     def update_headers(headers, body)
