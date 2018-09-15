@@ -47,7 +47,7 @@ class Grover
 
     def convert_to_pdf(response)
       grover = create_grover_for_response(response)
-      if grover.has_front_cover_path? || grover.has_back_cover_path?
+      if grover.show_front_cover? || grover.show_back_cover?
         add_cover_content grover
       else
         grover.to_pdf
