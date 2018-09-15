@@ -169,13 +169,13 @@ describe Grover::Middleware do
             @env = env
             response =
               if env['PATH_INFO'] == '/front/page/meta'
-                "This is the cover page - #{env['QUERY_STRING']}"
+                "This is the cover page with params #{env['QUERY_STRING']}"
               else
                 Grover::Utils.squish(<<-HTML)
                   <html>
                     <head>
                       <title>Paaage</title>
-                      <meta name="grover-front_cover_path" content="/front/page/meta?and-a-query=baz" />
+                      <meta name="grover-front_cover_path" content="/front/page/meta?queryparam=baz" />
                     </head>
                     <body>
                       <h1>Hey there</h1>
@@ -190,7 +190,9 @@ describe Grover::Middleware do
 
         it { expect(pdf_reader.page_count).to eq 2 }
         it do
-          expect(Grover::Utils.squish(pdf_reader.pages[0].text)).to eq 'This is the cover page ­ and­a­query=baz'
+          expect(Grover::Utils.squish(pdf_reader.pages[0].text)).to(
+            eq('This is the cover page with params queryparam=baz')
+          )
         end
         it { expect(Grover::Utils.squish(pdf_reader.pages[1].text)).to eq 'Hey there' }
       end
@@ -201,13 +203,13 @@ describe Grover::Middleware do
             @env = env
             response =
               if env['PATH_INFO'] == '/back/page/meta'
-                "This is the back page - #{env['QUERY_STRING']}"
+                "This is the back page with params #{env['QUERY_STRING']}"
               else
                 Grover::Utils.squish(<<-HTML)
                   <html>
                     <head>
                       <title>Paaage</title>
-                      <meta name="grover-back_cover_path" content="/back/page/meta?another-query=foo" />
+                      <meta name="grover-back_cover_path" content="/back/page/meta?anotherquery=foo" />
                     </head>
                     <body>
                       <h1>Hey there</h1>
@@ -223,7 +225,9 @@ describe Grover::Middleware do
         it { expect(pdf_reader.page_count).to eq 2 }
         it { expect(Grover::Utils.squish(pdf_reader.pages[0].text)).to eq 'Hey there' }
         it do
-          expect(Grover::Utils.squish(pdf_reader.pages[1].text)).to eq 'This is the back page ­ another­query=foo'
+          expect(Grover::Utils.squish(pdf_reader.pages[1].text)).to(
+            eq('This is the back page with params anotherquery=foo')
+          )
         end
       end
     end
