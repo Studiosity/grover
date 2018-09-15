@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [0.5.1](releases/tag/v0.5.1) - 2018-09-15
 ### Added
 - Support for front/back cover pages for middleware (combined with the original request PDF)
 
