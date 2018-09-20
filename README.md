@@ -44,7 +44,7 @@ Grover.new('<html><head><meta name="grover-margin-top" content="10px"')
 Grover can be configured to adjust the layout of the resulting PDF. 
 For available options, see https://github.com/GoogleChrome/puppeteer/blob/v1.7.0/docs/api.md#pagepdfoptions
 
-Also available is the `emulate_media` option.
+Also available are the `emulate_media`, `cache` and `timeout` options.
  
 ```ruby
 # config/initializers/grover.rb
@@ -56,7 +56,9 @@ Grover.configure do |config|
       bottom: '10cm'
     },
     prefer_css_page_size: true,
-    emulate_media: 'screen'
+    emulate_media: 'screen',
+    cache: false,
+    timeout: 0 # Timeout in ms. A value of `0` means 'no timeout'
   }
 end
 ```

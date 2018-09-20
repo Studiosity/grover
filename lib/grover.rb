@@ -21,14 +21,19 @@ class Grover
     dependencies puppeteer: 'puppeteer'
 
     def self.launch_params
-      ENV['CI'] == 'true' ? "{args: ['--no-sandbox', '--disable-setuid-sandbox']}" : ''
+      ENV['CI'] == 'true' ? "{args: ['--no-sandbox', '--disable-setuid-sandbox']}" : '{}'
     end
 
     method :convert_pdf, Utils.squish(<<-FUNCTION)
       async (url, options) => {
         let browser;
         try {
-          browser = await puppeteer.launch(#{launch_params});
+          let launch_params = #{launch_params};
+          const timeout = options.timeout; delete options.timeout;
+          if (timeout) {
+            launch_params.timeout = timeout;
+          }
+          browser = await puppeteer.launch(launch_params);
           const page = await browser.newPage();
 
           const cache = options.cache; delete options.cache;
