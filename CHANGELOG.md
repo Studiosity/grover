@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased
+- None
+
+## [0.5.5](releases/tag/v0.5.5) - 2018-09-20
 ### Fixed
 - Compare optional arguments with undefined instead of default `presence` check
 
