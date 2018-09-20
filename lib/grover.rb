@@ -24,45 +24,52 @@ class Grover
       ENV['CI'] == 'true' ? "{args: ['--no-sandbox', '--disable-setuid-sandbox']}" : ''
     end
 
-    method :convert_pdf, Utils.squish(<<-FUNCTION)
-      async (url, options) => {
+    method :convert_pdf, <<-FUNCTION
+      async (url_or_html, options) => {
         let browser;
         try {
+          // Launch the browser and create a page
           browser = await puppeteer.launch(#{launch_params});
           const page = await browser.newPage();
 
+          // Set caching flag (if provided)
           const cache = options.cache; delete options.cache;
           if (cache != undefined) {
             await page.setCacheEnabled(cache);
           }
 
+          // Setup timeout option (if provided)
           let request_options = {};
           const timeout = options.timeout; delete options.timeout;
           if (timeout != undefined) {
             request_options.timeout = timeout;
           }
 
-          if (url.match(/^http/i)) {
+          if (url_or_html.match(/^http/i)) {
+            // Request is for a URL, so request it 
             request_options.waitUntil = 'networkidle2';
-            await page.goto(url, request_options);
+            await page.goto(url_or_html, request_options);
           } else {
+            // Request is some HTML content. Use request interception to assign the body
             request_options.waitUntil = 'networkidle0';
             await page.setRequestInterception(true);
-            // Capture first request only
             page.once('request', request => {
-              // Fulfill request with HTML, and continue all subsequent requests
-              request.respond({ body: url });
+              request.respond({ body: url_or_html });
+              // Reset the request interception
+              // (we only want to intercept the first request - ie our HTML)
               page.on('request', request => request.continue());
             });
             const displayUrl = options.displayUrl; delete options.displayUrl;
             await page.goto(displayUrl || 'http://example.com', request_options);
           }
 
+          // If specified, emulate the media type
           const emulateMedia = options.emulateMedia; delete options.emulateMedia;
           if (emulateMedia != undefined) {
             await page.emulateMedia(emulateMedia);
           }
 
+          // Return the converted PDF
           return await page.pdf(options);
         } finally {
           if (browser) {
