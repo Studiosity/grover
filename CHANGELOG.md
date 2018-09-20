@@ -1,6 +1,13 @@
 # Changelog
 
 ## Unreleased
+- None
+
+## [0.5.2](releases/tag/v0.5.2) - 2018-09-20
+### Added
+- Control of Puppeteer page caching (default set to false)
+
+## [0.5.1](releases/tag/v0.5.1) - 2018-09-15
 ### Added
 - Support for front/back cover pages for middleware (combined with the original request PDF)
 
