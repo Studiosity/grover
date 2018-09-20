@@ -21,28 +21,30 @@ class Grover
     dependencies puppeteer: 'puppeteer'
 
     def self.launch_params
-      ENV['CI'] == 'true' ? "{args: ['--no-sandbox', '--disable-setuid-sandbox']}" : '{}'
+      ENV['CI'] == 'true' ? "{args: ['--no-sandbox', '--disable-setuid-sandbox']}" : ''
     end
 
     method :convert_pdf, Utils.squish(<<-FUNCTION)
       async (url, options) => {
         let browser;
         try {
-          let launch_params = #{launch_params};
-          const timeout = options.timeout; delete options.timeout;
-          if (timeout) {
-            launch_params.timeout = timeout;
-          }
-          browser = await puppeteer.launch(launch_params);
+          browser = await puppeteer.launch(#{launch_params});
           const page = await browser.newPage();
 
           const cache = options.cache; delete options.cache;
           await page.setCacheEnabled(cache);
 
+          let request_options = {};
+          const timeout = options.timeout; delete options.timeout;
+          if (timeout) {
+            request_options.timeout = timeout;
+          }
           if (url.match(/^http/i)) {
-            await page.goto(url, { waitUntil: 'networkidle2' });
+            request_options.waitUntil = 'networkidle2';
+            await page.goto(url, request_options);
           } else {
-            await page.goto(`data:text/html,${url}`, { waitUntil: 'networkidle0' });
+            request_options.waitUntil = 'networkidle0';
+            await page.goto(`data:text/html,${url}`, request_options);
           }
 
           const emulateMedia = options.emulateMedia; delete options.emulateMedia;

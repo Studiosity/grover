@@ -1,7 +1,8 @@
 # Changelog
 
 ## Unreleased
-- None
+### Fixed
+- Moved Puppeteer timeout from `launch` to page `goto`
 
 ## [0.5.3](releases/tag/v0.5.3) - 2018-09-20
 ### Added
