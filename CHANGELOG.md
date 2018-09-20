@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased
+- None
+
+## [0.5.3](releases/tag/v0.5.3) - 2018-09-20
 ### Added
 - Control of Puppeteer page timeout
 
