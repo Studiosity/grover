@@ -64,11 +64,11 @@ end
 ```
 
 #### Page URL for middleware requests (or passing through raw HTML)
-If you want to have the header or footer display the page URL and because this information is not available in the raw
-HTML, Grover requires that this is passed through via the `display_url` option.
+If you want to have the header or footer display the page URL, Grover requires that this is passed through via the
+`display_url` option. This is because the page URL is not available in the raw HTML!
 
-For Rack middleware conversions, the original request URL (without the .pdf extension) will be pass assigned to
-`display_url`. You can of course override this by setting using a meta tag in the downstream HTML response.
+For Rack middleware conversions, the original request URL (without the .pdf extension) will be passed through and
+assigned to `display_url` for you. You can of course override this by using a meta tag in the downstream HTML response.
 
 For raw HTML conversions, if the `display_url` is not provided `http://example.com` will be used as the default.
 
