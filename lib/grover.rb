@@ -47,7 +47,15 @@ class Grover
             await page.goto(url, request_options);
           } else {
             request_options.waitUntil = 'networkidle0';
-            await page.goto(`data:text/html,${url}`, request_options);
+            await page.setRequestInterception(true);
+            // Capture first request only
+            page.once('request', request => {
+              // Fulfill request with HTML, and continue all subsequent requests
+              request.respond({ body: url });
+              page.on('request', request => request.continue());
+            });
+            const displayUrl = options.displayUrl; delete options.displayUrl;
+            await page.goto(displayUrl || 'http://example.com', request_options);
           }
 
           const emulateMedia = options.emulateMedia; delete options.emulateMedia;
@@ -159,7 +167,7 @@ class Grover
     Utils.deep_merge! combined, Utils.deep_stringify_keys(options)
     Utils.deep_merge! combined, meta_options unless url_source?
 
-    fix_templates! combined
+    # fix_templates! combined
     fix_boolean_options! combined
     fix_numeric_options! combined
 
