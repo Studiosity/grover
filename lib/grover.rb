@@ -46,7 +46,7 @@ class Grover
           }
 
           if (url_or_html.match(/^http/i)) {
-            // Request is for a URL, so request it 
+            // Request is for a URL, so request it
             request_options.waitUntil = 'networkidle2';
             await page.goto(url_or_html, request_options);
           } else {
