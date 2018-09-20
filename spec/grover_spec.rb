@@ -213,6 +213,15 @@ describe Grover do
           expect(pdf_text_content).to eq "#{date} Paaage Hey there great http://www.example.net/foo/bar page"
         end
       end
+
+      context 'when display_url option is not provided' do
+        let(:options) { basic_header_footer_options.tap { |hash| hash.delete(:display_url) } }
+
+        it 'uses the default `example.com` for the footer URL' do
+          date = Date.today.strftime '%-m/%-d/%Y'
+          expect(pdf_text_content).to eq "#{date} Paaage Hey there http://example.com/ 1/1"
+        end
+      end
     end
 
     context 'when global options are defined' do
