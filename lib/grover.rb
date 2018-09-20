@@ -24,37 +24,52 @@ class Grover
       ENV['CI'] == 'true' ? "{args: ['--no-sandbox', '--disable-setuid-sandbox']}" : ''
     end
 
-    method :convert_pdf, Utils.squish(<<-FUNCTION)
-      async (url, options) => {
+    method :convert_pdf, <<-FUNCTION
+      async (url_or_html, options) => {
         let browser;
         try {
+          // Launch the browser and create a page
           browser = await puppeteer.launch(#{launch_params});
           const page = await browser.newPage();
 
+          // Set caching flag (if provided)
           const cache = options.cache; delete options.cache;
           if (cache != undefined) {
             await page.setCacheEnabled(cache);
           }
 
+          // Setup timeout option (if provided)
           let request_options = {};
           const timeout = options.timeout; delete options.timeout;
           if (timeout != undefined) {
             request_options.timeout = timeout;
           }
 
-          if (url.match(/^http/i)) {
+          if (url_or_html.match(/^http/i)) {
+            // Request is for a URL, so request it
             request_options.waitUntil = 'networkidle2';
-            await page.goto(url, request_options);
+            await page.goto(url_or_html, request_options);
           } else {
+            // Request is some HTML content. Use request interception to assign the body
             request_options.waitUntil = 'networkidle0';
-            await page.goto(`data:text/html,${url}`, request_options);
+            await page.setRequestInterception(true);
+            page.once('request', request => {
+              request.respond({ body: url_or_html });
+              // Reset the request interception
+              // (we only want to intercept the first request - ie our HTML)
+              page.on('request', request => request.continue());
+            });
+            const displayUrl = options.displayUrl; delete options.displayUrl;
+            await page.goto(displayUrl || 'http://example.com', request_options);
           }
 
+          // If specified, emulate the media type
           const emulateMedia = options.emulateMedia; delete options.emulateMedia;
           if (emulateMedia != undefined) {
             await page.emulateMedia(emulateMedia);
           }
 
+          // Return the converted PDF
           return await page.pdf(options);
         } finally {
           if (browser) {
@@ -66,11 +81,9 @@ class Grover
   end
   private_constant :Processor
 
-  DISPLAY_URL_PLACEHOLDER = '{{display_url}}'.freeze
-
   DEFAULT_HEADER_TEMPLATE = "<div class='date text left'></div><div class='title text center'></div>".freeze
   DEFAULT_FOOTER_TEMPLATE = Utils.strip_heredoc(<<-HTML).freeze
-    <div class='text left grow'>#{DISPLAY_URL_PLACEHOLDER}</div>
+    <div class='url text left grow'></div>
     <div class='text right'><span class='pageNumber'></span>/<span class='totalPages'></span></div>
   HTML
 
@@ -159,7 +172,6 @@ class Grover
     Utils.deep_merge! combined, Utils.deep_stringify_keys(options)
     Utils.deep_merge! combined, meta_options unless url_source?
 
-    fix_templates! combined
     fix_boolean_options! combined
     fix_numeric_options! combined
 
@@ -188,19 +200,6 @@ class Grover
 
   def url_source?
     @url.match(/^http/i)
-  end
-
-  def fix_templates!(options)
-    display_url = options.delete 'display_url'
-    return unless display_url
-
-    options['footer_template'] ||= DEFAULT_FOOTER_TEMPLATE
-
-    %w[header_template footer_template].each do |key|
-      next unless options[key].is_a? ::String
-
-      options[key] = options[key].gsub(DISPLAY_URL_PLACEHOLDER, display_url)
-    end
   end
 
   def fix_boolean_options!(options)

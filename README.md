@@ -63,26 +63,22 @@ Grover.configure do |config|
 end
 ```
 
-#### Header/Footer templates and the 'url' tag
-When using the Rack middleware, Grover passes the HTML response through to Puppeteer as inline HTML.
-As such, if the header/footer flag is enabled, by default Chromium will render the url
-(the entire HTML document as plain text) in the footer. Eep!
+#### Page URL for middleware requests (or passing through raw HTML)
+If you want to have the header or footer display the page URL and because this information is not available in the raw
+HTML, Grover requires that this is passed through via the `display_url` option.
 
-To get around this it is recommended to not use the 'url' class in either template.
-Instead, place the text `{{display_url}}` where you would like the request URL to display.
-Grover will look for that text, and replace it with the request URL before converting the HTML to PDF
+For Rack middleware conversions, the original request URL (without the .pdf extension) will be pass assigned to
+`display_url`. You can of course override this by setting using a meta tag in the downstream HTML response.
 
-To assist in this process, if the footer template has not been specified, the following default template is used:
-```HTML
-<div class='text left grow'>{{display_url}}</div>
-<div class='text right'>
-  <span class='pageNumber'></span>/<span class='totalPages'></span>
-</div>    
-```
-_N.B._ the `url` class is *not* used
+For raw HTML conversions, if the `display_url` is not provided `http://example.com` will be used as the default.
 
-I've raised [an issue](https://github.com/GoogleChrome/puppeteer/issues/3133) in the Google Puppeteer project regarding
-a longer term solution to this, however it would need to be resolved upstream in the Chromium project first 
+#### Header and footer templates
+Should be valid HTML markup with following classes used to inject printing values into them:
+* `date` formatted print date
+* `title` document title
+* `url` document location
+* `pageNumber` current page number
+* `totalPages` total pages in the document  
 
 
 ## Middleware
