@@ -1,7 +1,12 @@
 # Changelog
 
 ## Unreleased
-- None
+### Fixed
+- Use request interception instead of data URL for middleware/raw HTML conversions
+
+### Breaking change
+- The `{{display_url}}` header/footer hack was removed in favour of passing the URL via `display_url` option
+  (for middleware/raw HTML only) 
 
 ## [0.5.5](releases/tag/v0.5.5) - 2018-09-20
 ### Fixed

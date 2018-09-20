@@ -190,7 +190,7 @@ describe Grover do
       context 'when header template includes the display url marker' do
         let(:options) do
           basic_header_footer_options.merge(
-            header_template: "#{large_text}<div class='text'>abc{{display_url}}def</div>"
+            header_template: "#{large_text}<div class='text'>abc<span class='url'></span>def</div>"
           )
         end
 
@@ -204,7 +204,7 @@ describe Grover do
       context 'when options override footer template' do
         let(:options) do
           basic_header_footer_options.merge(
-            footer_template: "#{large_text}<div class='text'>great {{display_url}} page</div>"
+            footer_template: "#{large_text}<div class='text'>great <span class='url'></span> page</div>"
           )
         end
 

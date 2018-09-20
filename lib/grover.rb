@@ -81,11 +81,9 @@ class Grover
   end
   private_constant :Processor
 
-  DISPLAY_URL_PLACEHOLDER = '{{display_url}}'.freeze
-
   DEFAULT_HEADER_TEMPLATE = "<div class='date text left'></div><div class='title text center'></div>".freeze
   DEFAULT_FOOTER_TEMPLATE = Utils.strip_heredoc(<<-HTML).freeze
-    <div class='text left grow'>#{DISPLAY_URL_PLACEHOLDER}</div>
+    <div class='url text left grow'></div>
     <div class='text right'><span class='pageNumber'></span>/<span class='totalPages'></span></div>
   HTML
 
@@ -174,7 +172,6 @@ class Grover
     Utils.deep_merge! combined, Utils.deep_stringify_keys(options)
     Utils.deep_merge! combined, meta_options unless url_source?
 
-    # fix_templates! combined
     fix_boolean_options! combined
     fix_numeric_options! combined
 
@@ -203,19 +200,6 @@ class Grover
 
   def url_source?
     @url.match(/^http/i)
-  end
-
-  def fix_templates!(options)
-    display_url = options.delete 'display_url'
-    return unless display_url
-
-    options['footer_template'] ||= DEFAULT_FOOTER_TEMPLATE
-
-    %w[header_template footer_template].each do |key|
-      next unless options[key].is_a? ::String
-
-      options[key] = options[key].gsub(DISPLAY_URL_PLACEHOLDER, display_url)
-    end
   end
 
   def fix_boolean_options!(options)
