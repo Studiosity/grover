@@ -32,13 +32,16 @@ class Grover
           const page = await browser.newPage();
 
           const cache = options.cache; delete options.cache;
-          await page.setCacheEnabled(cache);
+          if (cache != undefined) { 
+            await page.setCacheEnabled(cache);
+          }
 
           let request_options = {};
           const timeout = options.timeout; delete options.timeout;
-          if (timeout) {
+          if (timeout != undefined) {
             request_options.timeout = timeout;
           }
+
           if (url.match(/^http/i)) {
             request_options.waitUntil = 'networkidle2';
             await page.goto(url, request_options);
@@ -48,7 +51,7 @@ class Grover
           }
 
           const emulateMedia = options.emulateMedia; delete options.emulateMedia;
-          if (emulateMedia) {
+          if (emulateMedia != undefined) {
             await page.emulateMedia(emulateMedia);
           }
 

@@ -1,7 +1,8 @@
 # Changelog
 
 ## Unreleased
-- None
+### Fixed
+- Compare optional arguments with undefined instead of default `presence` check
 
 ## [0.5.4](releases/tag/v0.5.4) - 2018-09-20
 ### Fixed
