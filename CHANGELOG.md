@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased
+- None
+
+## [0.6.2](releases/tag/v0.6.2) - 2018-09-20
 ### Fixed
 - Removed memoization of path variable in middleware (on occasion a previous requests state was present)
 
