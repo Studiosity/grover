@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased
+- None
+
+## [0.6.1](releases/tag/v0.6.1) - 2018-09-20
 ### Fixed
 - Use request interception instead of data URL for middleware/raw HTML conversions
 
