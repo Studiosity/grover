@@ -10,7 +10,7 @@ describe Grover do
 
     it { expect(new.instance_variable_get('@url')).to eq 'http://google.com' }
     it { expect(new.instance_variable_get('@root_path')).to be_nil }
-    it { expect(new.instance_variable_get('@options')).to eq('cache' => false) }
+    it { expect(new.instance_variable_get('@options')).to eq({}) }
 
     context 'with options passed' do
       subject(:new) { described_class.new('http://happyfuntimes.com', options) }
@@ -19,14 +19,14 @@ describe Grover do
 
       it { expect(new.instance_variable_get('@url')).to eq 'http://happyfuntimes.com' }
       it { expect(new.instance_variable_get('@root_path')).to be_nil }
-      it { expect(new.instance_variable_get('@options')).to eq('page_size' => 'A4', 'cache' => false) }
+      it { expect(new.instance_variable_get('@options')).to eq('page_size' => 'A4') }
 
       context 'with root path specified' do
         let(:options) { { page_size: 'A4', root_path: 'foo/bar/baz' } }
 
         it { expect(new.instance_variable_get('@url')).to eq 'http://happyfuntimes.com' }
         it { expect(new.instance_variable_get('@root_path')).to eq 'foo/bar/baz' }
-        it { expect(new.instance_variable_get('@options')).to eq('page_size' => 'A4', 'cache' => false) }
+        it { expect(new.instance_variable_get('@options')).to eq('page_size' => 'A4') }
       end
     end
   end

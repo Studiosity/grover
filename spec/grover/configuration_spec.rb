@@ -4,7 +4,7 @@ describe Grover::Configuration do
   subject(:configuration) { described_class.new }
 
   it 'sets default for options' do
-    expect(configuration.options).to eq(cache: false)
+    expect(configuration.options).to eq({})
   end
 
   it 'allows other options to be assigned' do
