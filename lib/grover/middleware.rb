@@ -59,7 +59,7 @@ class Grover
       body = body.join if body.is_a?(Array)
 
       body = HTMLPreprocessor.process body, root_url, protocol
-      Grover.new(body, display_url: request_url)
+      Grover.new(body, display_url: request_url, cache: false)
     end
 
     def add_cover_content(grover)

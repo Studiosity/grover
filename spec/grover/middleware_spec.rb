@@ -148,7 +148,7 @@ describe Grover::Middleware do
       it 'passes through the request URL (sans extension) to Grover' do
         expect(Grover).to(
           receive(:new).
-            with('Grover McGroveryface', display_url: 'http://www.example.org/test').
+            with('Grover McGroveryface', display_url: 'http://www.example.org/test', cache: false).
             and_return(grover)
         )
         expect(grover).to receive(:to_pdf).with(no_args).and_return 'A converted PDF'

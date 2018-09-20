@@ -6,7 +6,9 @@ class Grover
     attr_accessor :options, :meta_tag_prefix
 
     def initialize
-      @options = {}
+      @options = {
+        cache: false
+      }
       @meta_tag_prefix = 'grover-'
     end
   end

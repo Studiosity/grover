@@ -30,6 +30,10 @@ class Grover
         try {
           browser = await puppeteer.launch(#{launch_params});
           const page = await browser.newPage();
+
+          const cache = options.cache; delete options.cache;
+          await page.setCacheEnabled(cache);
+
           if (url.match(/^http/i)) {
             await page.goto(url, { waitUntil: 'networkidle2' });
           } else {
