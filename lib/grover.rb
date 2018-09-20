@@ -32,7 +32,7 @@ class Grover
           const page = await browser.newPage();
 
           const cache = options.cache; delete options.cache;
-          if (cache != undefined) { 
+          if (cache != undefined) {
             await page.setCacheEnabled(cache);
           }
 
