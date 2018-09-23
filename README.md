@@ -107,10 +107,10 @@ pages (with potentially different headers/footers etc) is not possible.
 
 To get around this, Grover's middleware allows you to specify relative paths for the cover page contents
 via `front_cover_path` and `back_cover_path` either via the global configuration, or via meta tags.
-These paths (with query parameters) are then requested from the upstream app.
+These paths (with query parameters) are then requested from the downstream app.
 
 The cover pages are converted to PDF in isolation, and then combined together with the original PDF response,
-before being returned back down through the Rack stack. 
+before being returned back up through the Rack stack. 
  
 _N.B_ To simplify things, the same request method and body are used for the cover page requests.
 

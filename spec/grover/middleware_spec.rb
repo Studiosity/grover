@@ -6,11 +6,11 @@ describe Grover::Middleware do
   subject(:mock_app) do
     builder = Rack::Builder.new
     builder.use described_class
-    builder.run upstream
+    builder.run downstream
     builder.to_app
   end
 
-  let(:upstream) do
+  let(:downstream) do
     lambda do |env|
       @env = env
       response_size = 0
@@ -50,7 +50,7 @@ describe Grover::Middleware do
       end
 
       context 'when request doesnt have an extension' do
-        it 'returns the upstream content type' do
+        it 'returns the downstream content type' do
           get 'http://www.example.org/test'
           expect(last_response.headers['Content-Type']).to eq 'text/html'
           expect(last_response.body).to eq 'Grover McGroveryface'
@@ -59,7 +59,7 @@ describe Grover::Middleware do
       end
 
       context 'when request has a non-PDF extension' do
-        it 'returns the upstream content type' do
+        it 'returns the downstream content type' do
           get 'http://www.example.org/test.html'
           expect(last_response.headers['Content-Type']).to eq 'text/html'
           expect(last_response.body).to eq 'Grover McGroveryface'
@@ -163,10 +163,9 @@ describe Grover::Middleware do
 
       before { get 'http://www.example.org/test.pdf' }
 
-      context 'when the upstream response includes front cover page configuration' do
-        let(:upstream) do
+      context 'when the downstream response includes front cover page configuration' do
+        let(:downstream) do
           lambda do |env|
-            @env = env
             response =
               if env['PATH_INFO'] == '/front/page/meta'
                 "This is the cover page with params #{env['QUERY_STRING']}"
@@ -197,10 +196,9 @@ describe Grover::Middleware do
         it { expect(Grover::Utils.squish(pdf_reader.pages[1].text)).to eq 'Hey there' }
       end
 
-      context 'when the upstream response includes back cover page configuration' do
-        let(:upstream) do
+      context 'when the downstream response includes back cover page configuration' do
+        let(:downstream) do
           lambda do |env|
-            @env = env
             response =
               if env['PATH_INFO'] == '/back/page/meta'
                 "This is the back page with params #{env['QUERY_STRING']}"
@@ -245,8 +243,58 @@ describe Grover::Middleware do
       expect(mock_app.send(:rendering_pdf?)).to eq true
 
       # Restore to false on any non-pdf request.
-      get 'http://www.example.org/test.html'
+      get 'http://www.example.org/test'
       expect(mock_app.send(:rendering_pdf?)).to eq false
+    end
+
+    context 'with a downstream app that can respond to different paths' do
+      let(:downstream) do
+        lambda do |env|
+          response =
+            case env['PATH_INFO']
+            when '/test1' then 'Test1 page contents'
+            when '/test2' then 'Test2 page contents'
+            else 'Default page contents'
+            end
+
+          [200, headers.merge('Content-Length' => response.length.to_s), [response]]
+        end
+      end
+
+      it 'does not cache any results from previous requests' do
+        # Non-PDF request
+        get 'http://www.example.org/test1'
+        expect(last_response.body).to eq 'Test1 page contents'
+
+        # PDF request for 'test 1'
+        get 'http://www.example.org/test1.pdf'
+        expect(last_response.body).to be_a_pdf
+        check_pdf contents: 'Test1 page contents'
+
+        # PDF request for 'test 2'
+        get 'http://www.example.org/test2.pdf'
+        expect(last_response.body).to be_a_pdf
+        check_pdf contents: 'Test2 page contents'
+
+        # Non-PDF request
+        get 'http://www.example.org/test1'
+        expect(last_response.body).to eq 'Test1 page contents'
+      end
+
+      def check_pdf(contents:)
+        pdf_reader = pdf_reader_from_response
+        expect(pdf_reader.page_count).to eq 1
+        expect(Grover::Utils.squish(pdf_reader.pages.first.text)).to eq contents
+      end
+
+      def pdf_reader_from_response
+        pdf_io = StringIO.new last_response.body
+        PDF::Reader.new pdf_io
+      end
+
+      def be_a_pdf
+        match(/^%PDF-1\.4/)
+      end
     end
   end
   # rubocop:enable RSpec/MultipleExpectations

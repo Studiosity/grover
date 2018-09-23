@@ -24,7 +24,7 @@ class Grover
       ENV['CI'] == 'true' ? "{args: ['--no-sandbox', '--disable-setuid-sandbox']}" : ''
     end
 
-    method :convert_pdf, <<-FUNCTION
+    method :convert_pdf, Utils.strip_heredoc(<<-FUNCTION)
       async (url_or_html, options) => {
         let browser;
         try {
