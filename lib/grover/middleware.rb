@@ -31,7 +31,7 @@ class Grover
 
     private
 
-    PDF_REGEX = /\.pdf$/i
+    PDF_REGEX = /\.pdf$/i.freeze
 
     def rendering_pdf?
       @render_pdf
