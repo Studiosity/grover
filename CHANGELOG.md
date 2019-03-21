@@ -1,7 +1,8 @@
 # Changelog
 
 ## Unreleased
-- None
+### Added
+- Ability to disable headless mode and open devtools via option parameters
 
 ## [0.6.2](releases/tag/v0.6.2) - 2018-09-20
 ### Fixed
