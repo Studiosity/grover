@@ -21,15 +21,24 @@ class Grover
     dependencies puppeteer: 'puppeteer'
 
     def self.launch_params
-      ENV['CI'] == 'true' ? "{args: ['--no-sandbox', '--disable-setuid-sandbox']}" : ''
+      ENV['CI'] == 'true' ? "{args: ['--no-sandbox', '--disable-setuid-sandbox']}" : '{}'
     end
 
     method :convert_pdf, Utils.strip_heredoc(<<-FUNCTION)
       async (url_or_html, options) => {
         let browser;
         try {
+          let launchParams = #{launch_params};
+
+          // Configure puppeteer debugging options
+          const debug = options.debug; delete options.debug;
+          if (debug != undefined) {
+            if (debug.headless != undefined) { launchParams.headless = debug.headless; }
+            if (debug.devtools != undefined) { launchParams.devtools = debug.devtools; }
+          }
+
           // Launch the browser and create a page
-          browser = await puppeteer.launch(#{launch_params});
+          browser = await puppeteer.launch(launchParams);
           const page = await browser.newPage();
 
           // Set caching flag (if provided)
@@ -69,8 +78,10 @@ class Grover
             await page.emulateMedia(emulateMedia);
           }
 
-          // Return the converted PDF
-          return await page.pdf(options);
+          // If we're not running puppeteer in headless mode, return the converted PDF
+          if (debug == undefined || debug.headless == undefined || debug.headless) {
+            return await page.pdf(options);
+          }
         } finally {
           if (browser) {
             await browser.close();
@@ -113,6 +124,8 @@ class Grover
     normalized_options = Utils.normalize_object @options
     normalized_options['path'] = path if path.is_a? ::String
     result = processor.convert_pdf @url, normalized_options
+    return unless result
+
     result['data'].pack('c*')
   end
 

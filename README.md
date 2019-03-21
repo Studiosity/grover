@@ -35,9 +35,32 @@ pdf = grover.to_pdf
 # Options can be provided through meta tags
 Grover.new('<html><head><meta name="grover-page_ranges" content="1-3"')
 Grover.new('<html><head><meta name="grover-margin-top" content="10px"')
-# N.B. options are underscore case, and sub-options separated with a dash
-# N.B. #2 all options can be overwritten, including `emulate_media` and `display_url` 
 ```
+
+N.B.
+* options are underscore case, and sub-options separated with a dash
+* all options can be overwritten, including `emulate_media` and `display_url`
+
+### Relative paths
+If calling Grover directly (not through middleware) you will need to either specify a `display_url` or modify your
+HTML by converting any relative paths to absolute paths before passing to Grover.
+
+This can be achieved using the HTML pre-processor helper:
+
+```ruby
+absolute_html = Grover::HTMLPreprocessor.process relative_html, 'http://my.server/', 'http'
+```
+
+This is important because Chromium will try and resolve any relative paths via the display url host. If not provided,
+the display URL defaults to `http://example.com`.
+
+#### Why would you pre-process the HTML rather than just use the `display_url`
+There are many scenarios where specifying a different host of relative paths would be preferred. For example, your
+server might be behind a NAT gateway and the display URL in front of it. The display URL might be shown in the
+header/footer, and as such shouldn't expose details of your private network.  
+
+If you run into trouble, take a look at the [debugging](#debugging) section below which would allow you to inspect the
+page content and devtools.       
 
 
 ## Configuration
@@ -133,6 +156,23 @@ Or via the meta tags in the original response:
 </html>    
 ```
  
+
+## Debugging
+If you're having trouble with converting the HTML content, you can enable some debugging options to help. These can be
+enabled as global options via `Grover.configure`, by passing through to the Grover initializer, or using meta tag
+options.
+
+```ruby
+debug: {
+  headless: false,  # Default true. When set to false, the Chromium browser will be displayed
+  devtools: true    # Default false. When set to true, the browser devtools will be displayed. 
+}
+```
+
+N.B.
+* The headless option disabled is not compatible with exporting of the PDF.
+* If showing the devtools, the browser will halt resulting in a navigation timeout
+
 
 ## Contributing
 
