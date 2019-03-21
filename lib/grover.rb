@@ -32,7 +32,7 @@ class Grover
 
           // Configure puppeteer debugging options
           const debug = options.debug; delete options.debug;
-          if (debug != undefined) {
+          if (typeof debug === 'object' && !!debug) {
             if (debug.headless != undefined) { launchParams.headless = debug.headless; }
             if (debug.devtools != undefined) { launchParams.devtools = debug.devtools; }
           }
@@ -78,8 +78,8 @@ class Grover
             await page.emulateMedia(emulateMedia);
           }
 
-          // If we're not running puppeteer in headless mode, return the converted PDF
-          if (debug == undefined || debug.headless == undefined || debug.headless) {
+          // If we're running puppeteer in headless mode, return the converted PDF
+          if (debug == undefined || (typeof debug === 'object' && (debug.headless == undefined || debug.headless))) {
             return await page.pdf(options);
           }
         } finally {
