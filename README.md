@@ -32,6 +32,9 @@ grover = Grover.new('https://google.com', format: 'A4')
 # Get an inline PDF
 pdf = grover.to_pdf
 
+# get a screenshot
+png = grover.screenshot
+
 # Options can be provided through meta tags
 Grover.new('<html><head><meta name="grover-page_ranges" content="1-3"')
 Grover.new('<html><head><meta name="grover-margin-top" content="10px"')
