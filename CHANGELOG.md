@@ -2,6 +2,7 @@
 
 ## Unreleased
 ### Fixed
+- Metadata options not included if source contained *any* line starting with `http` 
 - Add magic comment for freezing string literals
 
 ## [0.7.1](releases/tag/v0.7.1) - 2019-01-22

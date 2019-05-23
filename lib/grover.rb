@@ -214,7 +214,7 @@ class Grover
   end
 
   def url_source?
-    @url.match(/^http/i)
+    @url.match(/\Ahttp/i)
   end
 
   def fix_boolean_options!(options)
