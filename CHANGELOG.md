@@ -1,13 +1,20 @@
 # Changelog
 
 ## Unreleased
+- None
+
+## [0.7.3](releases/tag/v0.7.3) - 2019-05-23
 ### Fixed
-- Metadata options not included if source contained *any* line starting with `http` 
-- Add magic comment for freezing string literals
+- [#14](https://github.com/Studiosity/grover/pull/14) Metadata options not included if source contained *any* line starting with `http` 
+- [#15](https://github.com/Studiosity/grover/pull/15) Add magic comment for freezing string literals
+
+## [0.7.2](releases/tag/v0.7.2) - 2019-01-22
+### Fixed
+- Better handle `null` assignment of `debug` options
 
 ## [0.7.1](releases/tag/v0.7.1) - 2019-01-22
 ### Added
-- Ability to disable headless mode and open devtools via option parameters
+- [#10](https://github.com/Studiosity/grover/pull/10) Ability to disable headless mode and open devtools via option parameters
 
 ## [0.6.2](releases/tag/v0.6.2) - 2018-09-20
 ### Fixed
