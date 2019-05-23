@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Grover
   #
   # Utility class for Grover helper methods
@@ -27,7 +29,7 @@ class Grover
     # @see active_support/core_ext/string/strip.rb
     #
     def self.strip_heredoc(string, inline: false)
-      string = string.gsub(/^#{string.scan(/^[ \t]*(?=\S)/).min}/, ''.freeze)
+      string = string.gsub(/^#{string.scan(/^[ \t]*(?=\S)/).min}/, '')
       inline ? string.delete("\n") : string
     end
 

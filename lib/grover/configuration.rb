@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Grover
   #
   # Configuration of the options for Grover HTML to PDF conversion
