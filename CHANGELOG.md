@@ -1,7 +1,8 @@
 # Changelog
 
 ## Unreleased
-- None
+### Fixed
+- Add magic comment for freezing string literals
 
 ## [0.7.1](releases/tag/v0.7.1) - 2019-01-22
 ### Added
