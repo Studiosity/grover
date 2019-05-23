@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'grover/version'
 
 require 'grover/utils'
@@ -92,7 +94,7 @@ class Grover
   end
   private_constant :Processor
 
-  DEFAULT_HEADER_TEMPLATE = "<div class='date text left'></div><div class='title text center'></div>".freeze
+  DEFAULT_HEADER_TEMPLATE = "<div class='date text left'></div><div class='title text center'></div>"
   DEFAULT_FOOTER_TEMPLATE = Utils.strip_heredoc(<<-HTML).freeze
     <div class='url text left grow'></div>
     <div class='text right'><span class='pageNumber'></span>/<span class='totalPages'></span></div>

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Grover
   #
   # Helper module for preparing HTML for conversion
