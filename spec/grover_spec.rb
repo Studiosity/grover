@@ -130,6 +130,25 @@ describe Grover do
         it { expect(pdf_text_content).to eq 'Hey there Footer with "quotes" in it' }
       end
 
+      context 'when the page contains a line starting with `http`' do
+        let(:options) { basic_header_footer_options.merge(header_template: large_text) }
+        let(:url_or_html) do
+          Grover::Utils.strip_heredoc(<<-HTML)
+            <html>
+              <head>
+                <meta name="grover-footer_template" content="<div class='text'>Footer content</div>" />
+              </head>
+              <body>
+                <h1>Hey there</h1>
+            http://example.com
+              </body>
+            </html>
+          HTML
+        end
+
+        it { expect(pdf_text_content).to eq 'Hey there http://example.com Footer content' }
+      end
+
       context 'when the page contains meta options with boolean content' do
         let(:options) { basic_header_footer_options.merge(header_template: 'We dont expect to see this...') }
         let(:url_or_html) do
