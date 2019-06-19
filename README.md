@@ -158,7 +158,7 @@ Or via the meta tags in the original response:
 
 ## Running on Heroku
 
-To run grover/puppeteer on Heroku there are two steps.
+To run Grover (Puppeteer) on Heroku there are two steps.
 
 First add the buildpack for puppeteer by running the following command on your heroku applicaiton.
 Make sure the the puppeteer buildpack runs before the main ruby buildpack.
