@@ -53,7 +53,10 @@ describe Grover do
     end
 
     context 'when passing through a valid URL' do
-      let(:url_or_html) { 'https://www.google.com' }
+      # we need to add the language for test stability
+      # if not added explicitely, google can respond with a different locale
+      # based on IP address geo-lookup, timezone, etc.
+      let(:url_or_html) { 'https://www.google.com/?gl=us' }
 
       it { is_expected.to start_with "%PDF-1.4\n" }
       it { expect(pdf_reader.page_count).to eq 1 }
