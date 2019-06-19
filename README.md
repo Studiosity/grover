@@ -21,7 +21,7 @@ gem 'grover'
 ### Google Puppeteer
 ```bash
 npm install puppeteer
-``` 
+```
 
 
 ## Usage
@@ -57,18 +57,18 @@ the display URL defaults to `http://example.com`.
 #### Why would you pre-process the HTML rather than just use the `display_url`
 There are many scenarios where specifying a different host of relative paths would be preferred. For example, your
 server might be behind a NAT gateway and the display URL in front of it. The display URL might be shown in the
-header/footer, and as such shouldn't expose details of your private network.  
+header/footer, and as such shouldn't expose details of your private network.
 
 If you run into trouble, take a look at the [debugging](#debugging) section below which would allow you to inspect the
-page content and devtools.       
+page content and devtools.
 
 
 ## Configuration
-Grover can be configured to adjust the layout of the resulting PDF. 
+Grover can be configured to adjust the layout of the resulting PDF.
 For available options, see https://github.com/GoogleChrome/puppeteer/blob/v1.7.0/docs/api.md#pagepdfoptions
 
 Also available are the `emulate_media`, `cache` and `timeout` options.
- 
+
 ```ruby
 # config/initializers/grover.rb
 Grover.configure do |config|
@@ -101,7 +101,7 @@ Should be valid HTML markup with following classes used to inject printing value
 * `title` document title
 * `url` document location
 * `pageNumber` current page number
-* `totalPages` total pages in the document  
+* `totalPages` total pages in the document
 
 
 ## Middleware
@@ -133,8 +133,8 @@ via `front_cover_path` and `back_cover_path` either via the global configuration
 These paths (with query parameters) are then requested from the downstream app.
 
 The cover pages are converted to PDF in isolation, and then combined together with the original PDF response,
-before being returned back up through the Rack stack. 
- 
+before being returned back up through the Rack stack.
+
 _N.B_ To simplify things, the same request method and body are used for the cover page requests.
 
 ```ruby
@@ -153,9 +153,23 @@ Or via the meta tags in the original response:
     <meta name="grover-back_cover_path" content="/back/cover/page?bar=baz" />
   </head>
   ...
-</html>    
+</html>
 ```
- 
+
+## Running on Heroku
+
+To run Grover (Puppeteer) on Heroku there are two steps.
+
+First add the buildpack for puppeteer by running the following command on your heroku applicaiton.
+Make sure the the puppeteer buildpack runs before the main ruby buildpack.
+
+    heroku buildpacks:add jontewks/puppeteer --index=1 [--remote yourappname]
+
+Next, tell Grover to run Puppeteer in the "no-sandbox" mode by setting an ENV variable
+`GROVER_NO_SANDBOX=true` on your app dyno. Be carefull to make sure that you trust all
+the HTML/JS that you provide to Grover.
+
+    heroku config:set GROVER_NO_SANDBOX=true [--remote yourappname]
 
 ## Debugging
 If you're having trouble with converting the HTML content, you can enable some debugging options to help. These can be
@@ -165,7 +179,7 @@ options.
 ```ruby
 debug: {
   headless: false,  # Default true. When set to false, the Chromium browser will be displayed
-  devtools: true    # Default false. When set to true, the browser devtools will be displayed. 
+  devtools: true    # Default false. When set to true, the browser devtools will be displayed.
 }
 ```
 
@@ -179,7 +193,7 @@ N.B.
 Bug reports and pull requests are welcome on GitHub at https://github.com/Studiosity/grover.
 
 Note that spec tests are appreciated to minimise regressions. Before submitting a PR, please ensure that:
- 
+
 ```bash
 $ rspec
 ```
@@ -193,7 +207,7 @@ both succeed
 
 ## Special mention
 Thanks are given to the great work done in the [PDFKit project](https://github.com/pdfkit/pdfkit).
-The middleware and HTML preprocessing components were used heavily in the implementation of Grover.  
+The middleware and HTML preprocessing components were used heavily in the implementation of Grover.
 
 
 ## License
