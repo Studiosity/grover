@@ -165,7 +165,7 @@ Make sure the the puppeteer buildpack runs before the main ruby buildpack.
 
     heroku buildpacks:add jontewks/puppeteer --index=1 [--remote yourappname]
 
-Next, tell GROVER to run puppeteer in the "no-sandbox" mode by setting an ENV variable
+Next, tell Grover to run Puppeteer in the "no-sandbox" mode by setting an ENV variable
 `GROVER_NO_SANDBOX=true` on your app dyno. Be carefull to make sure that you trust all
 the HTML/JS that you provide to Grover.
 
