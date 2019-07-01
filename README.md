@@ -41,6 +41,19 @@ N.B.
 * options are underscore case, and sub-options separated with a dash
 * all options can be overwritten, including `emulate_media` and `display_url`
 
+### From a view template
+
+It's easy to render a normal Rails view template as a PDF, using Rails' [`render_to_string`](https://api.rubyonrails.org/classes/AbstractController/Rendering.html#method-i-render_to_string):
+
+```ruby
+html = MyController.new.render_to_string({
+  template: 'controller/view',
+  layout: 'my_layout',
+  locals: { :@instance_var => ... }
+})
+pdf = Grover.new(html, grover_options).to_pdf
+```
+
 ### Relative paths
 If calling Grover directly (not through middleware) you will need to either specify a `display_url` or modify your
 HTML by converting any relative paths to absolute paths before passing to Grover.
@@ -121,19 +134,6 @@ use Grover::Middleware
 # in application.rb
 require 'grover'
 config.middleware.use Grover::Middleware
-```
-
-## PDFs from a view temmplate
-
-It's easy to render a normal Rails view template as a PDF, using Rails' [`render_to_string`](https://api.rubyonrails.org/classes/AbstractController/Rendering.html#method-i-render_to_string):
-
-```ruby
-html = MyController.new.render_to_string({
-  template: 'controller/view',
-  layout: 'my_layout',
-  locals: { :@instance_var => ... }
-})
-pdf = Grover.new(html, grover_options).to_pdf
 ```
 
 ## Cover pages
