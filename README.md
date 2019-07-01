@@ -123,6 +123,18 @@ require 'grover'
 config.middleware.use Grover::Middleware
 ```
 
+## PDFs from a view temmplate
+
+It's easy to render a normal Rails view template as a PDF, using Rails' [`render_to_string`](https://api.rubyonrails.org/classes/AbstractController/Rendering.html#method-i-render_to_string):
+
+```
+html = MyController.new.render_to_string({
+  template: 'controller/view',
+  layout: 'my_layout',
+  locals: { :@instance_var => ... }
+})
+pdf = Grover.new(html, grover_options).to_pdf
+```
 
 ## Cover pages
 Since the header/footer for Puppeteer is configured globally, displaying of front/back cover
