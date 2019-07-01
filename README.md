@@ -42,7 +42,6 @@ N.B.
 * all options can be overwritten, including `emulate_media` and `display_url`
 
 ### From a view template
-
 It's easy to render a normal Rails view template as a PDF, using Rails' [`render_to_string`](https://api.rubyonrails.org/classes/AbstractController/Rendering.html#method-i-render_to_string):
 
 ```ruby
