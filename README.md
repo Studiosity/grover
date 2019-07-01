@@ -127,7 +127,7 @@ config.middleware.use Grover::Middleware
 
 It's easy to render a normal Rails view template as a PDF, using Rails' [`render_to_string`](https://api.rubyonrails.org/classes/AbstractController/Rendering.html#method-i-render_to_string):
 
-```
+```ruby
 html = MyController.new.render_to_string({
   template: 'controller/view',
   layout: 'my_layout',
