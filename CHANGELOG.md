@@ -1,7 +1,8 @@
 # Changelog
 
 ## Unreleased
-- None
+### Breaking change
+- Drop support for Ruby 2.2
 
 ## [0.7.4](releases/tag/v0.7.4) - 2019-07-09
 ### Breaking change
