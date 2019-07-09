@@ -3,6 +3,10 @@
 ## Unreleased
 - None
 
+## [0.7.4](releases/tag/v0.7.4) - 2019-07-09
+### Breaking change
+- [#18](https://github.com/Studiosity/grover/pull/18) Use `GROVER_NO_SANDBOX` for disabling sandbox ([@koenhandekyn][])
+ 
 ## [0.7.3](releases/tag/v0.7.3) - 2019-05-23
 ### Fixed
 - [#14](https://github.com/Studiosity/grover/pull/14) Metadata options not included if source contained *any* line starting with `http` 
@@ -131,3 +135,5 @@
 ## [0.0.1](releases/tag/v0.0.1) - 2018-08-22
 ### Added
 - Initial gem framework 
+
+[@koenhandekyn]: https://github.com/koenhandekyn
