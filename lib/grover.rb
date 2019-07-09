@@ -95,7 +95,7 @@ class Grover
   private_constant :Processor
 
   DEFAULT_HEADER_TEMPLATE = "<div class='date text left'></div><div class='title text center'></div>"
-  DEFAULT_FOOTER_TEMPLATE = <<~HTML.freeze
+  DEFAULT_FOOTER_TEMPLATE = <<~HTML
     <div class='url text left grow'></div>
     <div class='text right'><span class='pageNumber'></span>/<span class='totalPages'></span></div>
   HTML
