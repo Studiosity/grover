@@ -43,50 +43,6 @@ describe Grover::Utils do
     end
   end
 
-  describe '.strip_heredoc' do
-    subject(:strip_heredoc) { described_class.strip_heredoc string }
-
-    context 'with an empty string' do
-      let(:string) { '' }
-
-      it { is_expected.to eq '' }
-    end
-
-    context 'with a multi-line string and no padding' do
-      let(:string) { "Hey there\nbuddy\n" }
-
-      it { is_expected.to eq string }
-    end
-
-    context 'with a multi-line string and equal space padding' do
-      let(:string) { "    Hey there\n    buddy\n" }
-
-      it { is_expected.to eq "Hey there\nbuddy\n" }
-    end
-
-    context 'with a multi-line string where first line has shorter space padding' do
-      let(:string) { "  Hey there\n   buddy" }
-
-      it { is_expected.to eq "Hey there\n buddy" }
-    end
-
-    context 'with a multi-line string where second line has shorter space padding' do
-      let(:string) { "  Hey there\n buddy" }
-
-      it { is_expected.to eq " Hey there\nbuddy" }
-    end
-
-    context 'when the optional `inline` flag is set to true' do
-      subject(:strip_heredoc) { described_class.strip_heredoc string, inline: true }
-
-      context 'with a multi-line string' do
-        let(:string) { "  Hey there\n   buddy\n" }
-
-        it { is_expected.to eq 'Hey there buddy' }
-      end
-    end
-  end
-
   describe '.deep_assign' do
     subject(:deep_assign) { described_class.deep_assign(hash, keys, value) }
 

@@ -26,7 +26,7 @@ class Grover
       ENV['GROVER_NO_SANDBOX'] == 'true' ? "{args: ['--no-sandbox', '--disable-setuid-sandbox']}" : '{}'
     end
 
-    method :convert_pdf, Utils.strip_heredoc(<<-FUNCTION)
+    method :convert_pdf, <<~FUNCTION
       async (url_or_html, options) => {
         let browser;
         try {
@@ -95,7 +95,7 @@ class Grover
   private_constant :Processor
 
   DEFAULT_HEADER_TEMPLATE = "<div class='date text left'></div><div class='title text center'></div>"
-  DEFAULT_FOOTER_TEMPLATE = Utils.strip_heredoc(<<-HTML).freeze
+  DEFAULT_FOOTER_TEMPLATE = <<~HTML.freeze
     <div class='url text left grow'></div>
     <div class='text right'><span class='pageNumber'></span>/<span class='totalPages'></span></div>
   HTML

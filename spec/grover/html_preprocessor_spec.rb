@@ -23,7 +23,7 @@ describe Grover::HTMLPreprocessor do
 
     context 'with host-relative URL with single quotes' do
       let(:html) do
-        Grover::Utils.strip_heredoc <<-HTML
+        <<~HTML
           <html>
             <head>
               <link href='/stylesheets/application.css' rel='stylesheet' type='text/css' />
@@ -36,7 +36,7 @@ describe Grover::HTMLPreprocessor do
       end
 
       it do
-        expect(process).to eq Grover::Utils.strip_heredoc(<<-HTML)
+        expect(process).to eq <<~HTML
           <html>
             <head>
               <link href='http://example.com/stylesheets/application.css' rel='stylesheet' type='text/css' />
@@ -53,7 +53,7 @@ describe Grover::HTMLPreprocessor do
       let(:html) { '<link href="/stylesheets/application.css" media="screen" rel="stylesheet" type="text/css" />' }
 
       it do
-        expect(process).to eq Grover::Utils.strip_heredoc(<<-HTML, inline: true)
+        expect(process).to eq <<~HTML.delete("\n")
           <link href="http://example.com/stylesheets/application.css" media="screen" rel="stylesheet" type="text/css" />
         HTML
       end
@@ -65,7 +65,7 @@ describe Grover::HTMLPreprocessor do
       end
 
       it do
-        expect(process).to eq Grover::Utils.strip_heredoc(<<-HTML, inline: true)
+        expect(process).to eq <<~HTML.delete("\n")
           <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600' rel='stylesheet' type='text/css'>
         HTML
       end
@@ -77,7 +77,7 @@ describe Grover::HTMLPreprocessor do
       end
 
       it do
-        expect(process).to eq Grover::Utils.strip_heredoc(<<-HTML, inline: true)
+        expect(process).to eq <<~HTML.delete("\n")
           <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600" rel="stylesheet" type="text/css">
         HTML
       end
@@ -91,7 +91,7 @@ describe Grover::HTMLPreprocessor do
 
     context 'when options not set' do
       let(:html) do
-        Grover::Utils.strip_heredoc <<-HTML
+        <<~HTML
           <link href='//fonts.googleapis.com/css?family=Open+Sans:400,600' rel='stylesheet' type='text/css'>
           <a href='/'><img src='/logo.jpg'></a>
         HTML
@@ -101,7 +101,7 @@ describe Grover::HTMLPreprocessor do
         let(:root_url) { nil }
 
         it do
-          expect(process).to eq Grover::Utils.strip_heredoc(<<-HTML)
+          expect(process).to eq <<~HTML
             <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600' rel='stylesheet' type='text/css'>
             <a href='/'><img src='/logo.jpg'></a>
           HTML
@@ -112,7 +112,7 @@ describe Grover::HTMLPreprocessor do
         let(:protocol) { nil }
 
         it do
-          expect(process).to eq Grover::Utils.strip_heredoc(<<-HTML)
+          expect(process).to eq <<~HTML
             <link href='//fonts.googleapis.com/css?family=Open+Sans:400,600' rel='stylesheet' type='text/css'>
             <a href='http://example.com/'><img src='http://example.com/logo.jpg'></a>
           HTML
