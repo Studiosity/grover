@@ -26,71 +26,76 @@ class Grover
       ENV['GROVER_NO_SANDBOX'] == 'true' ? "{args: ['--no-sandbox', '--disable-setuid-sandbox']}" : '{}'
     end
 
-    method :convert_pdf, <<~FUNCTION
-      async (url_or_html, options) => {
-        let browser;
-        try {
-          let launchParams = #{launch_params};
+    def self.convert_function(convert_action)
+      <<~FUNCTION
+        async (url_or_html, options) => {
+          let browser;
+          try {
+            let launchParams = #{launch_params};
 
-          // Configure puppeteer debugging options
-          const debug = options.debug; delete options.debug;
-          if (typeof debug === 'object' && !!debug) {
-            if (debug.headless != undefined) { launchParams.headless = debug.headless; }
-            if (debug.devtools != undefined) { launchParams.devtools = debug.devtools; }
-          }
+            // Configure puppeteer debugging options
+            const debug = options.debug; delete options.debug;
+            if (typeof debug === 'object' && !!debug) {
+              if (debug.headless != undefined) { launchParams.headless = debug.headless; }
+              if (debug.devtools != undefined) { launchParams.devtools = debug.devtools; }
+            }
 
-          // Launch the browser and create a page
-          browser = await puppeteer.launch(launchParams);
-          const page = await browser.newPage();
+            // Launch the browser and create a page
+            browser = await puppeteer.launch(launchParams);
+            const page = await browser.newPage();
 
-          // Set caching flag (if provided)
-          const cache = options.cache; delete options.cache;
-          if (cache != undefined) {
-            await page.setCacheEnabled(cache);
-          }
+            // Set caching flag (if provided)
+            const cache = options.cache; delete options.cache;
+            if (cache != undefined) {
+              await page.setCacheEnabled(cache);
+            }
 
-          // Setup timeout option (if provided)
-          let request_options = {};
-          const timeout = options.timeout; delete options.timeout;
-          if (timeout != undefined) {
-            request_options.timeout = timeout;
-          }
+            // Setup timeout option (if provided)
+            let request_options = {};
+            const timeout = options.timeout; delete options.timeout;
+            if (timeout != undefined) {
+              request_options.timeout = timeout;
+            }
 
-          if (url_or_html.match(/^http/i)) {
-            // Request is for a URL, so request it
-            request_options.waitUntil = 'networkidle2';
-            await page.goto(url_or_html, request_options);
-          } else {
-            // Request is some HTML content. Use request interception to assign the body
-            request_options.waitUntil = 'networkidle0';
-            await page.setRequestInterception(true);
-            page.once('request', request => {
-              request.respond({ body: url_or_html });
-              // Reset the request interception
-              // (we only want to intercept the first request - ie our HTML)
-              page.on('request', request => request.continue());
-            });
-            const displayUrl = options.displayUrl; delete options.displayUrl;
-            await page.goto(displayUrl || 'http://example.com', request_options);
-          }
+            if (url_or_html.match(/^http/i)) {
+              // Request is for a URL, so request it
+              request_options.waitUntil = 'networkidle2';
+              await page.goto(url_or_html, request_options);
+            } else {
+              // Request is some HTML content. Use request interception to assign the body
+              request_options.waitUntil = 'networkidle0';
+              await page.setRequestInterception(true);
+              page.once('request', request => {
+                request.respond({ body: url_or_html });
+                // Reset the request interception
+                // (we only want to intercept the first request - ie our HTML)
+                page.on('request', request => request.continue());
+              });
+              const displayUrl = options.displayUrl; delete options.displayUrl;
+              await page.goto(displayUrl || 'http://example.com', request_options);
+            }
 
-          // If specified, emulate the media type
-          const emulateMedia = options.emulateMedia; delete options.emulateMedia;
-          if (emulateMedia != undefined) {
-            await page.emulateMedia(emulateMedia);
-          }
+            // If specified, emulate the media type
+            const emulateMedia = options.emulateMedia; delete options.emulateMedia;
+            if (emulateMedia != undefined) {
+              await page.emulateMedia(emulateMedia);
+            }
 
-          // If we're running puppeteer in headless mode, return the converted PDF
-          if (debug == undefined || (typeof debug === 'object' && (debug.headless == undefined || debug.headless))) {
-            return await page.pdf(options);
-          }
-        } finally {
-          if (browser) {
-            await browser.close();
+            // If we're running puppeteer in headless mode, return the converted PDF
+            if (debug == undefined || (typeof debug === 'object' && (debug.headless == undefined || debug.headless))) {
+              return await page.#{convert_action}(options);
+            }
+          } finally {
+            if (browser) {
+              await browser.close();
+            }
           }
         }
-      }
-    FUNCTION
+      FUNCTION
+    end
+
+    method :convert_pdf, convert_function('pdf')
+    method :convert_screenshot, convert_function('screenshot')
   end
   private_constant :Processor
 
@@ -123,12 +128,46 @@ class Grover
   # @return [String] The resulting PDF data
   #
   def to_pdf(path = nil)
-    normalized_options = Utils.normalize_object @options
-    normalized_options['path'] = path if path.is_a? ::String
-    result = processor.convert_pdf @url, normalized_options
+    result = processor.convert_pdf @url, normalized_options(path: path)
     return unless result
 
-    result['data'].pack('c*')
+    result['data'].pack('C*')
+  end
+
+  #
+  # Request URL with provided options and create screenshot
+  #
+  # @param [String] path Optional path to write the screenshot to
+  # @param [String] format Optional format of the screenshot
+  # @return [String] The resulting image data
+  #
+  def screenshot(path: nil, format: nil)
+    options = normalized_options(path: path)
+    options['type'] = format if format.is_a? ::String
+    result = processor.convert_screenshot @url, options
+    return unless result
+
+    result['data'].pack('C*')
+  end
+
+  #
+  # Request URL with provided options and create PNG
+  #
+  # @param [String] path Optional path to write the screenshot to
+  # @return [String] The resulting PNG data
+  #
+  def to_png(path = nil)
+    screenshot(path: path, format: 'png')
+  end
+
+  #
+  # Request URL with provided options and create JPEG
+  #
+  # @param [String] path Optional path to write the screenshot to
+  # @return [String] The resulting JPEG data
+  #
+  def to_jpeg(path = nil)
+    screenshot(path: path, format: 'jpeg')
   end
 
   #
@@ -231,5 +270,11 @@ class Grover
     return unless options.key? 'scale'
 
     options['scale'] = options['scale'].to_f
+  end
+
+  def normalized_options(path:)
+    normalized_options = Utils.normalize_object @options
+    normalized_options['path'] = path if path.is_a? ::String
+    normalized_options
   end
 end

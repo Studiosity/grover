@@ -5,7 +5,7 @@
 
 # Grover
 
-A Ruby gem to transform HTML into PDFs using [Google Puppeteer](https://github.com/GoogleChrome/puppeteer)
+A Ruby gem to transform HTML into PDFs, PNGs or JPEGs using [Google Puppeteer](https://github.com/GoogleChrome/puppeteer)
 and [Chromium](https://www.chromium.org/Home).
 
 ![Grover](/Grover.jpg "Grover")
@@ -31,6 +31,10 @@ grover = Grover.new('https://google.com', format: 'A4')
 
 # Get an inline PDF
 pdf = grover.to_pdf
+
+# Get a screenshot
+png = grover.to_png
+jpeg = grover.to_jpeg 
 
 # Options can be provided through meta tags
 Grover.new('<html><head><meta name="grover-page_ranges" content="1-3"')
@@ -76,8 +80,9 @@ page content and devtools.
 
 
 ## Configuration
-Grover can be configured to adjust the layout of the resulting PDF.
-For available options, see https://github.com/GoogleChrome/puppeteer/blob/v1.7.0/docs/api.md#pagepdfoptions
+Grover can be configured to adjust the layout of the resulting PDF/image.
+
+For available PDF options, see https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagepdfoptions
 
 Also available are the `emulate_media`, `cache` and `timeout` options.
 
@@ -97,6 +102,11 @@ Grover.configure do |config|
   }
 end
 ```
+
+For available PNG/JPEG options, see https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagescreenshotoptions
+
+Note that by default the `full_page` option is set to false and you will get a 800x600 image. You can either specify
+the image size using the `clip` options, or capture the entire page with `full_page` set to `true`. 
 
 #### Page URL for middleware requests (or passing through raw HTML)
 If you want to have the header or footer display the page URL, Grover requires that this is passed through via the
