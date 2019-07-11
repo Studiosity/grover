@@ -35,15 +35,28 @@ class Grover
     JPEG_REGEX = /\.jpe?g$/i.freeze
 
     attr_reader :pdf_request, :png_request, :jpeg_request
+    delegate :ignore_path, :use_pdf_middleware, :use_png_middleware, :use_jpeg_middleware, to: 'Grover.configuration'
 
     def identify_request_type
-      @pdf_request = Grover.configuration.use_pdf_middleware && !@request.path.match(PDF_REGEX).nil?
-      @png_request = Grover.configuration.use_png_middleware && !@request.path.match(PNG_REGEX).nil?
-      @jpeg_request = Grover.configuration.use_jpeg_middleware && !@request.path.match(JPEG_REGEX).nil?
+      @pdf_request = use_pdf_middleware && path_matches?(PDF_REGEX)
+      @png_request = use_png_middleware && path_matches?(PNG_REGEX)
+      @jpeg_request = use_jpeg_middleware && path_matches?(JPEG_REGEX)
+    end
+
+    def path_matches?(regex)
+      !@request.path.match(regex).nil?
     end
 
     def grover_request?
-      pdf_request || png_request || jpeg_request
+      (pdf_request || png_request || jpeg_request) && !ignore_request?
+    end
+
+    def ignore_request?
+      case ignore_path
+      when String then @request.path.start_with? ignore_path
+      when Regexp then ignore_path.match? @request.path
+      when Proc then ignore_path.call @request.path
+      end
     end
 
     def html_content?(headers)
@@ -51,19 +64,21 @@ class Grover
     end
 
     def update_response(response, headers)
-      grover = create_grover_for_response(response)
-
-      body, content_type =
-        if pdf_request
-          [convert_to_pdf(grover), 'application/pdf']
-        elsif png_request
-          [grover.to_png, 'image/png']
-        elsif jpeg_request
-          [grover.to_jpeg, 'image/jpeg']
-        end
-
+      body, content_type = convert_response response
       assign_headers headers, body, content_type
       [body]
+    end
+
+    def convert_response(response)
+      grover = create_grover_for_response(response)
+
+      if pdf_request
+        [convert_to_pdf(grover), 'application/pdf']
+      elsif png_request
+        [grover.to_png, 'image/png']
+      elsif jpeg_request
+        [grover.to_jpeg, 'image/jpeg']
+      end
     end
 
     def convert_to_pdf(grover)
