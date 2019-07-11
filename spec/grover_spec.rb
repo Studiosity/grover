@@ -54,7 +54,7 @@ describe Grover do
 
     context 'when passing through a valid URL' do
       # we need to add the language for test stability
-      # if not added explicitely, google can respond with a different locale
+      # if not added explicitly, google can respond with a different locale
       # based on IP address geo-lookup, timezone, etc.
       let(:url_or_html) { 'https://www.google.com/?gl=us' }
 
@@ -82,8 +82,6 @@ describe Grover do
     end
 
     context 'when passing through options to Grover' do
-      subject(:to_pdf) { grover.to_pdf }
-
       let(:url_or_html) { '<html><head><title>Paaage</title></head><body><h1>Hey there</h1></body></html>' }
 
       context 'when options includes A4 page format' do
@@ -290,6 +288,98 @@ describe Grover do
       end
     end
   end
+
+  # rubocop:disable RSpec/MultipleExpectations
+  describe '#screenshot' do
+    subject(:screenshot) { grover.screenshot }
+
+    let(:image) { MiniMagick::Image.read screenshot }
+
+    context 'when passing through a valid URL' do
+      let(:url_or_html) { 'https://www.google.com/?gl=us' }
+
+      # default screenshot is PNG 800w x 600h
+      it { expect(screenshot.unpack('C*')).to start_with "\x89PNG\r\n\x1A\n".unpack('C*') }
+      it { expect(image.type).to eq 'PNG' }
+      it { expect(image.dimensions).to eq [800, 600] }
+
+      # don't really want to rely on pixel testing the website screenshot
+      # so we'll check it's mean colour and kurtosis are roughly what we expect
+      it 'contains approximations of colour and frequency distribution sharpness' do
+        expect(image.data.dig('imageStatistics', 'all', 'mean').to_f).to be_within(0.5).of 188.4
+        expect(image.data.dig('imageStatistics', 'all', 'kurtosis').to_f).to be_within(50).of 3625.3
+      end
+    end
+
+    context 'when passing through html' do
+      let(:url_or_html) { '<html><body style="background-color: blue"></body></html>' }
+
+      it { expect(screenshot.unpack('C*')).to start_with "\x89PNG\r\n\x1A\n".unpack('C*') }
+      it { expect(image.type).to eq 'PNG' }
+      it { expect(image.dimensions).to eq [800, 600] }
+
+      it 'contains only blue' do
+        expect(image.data.dig('channelStatistics', 'red', 'mean')).to eq '0'
+        expect(image.data.dig('channelStatistics', 'green', 'mean')).to eq '0'
+        expect(image.data.dig('channelStatistics', 'blue', 'mean')).to eq '255'
+        expect(image.data.dig('channelStatistics', 'alpha', 'mean')).to eq '255'
+      end
+    end
+
+    context 'when passing through options to Grover' do
+      let(:url_or_html) { '<html><body style="background-color: red"></body></html>' }
+      let(:options) { { clip: { x: 0, y: 0, width: 200, height: 100 } } }
+
+      it { expect(screenshot.unpack('C*')).to start_with "\x89PNG\r\n\x1A\n".unpack('C*') }
+      it { expect(image.type).to eq 'PNG' }
+      it { expect(image.dimensions).to eq [200, 100] }
+
+      it 'contains only red' do
+        expect(image.data.dig('channelStatistics', 'red', 'mean')).to eq '255'
+        expect(image.data.dig('channelStatistics', 'green', 'mean')).to eq '0'
+        expect(image.data.dig('channelStatistics', 'blue', 'mean')).to eq '0'
+        expect(image.data.dig('channelStatistics', 'alpha', 'mean')).to eq '255'
+      end
+    end
+  end
+
+  describe '#to_png' do
+    subject(:to_png) { grover.to_png }
+
+    let(:image) { MiniMagick::Image.read to_png }
+    let(:url_or_html) { '<html><body style="background-color: green"></body></html>' }
+
+    it { expect(to_png.unpack('C*')).to start_with "\x89PNG\r\n\x1A\n".unpack('C*') }
+    it { expect(image.type).to eq 'PNG' }
+    it { expect(image.dimensions).to eq [800, 600] }
+
+    it 'contains only green' do
+      expect(image.data.dig('channelStatistics', 'red', 'mean')).to eq '0'
+      expect(image.data.dig('channelStatistics', 'green', 'mean')).to eq '128'
+      expect(image.data.dig('channelStatistics', 'blue', 'mean')).to eq '0'
+      expect(image.data.dig('channelStatistics', 'alpha', 'mean')).to eq '255'
+    end
+  end
+
+  describe '#to_jpeg' do
+    subject(:to_jpeg) { grover.to_jpeg }
+
+    let(:image) { MiniMagick::Image.read to_jpeg }
+    let(:url_or_html) { '<html><body style="background-color: purple"></body></html>' }
+
+    it { expect(to_jpeg.unpack('C*')).to start_with [0xFF, 0xD8, 0xFF] }
+    it { expect(to_jpeg[6..9]).to eq 'JFIF' }
+    it { expect(to_jpeg.unpack('C*')).to end_with [0xFF, 0xD9] }
+    it { expect(image.type).to eq 'JPEG' }
+    it { expect(image.dimensions).to eq [800, 600] }
+
+    it 'contains only purple' do
+      expect(image.data.dig('channelStatistics', 'red', 'mean')).to eq '129'
+      expect(image.data.dig('channelStatistics', 'green', 'mean')).to eq '0'
+      expect(image.data.dig('channelStatistics', 'blue', 'mean')).to eq '127'
+    end
+  end
+  # rubocop:enable RSpec/MultipleExpectations
 
   describe '#front_cover_path' do
     subject(:front_cover_path) { grover.front_cover_path }
