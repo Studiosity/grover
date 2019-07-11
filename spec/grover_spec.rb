@@ -289,7 +289,6 @@ describe Grover do
     end
   end
 
-  # rubocop:disable RSpec/MultipleExpectations
   describe '#screenshot' do
     subject(:screenshot) { grover.screenshot }
 
@@ -304,11 +303,8 @@ describe Grover do
       it { expect(image.dimensions).to eq [800, 600] }
 
       # don't really want to rely on pixel testing the website screenshot
-      # so we'll check it's mean colour and kurtosis are roughly what we expect
-      it 'contains approximations of colour and frequency distribution sharpness' do
-        expect(image.data.dig('imageStatistics', 'all', 'mean').to_f).to be_within(0.5).of 188.4
-        expect(image.data.dig('imageStatistics', 'all', 'kurtosis').to_f).to be_within(50).of 3625.3
-      end
+      # so we'll check it's mean colour is roughly what we expect
+      it { expect(image.data.dig('imageStatistics', 'all', 'mean').to_f).to be_within(0.5).of 188.4 }
     end
 
     context 'when passing through html' do
@@ -317,13 +313,7 @@ describe Grover do
       it { expect(screenshot.unpack('C*')).to start_with "\x89PNG\r\n\x1A\n".unpack('C*') }
       it { expect(image.type).to eq 'PNG' }
       it { expect(image.dimensions).to eq [800, 600] }
-
-      it 'contains only blue' do
-        expect(image.data.dig('channelStatistics', 'red', 'mean')).to eq '0'
-        expect(image.data.dig('channelStatistics', 'green', 'mean')).to eq '0'
-        expect(image.data.dig('channelStatistics', 'blue', 'mean')).to eq '255'
-        expect(image.data.dig('channelStatistics', 'alpha', 'mean')).to eq '255'
-      end
+      it { expect(mean_colour_statistics(image)).to eq %w[0 0 255] }
     end
 
     context 'when passing through options to Grover' do
@@ -333,13 +323,7 @@ describe Grover do
       it { expect(screenshot.unpack('C*')).to start_with "\x89PNG\r\n\x1A\n".unpack('C*') }
       it { expect(image.type).to eq 'PNG' }
       it { expect(image.dimensions).to eq [200, 100] }
-
-      it 'contains only red' do
-        expect(image.data.dig('channelStatistics', 'red', 'mean')).to eq '255'
-        expect(image.data.dig('channelStatistics', 'green', 'mean')).to eq '0'
-        expect(image.data.dig('channelStatistics', 'blue', 'mean')).to eq '0'
-        expect(image.data.dig('channelStatistics', 'alpha', 'mean')).to eq '255'
-      end
+      it { expect(mean_colour_statistics(image)).to eq %w[255 0 0] }
     end
   end
 
@@ -352,13 +336,7 @@ describe Grover do
     it { expect(to_png.unpack('C*')).to start_with "\x89PNG\r\n\x1A\n".unpack('C*') }
     it { expect(image.type).to eq 'PNG' }
     it { expect(image.dimensions).to eq [800, 600] }
-
-    it 'contains only green' do
-      expect(image.data.dig('channelStatistics', 'red', 'mean')).to eq '0'
-      expect(image.data.dig('channelStatistics', 'green', 'mean')).to eq '128'
-      expect(image.data.dig('channelStatistics', 'blue', 'mean')).to eq '0'
-      expect(image.data.dig('channelStatistics', 'alpha', 'mean')).to eq '255'
-    end
+    it { expect(mean_colour_statistics(image)).to eq %w[0 128 0] }
   end
 
   describe '#to_jpeg' do
@@ -372,14 +350,8 @@ describe Grover do
     it { expect(to_jpeg.unpack('C*')).to end_with [0xFF, 0xD9] }
     it { expect(image.type).to eq 'JPEG' }
     it { expect(image.dimensions).to eq [800, 600] }
-
-    it 'contains only purple' do
-      expect(image.data.dig('channelStatistics', 'red', 'mean')).to eq '129'
-      expect(image.data.dig('channelStatistics', 'green', 'mean')).to eq '0'
-      expect(image.data.dig('channelStatistics', 'blue', 'mean')).to eq '127'
-    end
+    it { expect(mean_colour_statistics(image)).to eq %w[129 0 127] }
   end
-  # rubocop:enable RSpec/MultipleExpectations
 
   describe '#front_cover_path' do
     subject(:front_cover_path) { grover.front_cover_path }
@@ -503,5 +475,9 @@ describe Grover do
 
   describe '.configure' do
     it { expect { |b| described_class.configure(&b) }.to yield_with_args(described_class.configuration) }
+  end
+
+  def mean_colour_statistics(image)
+    %w[red green blue].map { |colour| image.data.dig('channelStatistics', colour, 'mean') }
   end
 end
