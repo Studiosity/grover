@@ -7,7 +7,7 @@
 ### Added
 - [#25](https://github.com/Studiosity/grover/pull/25) Add support for capturing PNG/JPEG screenshots
 - [#27](https://github.com/Studiosity/grover/pull/27) Add support for PNG/JPEG middleware requests
-- Add support for `viewport` options (passed in to `page.setViewport` before the page is rendered)
+- [#28](https://github.com/Studiosity/grover/pull/28) Add support for `viewport` options (passed in to `page.setViewport` before the page is rendered)
 
 ## [0.7.4](releases/tag/v0.7.4) - 2019-07-09
 ### Breaking change
