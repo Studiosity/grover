@@ -57,6 +57,12 @@ class Grover
               request_options.timeout = timeout;
             }
 
+            // Setup viewport options (if provided)
+            const viewport = options.viewport; delete options.viewport;
+            if (viewport != undefined) {
+              await page.setViewport(viewport);
+            }
+
             if (url_or_html.match(/^http/i)) {
               // Request is for a URL, so request it
               request_options.waitUntil = 'networkidle2';

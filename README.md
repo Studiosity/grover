@@ -84,7 +84,7 @@ Grover can be configured to adjust the layout of the resulting PDF/image.
 
 For available PDF options, see https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagepdfoptions
 
-Also available are the `emulate_media`, `cache` and `timeout` options.
+Also available are the `emulate_media`, `cache`, `viewport` and `timeout` options.
 
 ```ruby
 # config/initializers/grover.rb
@@ -94,6 +94,10 @@ Grover.configure do |config|
     margin: {
       top: '5px',
       bottom: '10cm'
+    },
+    viewport: {
+      width: 640,
+      height: 480
     },
     prefer_css_page_size: true,
     emulate_media: 'screen',
@@ -106,7 +110,9 @@ end
 For available PNG/JPEG options, see https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagescreenshotoptions
 
 Note that by default the `full_page` option is set to false and you will get a 800x600 image. You can either specify
-the image size using the `clip` options, or capture the entire page with `full_page` set to `true`. 
+the image size using the `clip` options, or capture the entire page with `full_page` set to `true`.
+
+For `viewport` options, see https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagesetviewportviewport 
 
 #### Page URL for middleware requests (or passing through raw HTML)
 If you want to have the header or footer display the page URL, Grover requires that this is passed through via the

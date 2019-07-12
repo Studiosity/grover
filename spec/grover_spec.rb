@@ -316,7 +316,7 @@ describe Grover do
       it { expect(mean_colour_statistics(image)).to eq %w[0 0 255] }
     end
 
-    context 'when passing through options to Grover' do
+    context 'when passing through clip options to Grover' do
       let(:url_or_html) { '<html><body style="background-color: red"></body></html>' }
       let(:options) { { clip: { x: 0, y: 0, width: 200, height: 100 } } }
 
@@ -324,6 +324,16 @@ describe Grover do
       it { expect(image.type).to eq 'PNG' }
       it { expect(image.dimensions).to eq [200, 100] }
       it { expect(mean_colour_statistics(image)).to eq %w[255 0 0] }
+    end
+
+    context 'when passing through viewport options to Grover' do
+      let(:url_or_html) { '<html><body style="background-color: brown"></body></html>' }
+      let(:options) { { viewport: { width: 400, height: 500 } } }
+
+      it { expect(screenshot.unpack('C*')).to start_with "\x89PNG\r\n\x1A\n".unpack('C*') }
+      it { expect(image.type).to eq 'PNG' }
+      it { expect(image.dimensions).to eq [400, 500] }
+      it { expect(mean_colour_statistics(image)).to eq %w[165 42 42] }
     end
   end
 
