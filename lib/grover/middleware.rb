@@ -12,21 +12,18 @@ class Grover
   class Middleware
     def initialize(app)
       @app = app
-      @render_pdf = false
+      @pdf_request = false
+      @png_request = false
+      @jpeg_request = false
     end
 
     def call(env)
       @request = Rack::Request.new(env)
-      @render_pdf = pdf_request?
+      identify_request_type
 
-      configure_env_for_pdf_request(env) if rendering_pdf?
+      configure_env_for_grover_request(env) if grover_request?
       status, headers, response = @app.call(env)
-
-      if rendering_pdf? && html_content?(headers)
-        pdf = convert_to_pdf response
-        response = [pdf]
-        update_headers headers, pdf
-      end
+      response = update_response response, headers if grover_request? && html_content?(headers)
 
       [status, headers, response]
     end
@@ -34,21 +31,57 @@ class Grover
     private
 
     PDF_REGEX = /\.pdf$/i.freeze
+    PNG_REGEX = /\.png$/i.freeze
+    JPEG_REGEX = /\.jpe?g$/i.freeze
 
-    def rendering_pdf?
-      @render_pdf
+    attr_reader :pdf_request, :png_request, :jpeg_request
+
+    def identify_request_type
+      @pdf_request = Grover.configuration.use_pdf_middleware && path_matches?(PDF_REGEX)
+      @png_request = Grover.configuration.use_png_middleware && path_matches?(PNG_REGEX)
+      @jpeg_request = Grover.configuration.use_jpeg_middleware && path_matches?(JPEG_REGEX)
     end
 
-    def pdf_request?
-      !@request.path.match(PDF_REGEX).nil?
+    def path_matches?(regex)
+      !@request.path.match(regex).nil?
+    end
+
+    def grover_request?
+      (pdf_request || png_request || jpeg_request) && !ignore_request?
+    end
+
+    def ignore_request?
+      ignore_path = Grover.configuration.ignore_path
+      case ignore_path
+      when String then @request.path.start_with? ignore_path
+      when Regexp then !ignore_path.match(@request.path).nil?
+      when Proc then ignore_path.call @request.path
+      end
     end
 
     def html_content?(headers)
       headers['Content-Type'] =~ %r{text/html|application/xhtml\+xml}
     end
 
-    def convert_to_pdf(response)
+    def update_response(response, headers)
+      body, content_type = convert_response response
+      assign_headers headers, body, content_type
+      [body]
+    end
+
+    def convert_response(response)
       grover = create_grover_for_response(response)
+
+      if pdf_request
+        [convert_to_pdf(grover), 'application/pdf']
+      elsif png_request
+        [grover.to_png, 'image/png']
+      elsif jpeg_request
+        [grover.to_jpeg, 'image/jpeg']
+      end
+    end
+
+    def convert_to_pdf(grover)
       if grover.show_front_cover? || grover.show_back_cover?
         add_cover_content grover
       else
@@ -80,16 +113,16 @@ class Grover
       CombinePDF.parse grover.to_pdf
     end
 
-    def update_headers(headers, body)
-      # Do not cache PDFs
+    def assign_headers(headers, body, content_type)
+      # Do not cache results
       headers.delete 'ETag'
       headers.delete 'Cache-Control'
 
       headers['Content-Length'] = (body.respond_to?(:bytesize) ? body.bytesize : body.size).to_s
-      headers['Content-Type'] = 'application/pdf'
+      headers['Content-Type'] = content_type
     end
 
-    def configure_env_for_pdf_request(env)
+    def configure_env_for_grover_request(env)
       env['PATH_INFO'] = env['REQUEST_URI'] = path_without_extension
       env['HTTP_ACCEPT'] = concat(env['HTTP_ACCEPT'], Rack::Mime.mime_type('.html'))
       env['Rack-Middleware-Grover'] = 'true'
@@ -108,7 +141,17 @@ class Grover
     end
 
     def path_without_extension
-      @request.path.sub(PDF_REGEX, '').sub(@request.script_name, '')
+      @request.path.sub(request_regex, '').sub(@request.script_name, '')
+    end
+
+    def request_regex
+      if pdf_request
+        PDF_REGEX
+      elsif png_request
+        PNG_REGEX
+      elsif jpeg_request
+        JPEG_REGEX
+      end
     end
 
     def request_url

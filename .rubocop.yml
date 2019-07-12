@@ -7,17 +7,20 @@ Metrics/BlockLength:
   Exclude:
     - "**/*_spec.rb"
 
+Metrics/ClassLength:
+  Max: 125
+
 Metrics/LineLength:
   Max: 120
 
 RSpec/ExampleLength:
-  Max: 10
+  Max: 12
 
 RSpec/MessageSpies:
   EnforcedStyle: receive
 
 RSpec/NestedGroups:
-  Max: 4
+  Max: 5
 
 Style/Documentation:
   Exclude:

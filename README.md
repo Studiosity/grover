@@ -127,8 +127,8 @@ Should be valid HTML markup with following classes used to inject printing value
 
 
 ## Middleware
-Grover comes with a middleware that allows users to get a PDF view of
-any page on your site by appending .pdf to the URL.
+Grover comes with a middleware that allows users to get a PDF, PNG or JPEG view of
+any page on your site by appending .pdf, .png or .jpeg/.jpg to the URL.
 
 ### Middleware Setup
 **Non-Rails Rack apps**
@@ -143,6 +143,48 @@ use Grover::Middleware
 # in application.rb
 require 'grover'
 config.middleware.use Grover::Middleware
+```
+
+N.B. by default PNG and JPEG are not modified in the middleware to prevent breaking standard behaviours.
+To enable them, there are configuration options for each image type as well as an option to disable the PDF middleware
+(on by default).
+
+If either of the image handling middleware options are enabled, the [ignore_path](#ignore_path) should also
+be configured, otherwise assets are likely to be handled which would likely result in 404 responses.  
+
+```ruby
+# config/initializers/grover.rb
+Grover.configure do |config|
+  config.use_png_middleware = true
+  config.use_jpeg_middleware = true
+  config.use_pdf_middleware = false
+end
+```
+
+#### ignore_path
+The `ignore_path` configuration option can be used to tell Grover's middleware whether it should handle/modify
+the response. There are three ways to set up the `ignore_path`:
+ * a `String` which matches the start of the request path.
+ * a `Regexp` which could match any part of the request path.
+ * a `Proc` which accepts the request path as a parameter.
+
+```ruby
+# config/initializers/grover.rb
+Grover.configure do |config|
+  # assigning a String
+  config.ignore_path = '/assets/'
+  # matches `www.example.com/assets/foo.png` and not `www.example.com/bar/assets/foo.png`
+
+  # assigning a Regexp
+  config.ignore_path = /my\/path/
+  # matches `www.example.com/foo/my/path/bar.png` 
+
+  # assigning a Proc
+  config.ignore_path = ->(path) do
+    /\A\/foo\/.+\/[0-9]+\.png\z/.match path 
+  end
+  # matches `www.example.com/foo/bar/123.png`
+end
 ```
 
 ## Cover pages
