@@ -54,7 +54,7 @@ class Grover
       ignore_path = Grover.configuration.ignore_path
       case ignore_path
       when String then @request.path.start_with? ignore_path
-      when Regexp then ignore_path.match? @request.path
+      when Regexp then !ignore_path.match(@request.path).nil?
       when Proc then ignore_path.call @request.path
       end
     end

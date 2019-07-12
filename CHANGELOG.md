@@ -6,7 +6,7 @@
 
 ### Added
 - [#25](https://github.com/Studiosity/grover/pull/25) Add support for capturing PNG/JPEG screenshots
-- Add support for PNG/JPEG middleware requests
+- [#27](https://github.com/Studiosity/grover/pull/27) Add support for PNG/JPEG middleware requests
 
 ## [0.7.4](releases/tag/v0.7.4) - 2019-07-09
 ### Breaking change
