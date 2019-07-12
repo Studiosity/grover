@@ -35,12 +35,11 @@ class Grover
     JPEG_REGEX = /\.jpe?g$/i.freeze
 
     attr_reader :pdf_request, :png_request, :jpeg_request
-    delegate :ignore_path, :use_pdf_middleware, :use_png_middleware, :use_jpeg_middleware, to: 'Grover.configuration'
 
     def identify_request_type
-      @pdf_request = use_pdf_middleware && path_matches?(PDF_REGEX)
-      @png_request = use_png_middleware && path_matches?(PNG_REGEX)
-      @jpeg_request = use_jpeg_middleware && path_matches?(JPEG_REGEX)
+      @pdf_request = Grover.configuration.use_pdf_middleware && path_matches?(PDF_REGEX)
+      @png_request = Grover.configuration.use_png_middleware && path_matches?(PNG_REGEX)
+      @jpeg_request = Grover.configuration.use_jpeg_middleware && path_matches?(JPEG_REGEX)
     end
 
     def path_matches?(regex)
@@ -52,6 +51,7 @@ class Grover
     end
 
     def ignore_request?
+      ignore_path = Grover.configuration.ignore_path
       case ignore_path
       when String then @request.path.start_with? ignore_path
       when Regexp then ignore_path.match? @request.path
