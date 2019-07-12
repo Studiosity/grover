@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased
+- None
+
+## [0.8.1](releases/tag/v0.8.1) - 2019-07-13
 ### Breaking change
 - [#23](https://github.com/Studiosity/grover/pull/23) Drop support for Ruby 2.2
 
