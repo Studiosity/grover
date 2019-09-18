@@ -23,7 +23,7 @@ class Grover
     dependencies puppeteer: 'puppeteer'
 
     def self.launch_params
-      ENV['GROVER_NO_SANDBOX'] == 'true' ? "{args: ['--no-sandbox', '--disable-setuid-sandbox']}" : '{}'
+      ENV['GROVER_NO_SANDBOX'] == 'true' ? "{args: ['--no-sandbox', '--disable-setuid-sandbox']}" : '{args: []}'
     end
 
     def self.convert_function(convert_action)
@@ -38,6 +38,12 @@ class Grover
             if (typeof debug === 'object' && !!debug) {
               if (debug.headless != undefined) { launchParams.headless = debug.headless; }
               if (debug.devtools != undefined) { launchParams.devtools = debug.devtools; }
+            }
+
+            // Configure additional launch arguments
+            const args = options.args; delete options.args;
+            if (Array.isArray(args)) {
+              launchParams.args = launchParams.args.concat(args);
             }
 
             // Launch the browser and create a page

@@ -84,7 +84,7 @@ Grover can be configured to adjust the layout of the resulting PDF/image.
 
 For available PDF options, see https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagepdfoptions
 
-Also available are the `emulate_media`, `cache`, `viewport` and `timeout` options.
+Also available are the `emulate_media`, `cache`, `viewport`, `timeout`, and `args` options.
 
 ```ruby
 # config/initializers/grover.rb
@@ -102,7 +102,8 @@ Grover.configure do |config|
     prefer_css_page_size: true,
     emulate_media: 'screen',
     cache: false,
-    timeout: 0 # Timeout in ms. A value of `0` means 'no timeout'
+    timeout: 0, # Timeout in ms. A value of `0` means 'no timeout'
+    args: ['--font-render-hinting=medium'] # Chromium flags: http://peter.sh/experiments/chromium-command-line-switches/ 
   }
 end
 ```
