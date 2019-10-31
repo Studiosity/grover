@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased
+- None
+
+## [0.8.2](releases/tag/v0.8.2) - 2019-10-31
 ### Added
 - [#31](https://github.com/Studiosity/grover/pull/31) Add support for launch parameter args ([@joergschiller][])
 
