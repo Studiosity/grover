@@ -70,13 +70,14 @@ class Grover
               await page.setViewport(viewport);
             }
 
+            const waitUntil = options.waitUntil; delete options.waitUntil;
             if (url_or_html.match(/^http/i)) {
               // Request is for a URL, so request it
-              request_options.waitUntil = 'networkidle2';
+              request_options.waitUntil = waitUntil || 'networkidle2';
               await page.goto(url_or_html, request_options);
             } else {
               // Request is some HTML content. Use request interception to assign the body
-              request_options.waitUntil = 'networkidle0';
+              request_options.waitUntil = waitUntil || 'networkidle0';
               await page.setRequestInterception(true);
               page.once('request', request => {
                 request.respond({ body: url_or_html });
