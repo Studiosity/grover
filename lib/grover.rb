@@ -11,6 +11,7 @@ require 'grover/configuration'
 
 require 'nokogiri'
 require 'schmooze'
+require 'yaml'
 
 #
 # Grover interface for converting HTML to PDF
@@ -23,7 +24,7 @@ class Grover
     dependencies puppeteer: 'puppeteer'
 
     def self.launch_params
-      ENV['GROVER_NO_SANDBOX'] == 'true' ? "{args: ['--no-sandbox', '--disable-setuid-sandbox']}" : '{}'
+      ENV['GROVER_NO_SANDBOX'] == 'true' ? "{args: ['--no-sandbox', '--disable-setuid-sandbox']}" : '{args: []}'
     end
 
     def self.convert_function(convert_action)
@@ -38,6 +39,12 @@ class Grover
             if (typeof debug === 'object' && !!debug) {
               if (debug.headless != undefined) { launchParams.headless = debug.headless; }
               if (debug.devtools != undefined) { launchParams.devtools = debug.devtools; }
+            }
+
+            // Configure additional launch arguments
+            const args = options.launchArgs; delete options.launchArgs;
+            if (Array.isArray(args)) {
+              launchParams.args = launchParams.args.concat(args);
             }
 
             // Launch the browser and create a page
@@ -234,6 +241,7 @@ class Grover
 
     fix_boolean_options! combined
     fix_numeric_options! combined
+    fix_array_options! combined
 
     combined
   end
@@ -276,6 +284,12 @@ class Grover
     return unless options.key? 'scale'
 
     options['scale'] = options['scale'].to_f
+  end
+
+  def fix_array_options!(options)
+    return unless options['launch_args'].is_a? String
+
+    options['launch_args'] = YAML.safe_load options['launch_args']
   end
 
   def normalized_options(path:)

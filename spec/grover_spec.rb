@@ -249,6 +249,40 @@ describe Grover do
           expect(pdf_text_content).to eq "#{date} Paaage Hey there http://example.com/ 1/1"
         end
       end
+
+      context 'when passing through launch params' do
+        let(:options) { { launch_args: launch_args } }
+        let(:launch_args) { [] }
+        let(:url_or_html) do
+          <<-HTML
+            <html>
+              #{head}
+              <body>
+                Speech recognition is <span id="test" />
+                <script type="text/javascript">
+                  var speechSupported = "webkitSpeechRecognition" in window;
+                  document.getElementById("test").innerHTML = speechSupported ? "supported" : "not supported"
+                </script>
+              </body>    
+            </html>
+          HTML
+        end
+        let(:head) { '' }
+
+        it { expect(pdf_text_content).to eq 'Speech recognition is supported' }
+
+        context 'when launch params specify disabling the speech API' do
+          let(:launch_args) { ['--disable-speech-api'] }
+
+          it { expect(pdf_text_content).to eq 'Speech recognition is not supported' }
+        end
+
+        context 'when disabling speech API via launch params in meta tags' do
+          let(:head) { %{<meta name="grover-launch_args" content="['--disable-speech-api']" />} }
+
+          it { expect(pdf_text_content).to eq 'Speech recognition is not supported' }
+        end
+      end
     end
 
     context 'when global options are defined' do

@@ -84,7 +84,7 @@ Grover can be configured to adjust the layout of the resulting PDF/image.
 
 For available PDF options, see https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagepdfoptions
 
-Also available are the `emulate_media`, `cache`, `viewport` and `timeout` options.
+Also available are the `emulate_media`, `cache`, `viewport`, `timeout` and `launch_args` options.
 
 ```ruby
 # config/initializers/grover.rb
@@ -102,7 +102,8 @@ Grover.configure do |config|
     prefer_css_page_size: true,
     emulate_media: 'screen',
     cache: false,
-    timeout: 0 # Timeout in ms. A value of `0` means 'no timeout'
+    timeout: 0, # Timeout in ms. A value of `0` means 'no timeout'
+    launch_args: ['--font-render-hinting=medium'] 
   }
 end
 ```
@@ -112,7 +113,14 @@ For available PNG/JPEG options, see https://github.com/GoogleChrome/puppeteer/bl
 Note that by default the `full_page` option is set to false and you will get a 800x600 image. You can either specify
 the image size using the `clip` options, or capture the entire page with `full_page` set to `true`.
 
-For `viewport` options, see https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagesetviewportviewport 
+For `viewport` options, see https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagesetviewportviewport
+
+For `launch_args` options, see http://peter.sh/experiments/chromium-command-line-switches/
+Launch parameter args can also be provided using a meta tag:
+
+```html
+<meta name="grover-launch_args" content="['--disable-speech-api']" />
+``` 
 
 #### Page URL for middleware requests (or passing through raw HTML)
 If you want to have the header or footer display the page URL, Grover requires that this is passed through via the
