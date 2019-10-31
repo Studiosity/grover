@@ -263,7 +263,7 @@ describe Grover do
                   var speechSupported = "webkitSpeechRecognition" in window;
                   document.getElementById("test").innerHTML = speechSupported ? "supported" : "not supported"
                 </script>
-              </body>    
+              </body>
             </html>
           HTML
         end
@@ -278,7 +278,7 @@ describe Grover do
         end
 
         context 'when disabling speech API via launch params in meta tags' do
-          let(:head) { %{<meta name="grover-launch_args" content="['--disable-speech-api']" />} }
+          let(:head) { %(<meta name="grover-launch_args" content="['--disable-speech-api']" />) }
 
           it { expect(pdf_text_content).to eq 'Speech recognition is not supported' }
         end
