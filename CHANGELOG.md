@@ -1,7 +1,8 @@
 # Changelog
 
 ## Unreleased
-- None
+### Added
+- [#31](https://github.com/Studiosity/grover/pull/31) Add support for launch parameter args ([@joergschiller][])
 
 ## [0.8.1](releases/tag/v0.8.1) - 2019-07-13
 ### Breaking change
@@ -146,3 +147,4 @@
 - Initial gem framework 
 
 [@koenhandekyn]: https://github.com/koenhandekyn
+[@joergschiller]: https://github.com/joergschiller

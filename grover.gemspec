@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
   spec.summary     = <<~SUMMARY.delete("\n")
     A Ruby gem to transform HTML into PDF, PNG or JPEG by wrapping the NodeJS Google Puppeteer driver for Chromium
   SUMMARY
-  spec.homepage    = 'http://github.com/Studiosity/grover'
+  spec.homepage    = 'https://github.com/Studiosity/grover'
   spec.license     = 'MIT'
 
   spec.files         = `git ls-files lib`.split("\n")
