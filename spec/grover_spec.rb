@@ -283,6 +283,29 @@ describe Grover do
           it { expect(pdf_text_content).to eq 'Speech recognition is not supported' }
         end
       end
+
+      context 'when passing through wait_until option' do
+        let(:url_or_html) do
+          <<-HTML
+            <html>
+              <body>
+                Delayed JavaScript <span id="test">did not run</span>
+                <script type="text/javascript">
+                  setTimeout(function() { document.getElementById("test").innerHTML = "ran"; }, 250);
+                </script>
+              </body>
+            </html>
+          HTML
+        end
+
+        it { expect(pdf_text_content).to eq 'Delayed JavaScript ran' }
+
+        context 'when setting wait_until option to load' do
+          let(:options) { { wait_until: 'load' } }
+
+          it { expect(pdf_text_content).to eq 'Delayed JavaScript did not run' }
+        end
+      end
     end
 
     context 'when global options are defined' do

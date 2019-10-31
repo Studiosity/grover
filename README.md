@@ -103,7 +103,8 @@ Grover.configure do |config|
     emulate_media: 'screen',
     cache: false,
     timeout: 0, # Timeout in ms. A value of `0` means 'no timeout'
-    launch_args: ['--font-render-hinting=medium'] 
+    launch_args: ['--font-render-hinting=medium'],
+    wait_until: 'domcontentloaded' 
   }
 end
 ```
@@ -120,7 +121,10 @@ Launch parameter args can also be provided using a meta tag:
 
 ```html
 <meta name="grover-launch_args" content="['--disable-speech-api']" />
-``` 
+```
+
+For `wait_until` option, default for URLs is `networkidle2` and for HTML content `networkidle0`.
+For available options see https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagegotourl-options  
 
 #### Page URL for middleware requests (or passing through raw HTML)
 If you want to have the header or footer display the page URL, Grover requires that this is passed through via the
