@@ -3,7 +3,7 @@
 require 'grover/version'
 
 require 'grover/utils'
-require 'active_support_ext/object/deep_dup'
+require 'active_support_ext/object/deep_dup' unless defined?(ActiveSupport)
 
 require 'grover/html_preprocessor'
 require 'grover/middleware'
