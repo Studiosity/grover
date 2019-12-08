@@ -1,7 +1,8 @@
 # Changelog
 
 ## Unreleased
-- None
+### Added
+- [#34](https://github.com/Studiosity/grover/pull/34) Add support for custom executable path ([@ryansmith23][])
 
 ## [0.8.3](releases/tag/v0.8.3) - 2019-10-31
 ### Added
@@ -155,3 +156,4 @@
 
 [@koenhandekyn]: https://github.com/koenhandekyn
 [@joergschiller]: https://github.com/joergschiller
+[@ryansmith23]: https://github.com/ryansmith23
