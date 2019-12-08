@@ -128,6 +128,14 @@ For available options see https://github.com/GoogleChrome/puppeteer/blob/master/
 
 The Chrome/Chromium executable path can be overridden with the `executable_path` option.
 
+#### Basic authentication
+For requesting a page with basic authentication, `username` and `password` options can be provided. Note that this
+only really makes sense if you're calling Grover directly (and not via middleware).
+
+```ruby
+Grover.new('<some URI with basic authentication', username: 'the username', password: 'super secret').to_pdf
+```
+
 #### Page URL for middleware requests (or passing through raw HTML)
 If you want to have the header or footer display the page URL, Grover requires that this is passed through via the
 `display_url` option. This is because the page URL is not available in the raw HTML!

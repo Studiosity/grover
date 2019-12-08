@@ -3,7 +3,7 @@
 require 'grover/version'
 
 require 'grover/utils'
-require 'active_support_ext/object/deep_dup'
+require 'active_support_ext/object/deep_dup' unless defined?(ActiveSupport)
 
 require 'grover/html_preprocessor'
 require 'grover/middleware'
@@ -56,6 +56,13 @@ class Grover
             // Launch the browser and create a page
             browser = await puppeteer.launch(launchParams);
             const page = await browser.newPage();
+
+            // Basic auth
+            const username = options.username; delete options.username
+            const password = options.password; delete options.password
+            if (username != undefined && password != undefined) {
+              await page.authenticate({ username, password });
+            }
 
             // Set caching flag (if provided)
             const cache = options.cache; delete options.cache;

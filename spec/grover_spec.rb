@@ -316,6 +316,18 @@ describe Grover do
           end.to raise_error Schmooze::JavaScript::Error, %r{Failed to launch chrome! spawn /totes/invalid/path}
         end
       end
+
+      context 'when requesting a URI requiring basic authentication' do
+        let(:url_or_html) { 'https://jigsaw.w3.org/HTTP/Basic/' }
+
+        it { expect(pdf_text_content).to eq 'Unauthorized access You are denied access to this resource.' }
+
+        context 'when passing through `username` and `password` options' do
+          let(:options) { { username: 'guest', password: 'guest' } }
+
+          it { expect(pdf_text_content).to eq 'Your browser made it!' }
+        end
+      end
     end
 
     context 'when global options are defined' do
