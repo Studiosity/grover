@@ -306,6 +306,16 @@ describe Grover do
           it { expect(pdf_text_content).to eq 'Delayed JavaScript did not run' }
         end
       end
+
+      context 'when options include executable_path' do
+        let(:options) { { executable_path: '/totes/invalid/path' } }
+
+        it do
+          expect do
+            to_pdf
+          end.to raise_error Schmooze::JavaScript::Error, %r{Failed to launch chrome! spawn /totes/invalid/path}
+        end
+      end
     end
 
     context 'when global options are defined' do
