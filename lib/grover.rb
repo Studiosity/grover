@@ -57,6 +57,13 @@ class Grover
             browser = await puppeteer.launch(launchParams);
             const page = await browser.newPage();
 
+            // Basic auth
+            const username = options.username; delete options.username
+            const password = options.password; delete options.password
+            if (username != undefined && password != undefined) {
+              await page.authenticate({ username, password });
+            }
+
             // Set caching flag (if provided)
             const cache = options.cache; delete options.cache;
             if (cache != undefined) {

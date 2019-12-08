@@ -3,6 +3,7 @@
 ## Unreleased
 ### Added
 - [#34](https://github.com/Studiosity/grover/pull/34) Add support for custom executable path ([@ryansmith23][])
+- [#35](https://github.com/Studiosity/grover/pull/35) Add support for basic authentication ([@rwtaylor][])
 
 ### Changed
 - [#33](https://github.com/Studiosity/grover/pull/33) Improve support for Puppeteer 2.0 (`emulateMediaType`)
@@ -160,3 +161,4 @@
 [@koenhandekyn]: https://github.com/koenhandekyn
 [@joergschiller]: https://github.com/joergschiller
 [@ryansmith23]: https://github.com/ryansmith23
+[@rwtaylor]: https://github.com/rwtaylor 
