@@ -4,6 +4,9 @@
 ### Added
 - [#34](https://github.com/Studiosity/grover/pull/34) Add support for custom executable path ([@ryansmith23][])
 
+### Changed
+- [#33](https://github.com/Studiosity/grover/pull/33) Improve support for Puppeteer 2.0 (`emulateMediaType`)
+
 ## [0.8.3](releases/tag/v0.8.3) - 2019-10-31
 ### Added
 - [#32](https://github.com/Studiosity/grover/pull/32) Add support for wait until (puppeteer load state) option
