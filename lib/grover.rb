@@ -47,6 +47,12 @@ class Grover
               launchParams.args = launchParams.args.concat(args);
             }
 
+            // Set executable path if given
+            const executablePath = options.executablePath; delete options.executablePath;
+            if (executablePath) {
+              launchParams.executablePath = executablePath;
+            }
+
             // Launch the browser and create a page
             browser = await puppeteer.launch(launchParams);
             const page = await browser.newPage();

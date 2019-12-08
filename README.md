@@ -124,7 +124,9 @@ Launch parameter args can also be provided using a meta tag:
 ```
 
 For `wait_until` option, default for URLs is `networkidle2` and for HTML content `networkidle0`.
-For available options see https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagegotourl-options  
+For available options see https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagegotourl-options
+
+The Chrome/Chromium executable path can be overridden with the `executable_path` option.
 
 #### Page URL for middleware requests (or passing through raw HTML)
 If you want to have the header or footer display the page URL, Grover requires that this is passed through via the
