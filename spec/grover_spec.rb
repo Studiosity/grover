@@ -352,7 +352,7 @@ describe Grover do
     let(:image) { MiniMagick::Image.read screenshot }
 
     context 'when passing through a valid URL' do
-      let(:url_or_html) { 'https://www.google.com/?gl=us' }
+      let(:url_or_html) { 'https://media.gettyimages.com/photos/tabby-cat-selfie-picture-id1151094724?s=2048x2048' }
 
       # default screenshot is PNG 800w x 600h
       it { expect(screenshot.unpack('C*')).to start_with "\x89PNG\r\n\x1A\n".unpack('C*') }
@@ -361,7 +361,7 @@ describe Grover do
 
       # don't really want to rely on pixel testing the website screenshot
       # so we'll check it's mean colour is roughly what we expect
-      it { expect(image.data.dig('imageStatistics', 'all', 'mean').to_f).to be_within(5).of 165 }
+      it { expect(image.data.dig('imageStatistics', 'all', 'mean').to_f).to eq 97.7473 }
     end
 
     context 'when passing through html' do
