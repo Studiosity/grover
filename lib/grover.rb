@@ -92,7 +92,11 @@ class Grover
             // If specified, emulate the media type
             const emulateMedia = options.emulateMedia; delete options.emulateMedia;
             if (emulateMedia != undefined) {
-              await page.emulateMedia(emulateMedia);
+              if (typeof page.emulateMediaType == 'function') {
+                await page.emulateMediaType(emulateMedia);
+              } else {
+                await page.emulateMedia(emulateMedia);
+              }
             }
 
             // If we're running puppeteer in headless mode, return the converted PDF

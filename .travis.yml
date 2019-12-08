@@ -1,6 +1,9 @@
 env:
   global:
     - CC_TEST_REPORTER_ID=5cfed40102c670b5c9e509730782b751939ddbe53fc57c317b718f635bab1ce8
+  jobs:
+    - PUPPETEER_VERSION=1.20.0
+    - PUPPETEER_VERSION=2.0.0
 
 language: ruby
 rvm:
@@ -15,7 +18,7 @@ before_install:
 install:
   - bundle install --jobs=3 --retry=3
   - gem install rubocop
-  - npm install
+  - npm install puppeteer@$PUPPETEER_VERSION
 
 before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
