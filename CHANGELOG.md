@@ -1,7 +1,8 @@
 # Changelog
 
 ## Unreleased
-- None
+### Changed
+- [#33](https://github.com/Studiosity/grover/pull/33) Improve support for Puppeteer 2.0 (emulateMediaType)
 
 ## [0.8.3](releases/tag/v0.8.3) - 2019-10-31
 ### Added
