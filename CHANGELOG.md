@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased
+- None
+
+## [0.9.1](releases/tag/v0.9.1) - 2019-12-09
 ### Added
 - [#34](https://github.com/Studiosity/grover/pull/34) Add support for custom executable path ([@ryansmith23][])
 - [#35](https://github.com/Studiosity/grover/pull/35) Add support for basic authentication ([@rwtaylor][])
