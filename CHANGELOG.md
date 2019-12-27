@@ -3,6 +3,10 @@
 ## Unreleased
 - None
 
+## [0.9.2](releases/tag/v0.9.2) - 2019-12-27
+### Added
+- [#38](https://github.com/Studiosity/grover/pull/38) Add script execution support
+
 ## [0.9.1](releases/tag/v0.9.1) - 2019-12-09
 ### Added
 - [#34](https://github.com/Studiosity/grover/pull/34) Add support for custom executable path ([@ryansmith23][])
