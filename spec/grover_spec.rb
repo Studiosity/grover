@@ -366,6 +366,15 @@ describe Grover do
         it { expect(pdf_text_content).to eq 'Hey there This should only display for screen media' }
       end
     end
+
+    context 'when evaluate option is specified' do
+      let(:url_or_html) { '<html><body></body></html>' }
+      let(:options) { basic_header_footer_options.merge(execute_script: script) }
+      let(:script) { 'document.getElementsByTagName("body")[0].innerText = "Some evaluated content"' }
+      let(:date) { Date.today.strftime '%-m/%-d/%Y' }
+
+      it { expect(pdf_text_content).to eq "#{date} Some evaluated content http://www.example.net/foo/bar 1/1" }
+    end
   end
 
   describe '#screenshot' do

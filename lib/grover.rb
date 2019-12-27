@@ -112,6 +112,12 @@ class Grover
               }
             }
 
+            // If specified, evaluate script on the page
+            const executeScript = options.executeScript; delete options.executeScript;
+            if (executeScript != undefined) {
+              await page.evaluate(executeScript);
+            }
+
             // If we're running puppeteer in headless mode, return the converted PDF
             if (debug == undefined || (typeof debug === 'object' && (debug.headless == undefined || debug.headless))) {
               return await page.#{convert_action}(options);
