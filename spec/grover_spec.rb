@@ -369,7 +369,7 @@ describe Grover do
 
     context 'when evaluate option is specified' do
       let(:url_or_html) { '<html><body></body></html>' }
-      let(:options) { basic_header_footer_options.merge(evaluate: script) }
+      let(:options) { basic_header_footer_options.merge(execute_script: script) }
       let(:script) { 'document.getElementsByTagName("body")[0].innerText = "Some evaluated content"' }
       let(:date) { Date.today.strftime '%-m/%-d/%Y' }
 

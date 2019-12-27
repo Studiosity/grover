@@ -128,6 +128,9 @@ For available options see https://github.com/GoogleChrome/puppeteer/blob/master/
 
 The Chrome/Chromium executable path can be overridden with the `executable_path` option.
 
+Javascript can be executed on the page (after render and before conversion to PDF/image)
+with the `execute_script` option.
+
 #### Basic authentication
 For requesting a page with basic authentication, `username` and `password` options can be provided. Note that this
 only really makes sense if you're calling Grover directly (and not via middleware).

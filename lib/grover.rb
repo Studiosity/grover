@@ -113,9 +113,9 @@ class Grover
             }
 
             // If specified, evaluate script on the page
-            const evaluate = options.evaluate; delete options.evaluate;
-            if (evaluate != undefined) {
-              await page.evaluate(evaluate);
+            const executeScript = options.executeScript; delete options.executeScript;
+            if (executeScript != undefined) {
+              await page.evaluate(executeScript);
             }
 
             // If we're running puppeteer in headless mode, return the converted PDF
