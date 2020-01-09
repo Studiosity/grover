@@ -726,6 +726,37 @@ describe Grover::Middleware do
         match(/^%PDF-1\.4/)
       end
     end
+
+    describe 'threadsafety' do
+      let(:thread_count) { 30 }
+      let(:extensions) { Array.new(thread_count) { rand > 0.5 ? 'html' : 'pdf' } }
+      let(:response_content_types) { {} }
+      let(:threads) do
+        (0...thread_count).map do |i|
+          Thread.new do
+            response = get "http://www.example.org/test.#{extensions[i]}"
+            response_content_types[i] = response.content_type
+          end
+        end
+      end
+
+      before { mock_app }
+
+      it 'is threadsafe' do
+        threads.each(&:join)
+
+        extensions.each_with_index do |extension, index|
+          response_content_type = response_content_types[index]
+
+          case extension
+          when 'html'
+            expect(response_content_type).to eq "text/#{extension}"
+          when 'pdf'
+            expect(response_content_type).to eq 'application/pdf'
+          end
+        end
+      end
+    end
   end
   # rubocop:enable RSpec/MultipleExpectations
 end
