@@ -69,6 +69,7 @@ class Grover
 
     def update_response(response, headers)
       body, content_type = convert_response response
+      response.close if response.respond_to? :close
       assign_headers headers, body, content_type
       [body]
     end
