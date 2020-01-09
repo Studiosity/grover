@@ -513,118 +513,110 @@ describe Grover::Middleware do
 
     describe '#grover_request?' do
       it 'does not get stuck rendering each request as pdf' do
-        # false by default. No requests.
-        expect(mock_app.send(:grover_request?)).to eq false
+        # renders html by default
+        response = get 'http://www.example.org/test'
+        expect(response.content_type).to eq 'text/html'
 
-        # Remain false on a normal request
-        get 'http://www.example.org/test.html'
-        expect(mock_app.send(:grover_request?)).to eq false
+        response = get 'http://www.example.org/test.html'
+        expect(response.content_type).to eq 'text/html'
 
-        # Return true on a pdf request.
-        get 'http://www.example.org/test.pdf'
-        expect(mock_app.send(:grover_request?)).to eq true
+        response = get 'http://www.example.org/test.pdf'
+        expect(response.content_type).to eq 'application/pdf'
 
-        # Restore to false on any non-pdf request.
-        get 'http://www.example.org/test'
-        expect(mock_app.send(:grover_request?)).to eq false
+        response = get 'http://www.example.org/test'
+        expect(response.content_type).to eq 'text/html'
       end
 
       context 'when app configuration has PDF middleware disabled' do
         before { allow(Grover.configuration).to receive(:use_pdf_middleware).and_return false }
 
         it 'does not handle pdf requests' do
-          # false by default. No requests.
-          expect(mock_app.send(:grover_request?)).to eq false
+          # renders html by default
+          response = get 'http://www.example.org/test'
+          expect(response.content_type).to eq 'text/html'
 
-          # Return false on a pdf request.
-          get 'http://www.example.org/test.pdf'
-          expect(mock_app.send(:grover_request?)).to eq false
+          response = get 'http://www.example.org/test.pdf'
+          expect(response.content_type).to eq 'text/html'
         end
       end
 
       it 'does not handle png requests' do
-        # false by default. No requests.
-        expect(mock_app.send(:grover_request?)).to eq false
+        # renders html by default
+        response = get 'http://www.example.org/test'
+        expect(response.content_type).to eq 'text/html'
 
-        # Return false on a png request.
-        get 'http://www.example.org/test.png'
-        expect(mock_app.send(:grover_request?)).to eq false
+        response = get 'http://www.example.org/test.png'
+        expect(response.content_type).to eq 'text/html'
       end
 
       context 'when app configuration has PNG middleware enabled' do
         before { allow(Grover.configuration).to receive(:use_png_middleware).and_return true }
 
         it 'does not get stuck rendering each request as png' do
-          # false by default. No requests.
-          expect(mock_app.send(:grover_request?)).to eq false
+          # renders html by default
+          response = get 'http://www.example.org/test'
+          expect(response.content_type).to eq 'text/html'
 
-          # Remain false on a normal request
-          get 'http://www.example.org/test.html'
-          expect(mock_app.send(:grover_request?)).to eq false
+          response = get 'http://www.example.org/test.html'
+          expect(response.content_type).to eq 'text/html'
 
-          # Return true on a png request.
-          get 'http://www.example.org/test.png'
-          expect(mock_app.send(:grover_request?)).to eq true
+          response = get 'http://www.example.org/test.png'
+          expect(response.content_type).to eq 'image/png'
 
-          # Restore to false on any non-png request.
-          get 'http://www.example.org/test'
-          expect(mock_app.send(:grover_request?)).to eq false
+          response = get 'http://www.example.org/test'
+          expect(response.content_type).to eq 'text/html'
         end
       end
 
       it 'does not handle jpeg requests' do
-        # false by default. No requests.
-        expect(mock_app.send(:grover_request?)).to eq false
+        # renders html by default
+        response = get 'http://www.example.org/test'
+        expect(response.content_type).to eq 'text/html'
 
-        # Return false on a jpeg request.
-        get 'http://www.example.org/test.jpeg'
-        expect(mock_app.send(:grover_request?)).to eq false
+        response = get 'http://www.example.org/test.jpeg'
+        expect(response.content_type).to eq 'text/html'
       end
 
       it 'does not handle jpg requests' do
-        # false by default. No requests.
-        expect(mock_app.send(:grover_request?)).to eq false
+        # renders html by default
+        response = get 'http://www.example.org/test'
+        expect(response.content_type).to eq 'text/html'
 
-        # Return false on a jpg request.
-        get 'http://www.example.org/test.jpg'
-        expect(mock_app.send(:grover_request?)).to eq false
+        response = get 'http://www.example.org/test.jpg'
+        expect(response.content_type).to eq 'text/html'
       end
 
       context 'when app configuration has JPEG middleware enabled' do
         before { allow(Grover.configuration).to receive(:use_jpeg_middleware).and_return true }
 
         it 'does not get stuck rendering each request as jpeg' do
-          # false by default. No requests.
-          expect(mock_app.send(:grover_request?)).to eq false
+          # renders html by default
+          response = get 'http://www.example.org/test'
+          expect(response.content_type).to eq 'text/html'
 
-          # Remain false on a normal request
-          get 'http://www.example.org/test.html'
-          expect(mock_app.send(:grover_request?)).to eq false
+          response = get 'http://www.example.org/test.html'
+          expect(response.content_type).to eq 'text/html'
 
-          # Return true on a jpeg request.
-          get 'http://www.example.org/test.jpeg'
-          expect(mock_app.send(:grover_request?)).to eq true
+          response = get 'http://www.example.org/test.jpeg'
+          expect(response.content_type).to eq 'image/jpeg'
 
-          # Restore to false on any non-jpeg request.
-          get 'http://www.example.org/test'
-          expect(mock_app.send(:grover_request?)).to eq false
+          response = get 'http://www.example.org/test'
+          expect(response.content_type).to eq 'text/html'
         end
 
         it 'does not get stuck rendering each request as jpg' do
-          # false by default. No requests.
-          expect(mock_app.send(:grover_request?)).to eq false
+          # renders html by default
+          response = get 'http://www.example.org/test'
+          expect(response.content_type).to eq 'text/html'
 
-          # Remain false on a normal request
-          get 'http://www.example.org/test.html'
-          expect(mock_app.send(:grover_request?)).to eq false
+          response = get 'http://www.example.org/test.html'
+          expect(response.content_type).to eq 'text/html'
 
-          # Return true on a jpg request.
-          get 'http://www.example.org/test.jpg'
-          expect(mock_app.send(:grover_request?)).to eq true
+          response = get 'http://www.example.org/test.jpg'
+          expect(response.content_type).to eq 'image/jpeg'
 
-          # Restore to false on any non-jpeg request.
-          get 'http://www.example.org/test'
-          expect(mock_app.send(:grover_request?)).to eq false
+          response = get 'http://www.example.org/test'
+          expect(response.content_type).to eq 'text/html'
         end
       end
     end
@@ -634,21 +626,17 @@ describe Grover::Middleware do
         before { allow(Grover.configuration).to receive(:ignore_path).and_return '/foo/bar' }
 
         it 'request is ignored when the request path starts with the ignore_path' do
-          get 'http://www.example.org/foo/bar/baz'
-          expect(mock_app.send(:ignore_request?)).to eq true
-          expect(mock_app.send(:grover_request?)).to eq false
+          response = get 'http://www.example.org/foo/bar/baz'
+          expect(response.content_type).to eq 'text/html'
 
-          get 'http://www.example.org/foo/bar/baz.pdf'
-          expect(mock_app.send(:ignore_request?)).to eq true
-          expect(mock_app.send(:grover_request?)).to eq false
+          response = get 'http://www.example.org/foo/bar/baz.pdf'
+          expect(response.content_type).to eq 'text/html'
 
-          get 'http://www.example.org/foo/baz/bar'
-          expect(mock_app.send(:ignore_request?)).to eq false
-          expect(mock_app.send(:grover_request?)).to eq false
+          response = get 'http://www.example.org/foo/baz/bar'
+          expect(response.content_type).to eq 'text/html'
 
-          get 'http://www.example.org/foo/baz/bar.pdf'
-          expect(mock_app.send(:ignore_request?)).to eq false
-          expect(mock_app.send(:grover_request?)).to eq true
+          response = get 'http://www.example.org/foo/baz/bar.pdf'
+          expect(response.content_type).to eq 'application/pdf'
         end
       end
 
@@ -656,21 +644,17 @@ describe Grover::Middleware do
         before { allow(Grover.configuration).to receive(:ignore_path).and_return %r{foo/bar} }
 
         it 'request is ignored when the request path matches the ignore_path' do
-          get 'http://www.example.org/baz/foo/bar/baz'
-          expect(mock_app.send(:ignore_request?)).to eq true
-          expect(mock_app.send(:grover_request?)).to eq false
+          response = get 'http://www.example.org/baz/foo/bar/baz'
+          expect(response.content_type).to eq 'text/html'
 
-          get 'http://www.example.org/baz/foo/bar/baz.pdf'
-          expect(mock_app.send(:ignore_request?)).to eq true
-          expect(mock_app.send(:grover_request?)).to eq false
+          response = get 'http://www.example.org/baz/foo/bar/baz.pdf'
+          expect(response.content_type).to eq 'text/html'
 
-          get 'http://www.example.org/bar/foo/baz/bar'
-          expect(mock_app.send(:ignore_request?)).to eq false
-          expect(mock_app.send(:grover_request?)).to eq false
+          response = get 'http://www.example.org/bar/foo/baz/bar'
+          expect(response.content_type).to eq 'text/html'
 
-          get 'http://www.example.org/bar/foo/baz/bar.pdf'
-          expect(mock_app.send(:ignore_request?)).to eq false
-          expect(mock_app.send(:grover_request?)).to eq true
+          response = get 'http://www.example.org/bar/foo/baz/bar.pdf'
+          expect(response.content_type).to eq 'application/pdf'
         end
       end
 
@@ -678,21 +662,17 @@ describe Grover::Middleware do
         before { allow(Grover.configuration).to receive(:ignore_path).and_return(->(path) { path.include? 'baz' }) }
 
         it 'request is ignored when the request path passed to the proc defined in ignore_path returns true' do
-          get 'http://www.example.org/foobazbar'
-          expect(mock_app.send(:ignore_request?)).to eq true
-          expect(mock_app.send(:grover_request?)).to eq false
+          response = get 'http://www.example.org/foobazbar'
+          expect(response.content_type).to eq 'text/html'
 
-          get 'http://www.example.org/foobazbar.pdf'
-          expect(mock_app.send(:ignore_request?)).to eq true
-          expect(mock_app.send(:grover_request?)).to eq false
+          response = get 'http://www.example.org/foobazbar.pdf'
+          expect(response.content_type).to eq 'text/html'
 
-          get 'http://www.example.org/foobarbar'
-          expect(mock_app.send(:ignore_request?)).to eq false
-          expect(mock_app.send(:grover_request?)).to eq false
+          response = get 'http://www.example.org/foobarbar'
+          expect(response.content_type).to eq 'text/html'
 
-          get 'http://www.example.org/foobarbar.pdf'
-          expect(mock_app.send(:ignore_request?)).to eq false
-          expect(mock_app.send(:grover_request?)).to eq true
+          response = get 'http://www.example.org/foobarbar.pdf'
+          expect(response.content_type).to eq 'application/pdf'
         end
       end
     end

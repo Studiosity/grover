@@ -18,6 +18,10 @@ class Grover
     end
 
     def call(env)
+      dup._call(env)
+    end
+
+    def _call(env)
       @request = Rack::Request.new(env)
       identify_request_type
 
