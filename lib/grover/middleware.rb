@@ -18,6 +18,10 @@ class Grover
     end
 
     def call(env)
+      dup._call(env)
+    end
+
+    def _call(env)
       @request = Rack::Request.new(env)
       identify_request_type
 
@@ -65,6 +69,7 @@ class Grover
 
     def update_response(response, headers)
       body, content_type = convert_response response
+      response.close if response.respond_to? :close
       assign_headers headers, body, content_type
       [body]
     end
