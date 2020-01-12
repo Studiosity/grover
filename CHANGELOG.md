@@ -3,6 +3,10 @@
 ## Unreleased
 - None
 
+## [0.10.1](releases/tag/v0.10.1) - 2020-01-13
+### Fixed
+- [#39](https://github.com/Studiosity/grover/pull/39) Fix middleware thread safety issue ([@jnimety][]) 
+
 ## [0.9.2](releases/tag/v0.9.2) - 2019-12-27
 ### Added
 - [#38](https://github.com/Studiosity/grover/pull/38) Add script execution support
@@ -169,3 +173,4 @@
 [@joergschiller]: https://github.com/joergschiller
 [@ryansmith23]: https://github.com/ryansmith23
 [@rwtaylor]: https://github.com/rwtaylor 
+[@jnimety]: https://github.com/jnimety
