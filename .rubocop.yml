@@ -8,7 +8,7 @@ Metrics/BlockLength:
     - "**/*_spec.rb"
 
 Metrics/ClassLength:
-  Max: 125
+  Max: 135
 
 Metrics/LineLength:
   Max: 120
