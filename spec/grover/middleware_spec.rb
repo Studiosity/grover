@@ -449,9 +449,20 @@ describe Grover::Middleware do
           lambda do |env|
             response =
               if env['PATH_INFO'] == '/front/page/meta'
-                "This is the cover page with params #{env['QUERY_STRING']}"
+                <<-HTML
+                  <p>This is the cover page with params:</p>
+                  <p>Query string: #{env['QUERY_STRING']}</p>
+                  <p>Parameters: #{env['action_dispatch.request.parameters']}</p>
+                  <p>Query params: #{env['action_dispatch.request.query_parameters']}</p>
+                  <p>Request params: #{env['action_dispatch.request.request_parameters']}</p>
+                HTML
               else
-                Grover::Utils.squish(<<-HTML)
+                # Can't directly test the helpers for these as they're in Rails, but we can
+                # test that they're not persisted in the subsequent cover page request
+                env['action_dispatch.request.parameters'] = 'Original params' # Overall Rails param cache
+                env['action_dispatch.request.query_parameters'] = 'Original query params' # get params cache
+                env['action_dispatch.request.request_parameters'] = 'Original request params' # post params cache
+                Grover::Utils.squish <<-HTML
                   <html>
                     <head>
                       <title>Paaage</title>
@@ -470,9 +481,13 @@ describe Grover::Middleware do
 
         it { expect(pdf_reader.page_count).to eq 2 }
         it do
-          expect(Grover::Utils.squish(pdf_reader.pages[0].text)).to(
-            eq('This is the cover page with params queryparam=baz')
-          )
+          expect(Grover::Utils.squish(pdf_reader.pages[0].text)).to eq Grover::Utils.squish <<-HTML
+            This is the cover page with params:
+            Query string: queryparam=baz
+            Parameters:
+            Query params:
+            Request params:
+          HTML
         end
         it { expect(Grover::Utils.squish(pdf_reader.pages[1].text)).to eq 'Hey there' }
       end
@@ -484,7 +499,7 @@ describe Grover::Middleware do
               if env['PATH_INFO'] == '/back/page/meta'
                 "This is the back page with params #{env['QUERY_STRING']}"
               else
-                Grover::Utils.squish(<<-HTML)
+                Grover::Utils.squish <<-HTML
                   <html>
                     <head>
                       <title>Paaage</title>
@@ -727,7 +742,7 @@ describe Grover::Middleware do
       end
     end
 
-    describe 'threadsafety' do
+    describe 'thread safety' do
       let(:thread_count) { 30 }
       let(:extensions) { Array.new(thread_count) { rand > 0.5 ? 'html' : 'pdf' } }
       let(:response_content_types) { {} }
@@ -750,7 +765,7 @@ describe Grover::Middleware do
 
           case extension
           when 'html'
-            expect(response_content_type).to eq "text/#{extension}"
+            expect(response_content_type).to eq 'text/html'
           when 'pdf'
             expect(response_content_type).to eq 'application/pdf'
           end

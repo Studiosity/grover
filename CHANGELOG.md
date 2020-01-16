@@ -1,7 +1,8 @@
 # Changelog
 
 ## Unreleased
-- None
+### Fixed
+- [#41](https://github.com/Studiosity/grover/pull/41) Fix middleware cover page request env scrubbing
 
 ## [0.10.1](releases/tag/v0.10.1) - 2020-01-13
 ### Fixed
