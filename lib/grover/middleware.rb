@@ -111,6 +111,7 @@ class Grover
 
     def fetch_cover_pdf(path)
       temp_env = env.deep_dup
+      scrub_env! temp_env
       temp_env['PATH_INFO'], temp_env['QUERY_STRING'] = path.split '?'
       _, _, response = @app.call(temp_env)
       response.close if response.respond_to? :close
@@ -165,6 +166,15 @@ class Grover
 
     def env
       @request.env
+    end
+
+    def scrub_env!(env)
+      # Reset the env to remove any cached values from the original request
+      env.delete_if { |k, _| k =~ /^(action_dispatch|rack)\.request/ }
+      env.delete_if { |k, _| k =~ /^action_dispatch\.rescue/ }
+      env['rack.input'] = StringIO.new
+      env.delete 'CONTENT_LENGTH'
+      env.delete 'RAW_POST_DATA'
     end
   end
 end
