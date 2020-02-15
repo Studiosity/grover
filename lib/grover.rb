@@ -305,9 +305,10 @@ class Grover
   FALSE_VALUES = [nil, false, 0, '0', 'f', 'F', 'false', 'FALSE', 'off', 'OFF'].freeze
 
   def fix_numeric_options!(options)
-    return unless options.key? 'scale'
-
-    options['scale'] = options['scale'].to_f
+    options['viewport']['width'] = options['viewport']['width'].to_i if options.dig('viewport', 'width')
+    options['viewport']['height'] = options['viewport']['height'].to_i if options.dig('viewport', 'height')
+    options['viewport']['device_scale_factor'] = options['viewport']['device_scale_factor'].to_f if options.dig('viewport', 'device_scale_factor')
+    options['scale'] = options['scale'].to_f if options.key? 'scale'
   end
 
   def fix_array_options!(options)
