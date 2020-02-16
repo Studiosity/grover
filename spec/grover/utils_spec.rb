@@ -152,11 +152,13 @@ describe Grover::Utils do
       let(:hash2) { {} }
 
       it { is_expected.to eq({}) }
-      it do
+
+      it 'leaves the first hash empty' do
         deep_merge!
         expect(hash1).to eq({})
       end
-      it do
+
+      it 'leaves the second hash empty' do
         deep_merge!
         expect(hash2).to eq({})
       end
@@ -167,11 +169,13 @@ describe Grover::Utils do
       let(:hash2) { {} }
 
       it { is_expected.to eq(foo: 'bar') }
-      it do
+
+      it 'leaves the first hash as it was' do
         deep_merge!
         expect(hash1).to eq(foo: 'bar')
       end
-      it do
+
+      it 'leaves the second hash empty' do
         deep_merge!
         expect(hash2).to eq({})
       end
@@ -182,11 +186,13 @@ describe Grover::Utils do
       let(:hash2) { { foo: 'bar' } }
 
       it { is_expected.to eq(foo: 'bar') }
-      it do
+
+      it 'updates hash1 to include the contents from hash2' do
         deep_merge!
         expect(hash1).to eq(foo: 'bar')
       end
-      it do
+
+      it 'leaves the second hash as it was' do
         deep_merge!
         expect(hash2).to eq(foo: 'bar')
       end
@@ -197,11 +203,13 @@ describe Grover::Utils do
       let(:hash2) { { foo: 'bar' } }
 
       it { is_expected.to eq(foo: 'bar', bar: 'baz') }
-      it do
+
+      it 'merges the contents of hash1 and hash2' do
         deep_merge!
         expect(hash1).to eq(foo: 'bar', bar: 'baz')
       end
-      it do
+
+      it 'leaves the second hash as it was' do
         deep_merge!
         expect(hash2).to eq(foo: 'bar')
       end
@@ -212,11 +220,13 @@ describe Grover::Utils do
       let(:hash2) { { foo: 'bar' } }
 
       it { is_expected.to eq(foo: 'bar', baz: 'foo') }
-      it do
+
+      it 'overloads existing key values in hash1' do
         deep_merge!
         expect(hash1).to eq(foo: 'bar', baz: 'foo')
       end
-      it do
+
+      it 'leaves the second hash as it was' do
         deep_merge!
         expect(hash2).to eq(foo: 'bar')
       end
@@ -227,11 +237,13 @@ describe Grover::Utils do
       let(:hash2) { { foo: { baz: 'bar', bar: 'foo' } } }
 
       it { is_expected.to eq(foo: { bar: 'foo', baz: 'bar' }, fizz: 'buzz') }
-      it do
+
+      it 'overloads existing deep key values in hash1' do
         deep_merge!
         expect(hash1).to eq(foo: { bar: 'foo', baz: 'bar' }, fizz: 'buzz')
       end
-      it do
+
+      it 'leaves the second hash as it was' do
         deep_merge!
         expect(hash2).to eq(foo: { baz: 'bar', bar: 'foo' })
       end

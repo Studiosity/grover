@@ -13,9 +13,6 @@ Metrics/ClassLength:
 Metrics/LineLength:
   Max: 120
 
-RSpec/EmptyLineAfterExample:
-  Enabled: false
-
 RSpec/ExampleLength:
   Max: 12
 

@@ -481,7 +481,8 @@ describe Grover::Middleware do
         end
 
         it { expect(pdf_reader.page_count).to eq 2 }
-        it do
+
+        it 'contains expected first page text' do
           expect(Grover::Utils.squish(pdf_reader.pages[0].text)).to eq Grover::Utils.squish <<-HTML
             This is the cover page with params:
             Query string: queryparam=baz
@@ -490,6 +491,7 @@ describe Grover::Middleware do
             Request params:
           HTML
         end
+
         it { expect(Grover::Utils.squish(pdf_reader.pages[1].text)).to eq 'Hey there' }
       end
 
@@ -519,7 +521,8 @@ describe Grover::Middleware do
 
         it { expect(pdf_reader.page_count).to eq 2 }
         it { expect(Grover::Utils.squish(pdf_reader.pages[0].text)).to eq 'Hey there' }
-        it do
+
+        it 'contains expected second page text' do
           expect(Grover::Utils.squish(pdf_reader.pages[1].text)).to(
             eq('This is the back page with params anotherquery=foo')
           )
