@@ -264,7 +264,8 @@ class Grover
     Utils.deep_merge! combined, meta_options unless url_source?
 
     fix_boolean_options! combined
-    fix_numeric_options! combined
+    fix_integer_options! combined
+    fix_float_options! combined
     fix_array_options! combined
 
     combined
@@ -304,10 +305,18 @@ class Grover
 
   FALSE_VALUES = [nil, false, 0, '0', 'f', 'F', 'false', 'FALSE', 'off', 'OFF'].freeze
 
-  def fix_numeric_options!(options)
-    return unless options.key? 'scale'
+  def fix_integer_options!(options)
+    ['viewport.width', 'viewport.height'].each do |opt|
+      keys = opt.split('.')
+      Utils.deep_assign(options, keys, options.dig(*keys).to_i) if options.dig(*keys)
+    end
+  end
 
-    options['scale'] = options['scale'].to_f
+  def fix_float_options!(options)
+    ['viewport.device_scale_factor', 'scale'].each do |opt|
+      keys = opt.split('.')
+      Utils.deep_assign(options, keys, options.dig(*keys).to_f) if options.dig(*keys)
+    end
   end
 
   def fix_array_options!(options)
