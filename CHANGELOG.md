@@ -3,6 +3,10 @@
 ## Unreleased
 - none
 
+## [0.11.2](releases/tag/v0.11.2) - 2020-02-17
+### Fixed
+- [#43](https://github.com/Studiosity/grover/pull/43) Fix parsing of numeric type viewport options from meta tags ([@willkoehler][])
+
 ## [0.11.1](releases/tag/v0.11.1) - 2020-01-17
 ### Fixed
 - [#41](https://github.com/Studiosity/grover/pull/41) Fix middleware cover page request env scrubbing
@@ -178,3 +182,4 @@
 [@ryansmith23]: https://github.com/ryansmith23
 [@rwtaylor]: https://github.com/rwtaylor 
 [@jnimety]: https://github.com/jnimety
+[@willkoehler]: https://github.com/willkoehler

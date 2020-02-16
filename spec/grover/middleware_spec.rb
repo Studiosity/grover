@@ -3,8 +3,6 @@
 require 'spec_helper'
 
 describe Grover::Middleware do
-  # rubocop:disable RSpec/MultipleExpectations
-
   subject(:mock_app) do
     builder = Rack::Builder.new
     builder.use described_class
@@ -31,6 +29,11 @@ describe Grover::Middleware do
   end
   let(:response) { ['Grover McGroveryface'] }
 
+  def request_env
+    @env # rubocop:disable RSpec/InstanceVariable
+  end
+
+  # rubocop:disable RSpec/MultipleExpectations
   describe '#call' do
     describe 'response content type' do
       context 'when requesting a PDF' do
@@ -119,13 +122,12 @@ describe Grover::Middleware do
     end
 
     describe 'rack environment' do
-      # rubocop:disable RSpec/InstanceVariable
       context 'when requesting a PDF' do
         it 'removes PDF extension from PATH_INFO and REQUEST_URI' do
           get 'http://www.example.org/test.pdf'
-          expect(@env['PATH_INFO']).to eq '/test'
-          expect(@env['REQUEST_URI']).to eq '/test'
-          expect(@env['Rack-Middleware-Grover']).to eq 'true'
+          expect(request_env['PATH_INFO']).to eq '/test'
+          expect(request_env['REQUEST_URI']).to eq '/test'
+          expect(request_env['Rack-Middleware-Grover']).to eq 'true'
         end
 
         context 'when app configuration has PDF middleware disabled' do
@@ -133,9 +135,9 @@ describe Grover::Middleware do
 
           it 'doesnt assign path environment variables' do
             get 'http://www.example.org/test.pdf'
-            expect(@env['PATH_INFO']).to eq '/test.pdf'
-            expect(@env).not_to have_key 'REQUEST_URI'
-            expect(@env).not_to have_key 'Rack-Middleware-Grover'
+            expect(request_env['PATH_INFO']).to eq '/test.pdf'
+            expect(request_env).not_to have_key 'REQUEST_URI'
+            expect(request_env).not_to have_key 'Rack-Middleware-Grover'
           end
         end
       end
@@ -143,9 +145,9 @@ describe Grover::Middleware do
       context 'when requesting a PNG' do
         it 'doesnt assign path environment variables' do
           get 'http://www.example.org/test.png'
-          expect(@env['PATH_INFO']).to eq '/test.png'
-          expect(@env).not_to have_key 'REQUEST_URI'
-          expect(@env).not_to have_key 'Rack-Middleware-Grover'
+          expect(request_env['PATH_INFO']).to eq '/test.png'
+          expect(request_env).not_to have_key 'REQUEST_URI'
+          expect(request_env).not_to have_key 'Rack-Middleware-Grover'
         end
 
         context 'when app configuration has PNG middleware enabled' do
@@ -153,9 +155,9 @@ describe Grover::Middleware do
 
           it 'removes PNG extension from PATH_INFO and REQUEST_URI' do
             get 'http://www.example.org/test.png'
-            expect(@env['PATH_INFO']).to eq '/test'
-            expect(@env['REQUEST_URI']).to eq '/test'
-            expect(@env['Rack-Middleware-Grover']).to eq 'true'
+            expect(request_env['PATH_INFO']).to eq '/test'
+            expect(request_env['REQUEST_URI']).to eq '/test'
+            expect(request_env['Rack-Middleware-Grover']).to eq 'true'
           end
         end
       end
@@ -163,16 +165,16 @@ describe Grover::Middleware do
       context 'when requesting a JPEG' do
         it 'doesnt assign path environment variables for JPEG' do
           get 'http://www.example.org/test.jpeg'
-          expect(@env['PATH_INFO']).to eq '/test.jpeg'
-          expect(@env).not_to have_key 'REQUEST_URI'
-          expect(@env).not_to have_key 'Rack-Middleware-Grover'
+          expect(request_env['PATH_INFO']).to eq '/test.jpeg'
+          expect(request_env).not_to have_key 'REQUEST_URI'
+          expect(request_env).not_to have_key 'Rack-Middleware-Grover'
         end
 
         it 'doesnt assign path environment variables for JPG' do
           get 'http://www.example.org/test.jpg'
-          expect(@env['PATH_INFO']).to eq '/test.jpg'
-          expect(@env).not_to have_key 'REQUEST_URI'
-          expect(@env).not_to have_key 'Rack-Middleware-Grover'
+          expect(request_env['PATH_INFO']).to eq '/test.jpg'
+          expect(request_env).not_to have_key 'REQUEST_URI'
+          expect(request_env).not_to have_key 'Rack-Middleware-Grover'
         end
 
         context 'when app configuration has JPEG middleware enabled' do
@@ -180,16 +182,16 @@ describe Grover::Middleware do
 
           it 'removes JPEG extension from PATH_INFO and REQUEST_URI' do
             get 'http://www.example.org/test.jpeg'
-            expect(@env['PATH_INFO']).to eq '/test'
-            expect(@env['REQUEST_URI']).to eq '/test'
-            expect(@env['Rack-Middleware-Grover']).to eq 'true'
+            expect(request_env['PATH_INFO']).to eq '/test'
+            expect(request_env['REQUEST_URI']).to eq '/test'
+            expect(request_env['Rack-Middleware-Grover']).to eq 'true'
           end
 
           it 'removes JPG extension from PATH_INFO and REQUEST_URI' do
             get 'http://www.example.org/test.jpg'
-            expect(@env['PATH_INFO']).to eq '/test'
-            expect(@env['REQUEST_URI']).to eq '/test'
-            expect(@env['Rack-Middleware-Grover']).to eq 'true'
+            expect(request_env['PATH_INFO']).to eq '/test'
+            expect(request_env['REQUEST_URI']).to eq '/test'
+            expect(request_env['Rack-Middleware-Grover']).to eq 'true'
           end
         end
       end
@@ -197,12 +199,11 @@ describe Grover::Middleware do
       context 'when not requesting a PDF/PNG or JPEG' do
         it 'keeps the original PATH_INFO and not change to REQUEST_URI' do
           get 'http://www.example.org/test.html'
-          expect(@env['PATH_INFO']).to eq '/test.html'
-          expect(@env['REQUEST_URI']).to be_nil
-          expect(@env['Rack-Middleware-Grover']).to be_nil
+          expect(request_env['PATH_INFO']).to eq '/test.html'
+          expect(request_env['REQUEST_URI']).to be_nil
+          expect(request_env['Rack-Middleware-Grover']).to be_nil
         end
       end
-      # rubocop:enable RSpec/InstanceVariable
     end
 
     describe 'caching' do
@@ -714,19 +715,19 @@ describe Grover::Middleware do
         # PDF request for 'test 1'
         get 'http://www.example.org/test1.pdf'
         expect(last_response.body).to be_a_pdf
-        check_pdf contents: 'Test1 page contents'
+        check_response_pdf contents: 'Test1 page contents'
 
         # PDF request for 'test 2'
         get 'http://www.example.org/test2.pdf'
         expect(last_response.body).to be_a_pdf
-        check_pdf contents: 'Test2 page contents'
+        check_response_pdf contents: 'Test2 page contents'
 
         # Non-PDF request
         get 'http://www.example.org/test1'
         expect(last_response.body).to eq 'Test1 page contents'
       end
 
-      def check_pdf(contents:)
+      def check_response_pdf(contents:)
         pdf_reader = pdf_reader_from_response
         expect(pdf_reader.page_count).to eq 1
         expect(Grover::Utils.squish(pdf_reader.pages.first.text)).to eq contents
