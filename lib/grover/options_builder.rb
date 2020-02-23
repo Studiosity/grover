@@ -1,10 +1,13 @@
+# frozen_string_literal: true
+
 require 'grover/utils'
 require 'grover/options_fixer'
 
 class Grover
-
+  #
+  # Build options from Grover.configuration, meta_options, and passed-in options
+  #
   class OptionsBuilder < Hash
-
     def initialize(options, url)
       @url = url
       combined = grover_configuration

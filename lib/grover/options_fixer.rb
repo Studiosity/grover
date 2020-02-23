@@ -1,9 +1,12 @@
+# frozen_string_literal: true
+
 require 'grover/utils'
 
 class Grover
-
+  #
+  # Convert string option values to boolean, numeric, and array literals
+  #
   class OptionsFixer
-
     FALSE_VALUES = [nil, false, 0, '0', 'f', 'F', 'false', 'FALSE', 'off', 'OFF'].freeze
 
     def initialize(options)
@@ -39,15 +42,11 @@ class Grover
     end
 
     def fix_integer_options!
-      fix_options!('viewport.width', 'viewport.height') do |value|
-        value.to_i
-      end
+      fix_options!('viewport.width', 'viewport.height', &:to_i)
     end
 
     def fix_float_options!
-      fix_options!('viewport.device_scale_factor', 'scale') do |value|
-        value.to_f
-      end
+      fix_options!('viewport.device_scale_factor', 'scale', &:to_f)
     end
 
     def fix_array_options!
