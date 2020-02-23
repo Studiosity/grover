@@ -596,6 +596,6 @@ describe Grover do
   end
 
   def mean_colour_statistics(image)
-    %w[red green blue].map { |colour| image.data.dig('channelStatistics', colour, 'mean') }
+    %w[red green blue].map { |colour| image.data.dig('channelStatistics', colour, 'mean').to_s }
   end
 end
