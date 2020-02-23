@@ -48,7 +48,7 @@ class Grover
     def fix_array_options!
       %w[launch_args].each do |opt|
         keys = opt.split('.')
-        Utils.deep_assign(@options, keys, YAML.safe_load(@options.dig(*keys))) if @options.dig(*keys)
+        Utils.deep_assign(@options, keys, YAML.safe_load(@options.dig(*keys))) if @options.dig(*keys).is_a? String
       end
     end
   end
