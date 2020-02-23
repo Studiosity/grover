@@ -20,10 +20,17 @@ class Grover
 
     private
 
+    def fix_options!(*options)
+      options.each do |option|
+        keys = option.split '.'
+        value = @options.dig(*keys)
+        Utils.deep_assign(@options, keys, yield(value)) if value
+      end
+    end
+
     def fix_boolean_options!
-      %w[display_header_footer print_background landscape prefer_css_page_size].each do |opt|
-        keys = opt.split('.')
-        Utils.deep_assign(@options, keys, string_to_bool(@options.dig(*keys))) if @options.dig(*keys)
+      fix_options!('display_header_footer', 'print_background', 'landscape', 'prefer_css_page_size') do |value|
+        !FALSE_VALUES.include? value
       end
     end
 
@@ -32,23 +39,20 @@ class Grover
     end
 
     def fix_integer_options!
-      ['viewport.width', 'viewport.height'].each do |opt|
-        keys = opt.split('.')
-        Utils.deep_assign(@options, keys, @options.dig(*keys).to_i) if @options.dig(*keys)
+      fix_options!('viewport.width', 'viewport.height') do |value|
+        value.to_i
       end
     end
 
     def fix_float_options!
-      ['viewport.device_scale_factor', 'scale'].each do |opt|
-        keys = opt.split('.')
-        Utils.deep_assign(@options, keys, @options.dig(*keys).to_f) if @options.dig(*keys)
+      fix_options!('viewport.device_scale_factor', 'scale') do |value|
+        value.to_f
       end
     end
 
     def fix_array_options!
-      %w[launch_args].each do |opt|
-        keys = opt.split('.')
-        Utils.deep_assign(@options, keys, YAML.safe_load(@options.dig(*keys))) if @options.dig(*keys).is_a? String
+      fix_options!('launch_args') do |value|
+        value.is_a?(String) ? YAML.safe_load(value) : value
       end
     end
   end
