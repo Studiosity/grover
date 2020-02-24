@@ -33,7 +33,7 @@ class Grover
 
     def fix_boolean_options!
       fix_options!('display_header_footer', 'print_background', 'landscape', 'prefer_css_page_size') do |value|
-        !FALSE_VALUES.include? value
+        string_to_bool(value)
       end
     end
 
