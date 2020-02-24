@@ -313,7 +313,8 @@ describe Grover do
         it do
           expect do
             to_pdf
-          end.to raise_error Schmooze::JavaScript::Error, %r{Failed to launch chrome! spawn /totes/invalid/path}
+          end.to raise_error Schmooze::JavaScript::Error,
+                             %r{Failed to launch (chrome|the browser process)! spawn /totes/invalid/path}
         end
       end
 
