@@ -393,7 +393,11 @@ describe Grover do
 
       # don't really want to rely on pixel testing the website screenshot
       # so we'll check it's mean colour is roughly what we expect
-      it { expect(image.data.dig('imageStatistics', 'all', 'mean').to_f).to be_within(1).of 97.7473 }
+      it do
+        expect(image.data.dig('imageStatistics', 'all', 'mean').to_f).
+          to be_within(1).of(97.7473).
+          or be_within(1).of(161.497)
+      end
     end
 
     context 'when passing through html' do
