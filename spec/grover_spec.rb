@@ -395,8 +395,8 @@ describe Grover do
       # so we'll check it's mean colour is roughly what we expect
       it do
         expect(image.data.dig('imageStatistics', 'all', 'mean').to_f).
-          to be_within(1).of(97.7473).
-          or be_within(1).of(161.497)
+          to be_within(1).of(97.7473).  # ImageMagick 6.9.3-1 (version used by Travis CI)
+          or be_within(1).of(161.497)   # ImageMagick 6.9.10-84
       end
     end
 
