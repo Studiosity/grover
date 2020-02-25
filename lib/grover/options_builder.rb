@@ -22,6 +22,9 @@ class Grover
       Utils.deep_stringify_keys Grover.configuration.options
     end
 
+    #
+    # Extract out options from meta tags in the source - based on code from PDFKit project
+    #
     def meta_options
       meta_opts = {}
 
