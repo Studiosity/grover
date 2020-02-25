@@ -81,7 +81,7 @@ describe Grover::OptionsFixer do
   context 'when a boolean option is truthy' do
     let(:options) { { 'display_header_footer' => 'true' } }
 
-    it 'converts the options to a false literal' do
+    it 'converts the option to a true literal' do
       expect(fixed_options['display_header_footer']).to be true
     end
   end
@@ -89,7 +89,7 @@ describe Grover::OptionsFixer do
   context 'with an integer option' do
     let(:options) { { 'viewport' => { 'width' => '123' } } }
 
-    it 'converts the option to a float' do
+    it 'converts the option to an integer' do
       expect(fixed_options['viewport']['width']).to eq 123
     end
   end
@@ -97,7 +97,7 @@ describe Grover::OptionsFixer do
   context 'with a float option' do
     let(:options) { { 'viewport' => { 'device_scale_factor' => '123.456' } } }
 
-    it 'converts the option to an integer' do
+    it 'converts the option to a float' do
       expect(fixed_options['viewport']['device_scale_factor']).to eq 123.456
     end
   end
