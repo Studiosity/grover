@@ -23,9 +23,9 @@ class Grover
 
     private
 
-    def fix_options!(*options)
-      options.each do |option|
-        keys = option.split '.'
+    def fix_options!(*paths)
+      paths.each do |path|
+        keys = path.split '.'
         value = @options.dig(*keys)
         Utils.deep_assign(@options, keys, yield(value)) if value
       end
