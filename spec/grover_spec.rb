@@ -428,6 +428,26 @@ describe Grover do
       it { expect(image.dimensions).to eq [400, 500] }
       it { expect(mean_colour_statistics(image)).to eq %w[165 42 42] }
     end
+
+    context 'when passing viewport options to Grover with meta tags' do
+      let(:url_or_html) do
+        Grover::Utils.squish(<<-HTML)
+          <html>
+            <head>
+              <title>Paaage</title>
+              <meta name="grover-viewport-height" content="100" />
+              <meta name="grover-viewport-width" content="200" />
+              <meta name="grover-viewport-device_scale_factor" content="2.5" />
+            </head>
+            <body>
+              <h1>Hey there</h1>
+            </body>
+          </html>
+        HTML
+      end
+
+      it { expect(image.dimensions).to eq [500, 250] }
+    end
   end
 
   describe '#to_png' do
