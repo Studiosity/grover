@@ -11,8 +11,8 @@ class Grover
     def initialize(options, url)
       @url = url
       combined = grover_configuration
-      Utils.deep_merge!(combined, Utils.deep_stringify_keys(options))
-      Utils.deep_merge!(combined, meta_options) unless url_source?
+      Utils.deep_merge! combined, Utils.deep_stringify_keys(options)
+      Utils.deep_merge! combined, meta_options unless url_source?
       update(OptionsFixer.new(combined).run)
     end
 
