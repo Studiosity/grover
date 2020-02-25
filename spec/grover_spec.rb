@@ -111,11 +111,11 @@ describe Grover do
           HTML
         end
 
-        # For some reason, the Mac platform results in a weird page height (not double the A4 width)
-        if /darwin/ =~ RUBY_PLATFORM
-          it { expect(pdf_reader.pages.first.attributes).to include(MediaBox: [0, 0, 841.91998, 1188]) }
-        else
-          it { expect(pdf_reader.pages.first.attributes).to include(MediaBox: [0, 0, 841.91998, 1189.91992]) }
+        it do
+          # For some reason, the Mac platform results in a weird page height (not double the A4 width)
+          expect(pdf_reader.pages.first.attributes).
+            to include(MediaBox: [0, 0, 841.91998, 1188]).      # Mac platform with older ImageMagick
+            or include(MediaBox: [0, 0, 841.91998, 1189.91992]) # All others
         end
       end
 
