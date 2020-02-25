@@ -66,4 +66,32 @@ describe Grover::OptionsBuilder do
       )
     end
   end
+
+  context 'when the meta options match global and passed-in options' do
+    let(:url_or_html) do
+      Grover::Utils.squish(<<-HTML)
+        <html>
+          <head>
+            <title>Paaage</title>
+            <meta name="grover-quality" content="91" />
+            <meta name="grover-viewport-width" content="100" />
+          </head>
+          <body>
+            <h1>Hey there</h1>
+          </body>
+        </html>
+      HTML
+    end
+    let(:options) { { viewport: { width: 200 } } }
+
+    it 'overrides the global and passed-in options with the meta options' do
+      expect(built_options).to eq(
+        'cache' => false,
+        'quality' => '91',
+        'viewport' => {
+          'width' => 100
+        }
+      )
+    end
+  end
 end
