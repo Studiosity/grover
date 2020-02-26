@@ -1,7 +1,11 @@
 # Changelog
 
 ## Unreleased
-- none
+### Added
+- [#48](https://github.com/Studiosity/grover/pull/48) Add missing option casting for `screenshot` and `viewport` attributes
+
+### Refactor
+- [#46](https://github.com/Studiosity/grover/pull/46) Extract option logic from Grover class ([@willkoehler][])
 
 ## [0.11.2](releases/tag/v0.11.2) - 2020-02-17
 ### Fixed

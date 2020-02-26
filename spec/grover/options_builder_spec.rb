@@ -87,7 +87,7 @@ describe Grover::OptionsBuilder do
     it 'overrides the global and passed-in options with the meta options' do
       expect(built_options).to eq(
         'cache' => false,
-        'quality' => '91',
+        'quality' => 91,
         'viewport' => {
           'width' => 100
         }
