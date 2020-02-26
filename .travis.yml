@@ -3,7 +3,7 @@ env:
     - CC_TEST_REPORTER_ID=5cfed40102c670b5c9e509730782b751939ddbe53fc57c317b718f635bab1ce8
   jobs:
     - PUPPETEER_VERSION=1.20.0
-    - PUPPETEER_VERSION=2.0.0
+    - PUPPETEER_VERSION=2.1.1
 
 language: ruby
 rvm:
