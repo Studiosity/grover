@@ -111,11 +111,11 @@ describe Grover do
           HTML
         end
 
-        # For some reason, the Mac platform results in a weird page height (not double the A4 width)
-        if /darwin/ =~ RUBY_PLATFORM
-          it { expect(pdf_reader.pages.first.attributes).to include(MediaBox: [0, 0, 841.91998, 1188]) }
-        else
-          it { expect(pdf_reader.pages.first.attributes).to include(MediaBox: [0, 0, 841.91998, 1189.91992]) }
+        it do
+          # For some reason, the Mac platform results in a weird page height (not double the A4 width)
+          expect(pdf_reader.pages.first.attributes).
+            to include(MediaBox: [0, 0, 841.91998, 1188]).      # Mac platform with older ImageMagick
+            or include(MediaBox: [0, 0, 841.91998, 1189.91992]) # All others
         end
       end
 
@@ -313,7 +313,8 @@ describe Grover do
         it do
           expect do
             to_pdf
-          end.to raise_error Schmooze::JavaScript::Error, %r{Failed to launch chrome! spawn /totes/invalid/path}
+          end.to raise_error Schmooze::JavaScript::Error,
+                             %r{Failed to launch (chrome|the browser process)! spawn /totes/invalid/path}
         end
       end
 
@@ -392,7 +393,11 @@ describe Grover do
 
       # don't really want to rely on pixel testing the website screenshot
       # so we'll check it's mean colour is roughly what we expect
-      it { expect(image.data.dig('imageStatistics', 'all', 'mean').to_f).to be_within(1).of 97.7473 }
+      it do
+        expect(image.data.dig('imageStatistics', 'all', 'mean').to_f).
+          to be_within(1).of(97.7473).  # ImageMagick 6.9.3-1 (version used by Travis CI)
+          or be_within(1).of(161.497)   # ImageMagick 6.9.10-84
+      end
     end
 
     context 'when passing through html' do
@@ -596,6 +601,6 @@ describe Grover do
   end
 
   def mean_colour_statistics(image)
-    %w[red green blue].map { |colour| image.data.dig('channelStatistics', colour, 'mean') }
+    %w[red green blue].map { |colour| image.data.dig('channelStatistics', colour, 'mean').to_s }
   end
 end

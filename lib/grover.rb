@@ -8,6 +8,7 @@ require 'active_support_ext/object/deep_dup' unless defined?(ActiveSupport)
 require 'grover/html_preprocessor'
 require 'grover/middleware'
 require 'grover/configuration'
+require 'grover/options_builder'
 
 require 'nokogiri'
 require 'schmooze'
@@ -151,8 +152,7 @@ class Grover
   #
   def initialize(url, options = {})
     @url = url
-    @options = combine_options options
-
+    @options = OptionsBuilder.new(options, url)
     @root_path = @options.delete 'root_path'
     @front_cover_path = @options.delete 'front_cover_path'
     @back_cover_path = @options.delete 'back_cover_path'
@@ -256,73 +256,6 @@ class Grover
 
   def processor
     Processor.new(root_path)
-  end
-
-  def combine_options(options)
-    combined = Utils.deep_stringify_keys Grover.configuration.options
-    Utils.deep_merge! combined, Utils.deep_stringify_keys(options)
-    Utils.deep_merge! combined, meta_options unless url_source?
-
-    fix_boolean_options! combined
-    fix_integer_options! combined
-    fix_float_options! combined
-    fix_array_options! combined
-
-    combined
-  end
-
-  #
-  # Extract out options from meta tags in the source - based on code from PDFKit project
-  #
-  def meta_options
-    meta_opts = {}
-
-    meta_tags.each do |meta|
-      tag_name = meta['name'] && meta['name'][/#{Grover.configuration.meta_tag_prefix}([a-z_-]+)/, 1]
-      next unless tag_name
-
-      Utils.deep_assign meta_opts, tag_name.split('-'), meta['content']
-    end
-
-    meta_opts
-  end
-
-  def meta_tags
-    Nokogiri::HTML(@url).xpath('//meta')
-  end
-
-  def url_source?
-    @url.match(/\Ahttp/i)
-  end
-
-  def fix_boolean_options!(options)
-    %w[display_header_footer print_background landscape prefer_css_page_size].each do |opt|
-      next unless options.key? opt
-
-      options[opt] = !FALSE_VALUES.include?(options[opt])
-    end
-  end
-
-  FALSE_VALUES = [nil, false, 0, '0', 'f', 'F', 'false', 'FALSE', 'off', 'OFF'].freeze
-
-  def fix_integer_options!(options)
-    ['viewport.width', 'viewport.height'].each do |opt|
-      keys = opt.split('.')
-      Utils.deep_assign(options, keys, options.dig(*keys).to_i) if options.dig(*keys)
-    end
-  end
-
-  def fix_float_options!(options)
-    ['viewport.device_scale_factor', 'scale'].each do |opt|
-      keys = opt.split('.')
-      Utils.deep_assign(options, keys, options.dig(*keys).to_f) if options.dig(*keys)
-    end
-  end
-
-  def fix_array_options!(options)
-    return unless options['launch_args'].is_a? String
-
-    options['launch_args'] = YAML.safe_load options['launch_args']
   end
 
   def normalized_options(path:)
