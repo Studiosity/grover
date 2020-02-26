@@ -3,15 +3,15 @@ require: rubocop-rspec
 Layout/DotPosition:
   EnforcedStyle: trailing
 
+Layout/LineLength:
+  Max: 120
+
 Metrics/BlockLength:
   Exclude:
     - "**/*_spec.rb"
 
 Metrics/ClassLength:
   Max: 135
-
-Metrics/LineLength:
-  Max: 120
 
 RSpec/ExampleLength:
   Max: 12
