@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased
+- none
+
+## [0.11.3](releases/tag/v0.11.3) - 2020-02-27
 ### Added
 - [#48](https://github.com/Studiosity/grover/pull/48) Add missing option casting for `screenshot` and `viewport` attributes
 
