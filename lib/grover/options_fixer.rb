@@ -23,30 +23,33 @@ class Grover
 
     private
 
-    def fix_options!(*paths)
-      paths.each do |path|
-        keys = path.split '.'
+    def fix_options!(*option_paths)
+      option_paths.each do |option_path|
+        keys = option_path.split '.'
         value = @options.dig(*keys)
         Utils.deep_assign(@options, keys, yield(value)) if value
       end
     end
 
     def fix_boolean_options!
-      fix_options!('display_header_footer', 'print_background', 'landscape', 'prefer_css_page_size') do |value|
-        string_to_bool(value)
-      end
-    end
-
-    def string_to_bool(value)
-      !FALSE_VALUES.include?(value)
+      fix_options!(
+        'display_header_footer', 'full_page', 'landscape', 'omit_background', 'prefer_css_page_size',
+        'print_background', 'viewport.has_touch', 'viewport.is_landscape', 'viewport.is_mobile'
+      ) { |value| !FALSE_VALUES.include?(value) }
     end
 
     def fix_integer_options!
-      fix_options!('viewport.width', 'viewport.height', &:to_i)
+      fix_options!(
+        'viewport.height', 'viewport.width',
+        &:to_i
+      )
     end
 
     def fix_float_options!
-      fix_options!('viewport.device_scale_factor', 'scale', &:to_f)
+      fix_options!(
+        'clip.height', 'clip.width', 'clip.x', 'clip.y', 'quality', 'scale', 'viewport.device_scale_factor',
+        &:to_f
+      )
     end
 
     def fix_array_options!
