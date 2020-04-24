@@ -329,6 +329,14 @@ describe Grover do
           it { expect(pdf_text_content).to eq 'Your browser made it!' }
         end
       end
+
+      context 'when passing through cookies option' do
+        let(:url_or_html) { 'http://www.html-kit.com/tools/cookietester' }
+        let(:options) { { cookies: [{ name: 'grover-test', value: 'nom nom nom', domain: 'www.html-kit.com' }] } }
+
+        it { expect(pdf_text_content).to include '1. Cookie named "grover-test' }
+        it { expect(pdf_text_content).to include 'nom nom nom' }
+      end
     end
 
     context 'when global options are defined' do

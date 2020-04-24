@@ -1,7 +1,8 @@
 # Changelog
 
 ## Unreleased
-- none
+### Added
+- [#49](https://github.com/Studiosity/grover/pull/49) Add support for passing request cookies ([@Richacinas][])
 
 ## [0.11.3](releases/tag/v0.11.3) - 2020-02-27
 ### Added
@@ -190,3 +191,4 @@
 [@rwtaylor]: https://github.com/rwtaylor 
 [@jnimety]: https://github.com/jnimety
 [@willkoehler]: https://github.com/willkoehler
+[@Richacinas]: https://github.com/Richacinas
