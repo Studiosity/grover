@@ -139,6 +139,37 @@ only really makes sense if you're calling Grover directly (and not via middlewar
 Grover.new('<some URI with basic authentication', username: 'the username', password: 'super secret').to_pdf
 ```
 
+#### Adding cookies
+To set request cookies when requesting a URL, pass an array of hashes as such
+_N.B._ Only the `name` and `value` properties are required.
+See [page.setCookies](https://github.com/puppeteer/puppeteer/blob/master/docs/api.md#pagesetcookiecookies) documentation for more details.
+
+```ruby
+myCookies = [
+  { name: 'sign_username', value: 'any@any.com', domain: 'mydomain' },
+  { name: '_session_id', value: '9c014df0b699d8dc08d1c472f8cc594c', domain: 'mydomain' }
+]
+Grover.new('<some URI with cookies', cookies: myCookies).to_pdf
+```
+
+If you need to forward the cookies from the original request, you could extract them as such:
+
+```ruby
+def header_cookies
+  request.headers['Cookie'].split('; ').map do |cookie|
+    key, value = cookie.split '='
+    { name: key, value: value, domain: request.headers['Host'] }
+  end
+end
+```
+
+And give that array to Grover:
+
+```ruby
+Grover.new('<some URI with cookies', cookies: header_cookies).to_pdf
+```
+
+
 #### Page URL for middleware requests (or passing through raw HTML)
 If you want to have the header or footer display the page URL, Grover requires that this is passed through via the
 `display_url` option. This is because the page URL is not available in the raw HTML!

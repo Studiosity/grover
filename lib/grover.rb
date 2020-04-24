@@ -65,6 +65,12 @@ class Grover
               await page.authenticate({ username, password });
             }
 
+            // Setting cookies
+            const cookies = options.cookies; delete options.cookies
+            if (Array.isArray(cookies)) {
+              await page.setCookie(...cookies);
+            }
+
             // Set caching flag (if provided)
             const cache = options.cache; delete options.cache;
             if (cache != undefined) {
