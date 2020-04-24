@@ -140,35 +140,29 @@ Grover.new('<some URI with basic authentication', username: 'the username', pass
 ```
 
 #### Adding cookies
-If you need to set cookies to your new page instance, just pass them along like this:
+If you need to set cookies to your new page instance, just pass them along like this (please note that the only required properties are `name` and `value`. Check [.setCookies](https://github.com/puppeteer/puppeteer/blob/master/docs/api.md#pagesetcookiecookies) docs):
 
 ```ruby
 myCookies = [{:name=>"sign_username", :value=>"any@any.com", :domain=>"mydomain"}, {:name=>"_session_id", :value=>"9c014df0b699d8dc08d1c472f8cc594c", :domain=>"mydomain"}]
-Grover.new('<some URI with cookies', cookies: myCookies ).to_pdf
+Grover.new('<some URI with cookies', cookies: myCookies).to_pdf
 ```
 
 If, let's say, you wanted to just forward the cookies that you got on your original request, you can do something like:
 
 ```ruby
-def header_cookies(req=nil)
-    req ||= request
-    cookie_dough = request.headers['Cookie'].split '; '
-    resultHash = Hash[cookie_dough.map do |c| 
-      pieces = c.split '='
-      [pieces[0].to_sym, pieces[1]]
-    end]
-
-    return resultHash.each_with_object([]) do |(key, value), array|
-      array << { name: key, value: value, domain: request.headers["Host"] }
-    end
+def header_cookies
+  request.headers['Cookie'].split('; ').map do |cookie|
+    key, value = cookie.split '='
+    { name: key, value: value, domain: request.headers['Host'] }
   end
+end
 ```
 
 And give that array to Grover:
 
 ```ruby
 myCookiesFromRequest = header_cookies(request)
-Grover.new('<some URI with cookies', cookies: myCookiesFromRequest ).to_pdf
+Grover.new('<some URI with cookies', cookies: myCookiesFromRequest).to_pdf
 ```
 
 
