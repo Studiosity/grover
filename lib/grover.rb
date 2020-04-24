@@ -67,7 +67,7 @@ class Grover
 
             // Setting cookies
             const cookies = options.cookies; delete options.cookies
-            if (cookies != undefined && Array.isArray(cookies)) {
+            if (Array.isArray(cookies)) {
               await page.setCookie(...cookies);
             }
 

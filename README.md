@@ -140,7 +140,9 @@ Grover.new('<some URI with basic authentication', username: 'the username', pass
 ```
 
 #### Adding cookies
-If you need to set cookies to your new page instance, just pass them along like this (please note that the only required properties are `name` and `value`. Check [.setCookies](https://github.com/puppeteer/puppeteer/blob/master/docs/api.md#pagesetcookiecookies) docs):
+To set request cookies when requesting a URL, pass an array of hashes as such
+_N.B._ Only the `name` and `value` properties are required.
+See [page.setCookies](https://github.com/puppeteer/puppeteer/blob/master/docs/api.md#pagesetcookiecookies) documentation for more details.
 
 ```ruby
 myCookies = [
@@ -150,7 +152,7 @@ myCookies = [
 Grover.new('<some URI with cookies', cookies: myCookies).to_pdf
 ```
 
-If, let's say, you wanted to just forward the cookies that you got on your original request, you can do something like:
+If you need to forward the cookies from the original request, you could extract them as such:
 
 ```ruby
 def header_cookies
@@ -164,8 +166,7 @@ end
 And give that array to Grover:
 
 ```ruby
-myCookiesFromRequest = header_cookies(request)
-Grover.new('<some URI with cookies', cookies: myCookiesFromRequest).to_pdf
+Grover.new('<some URI with cookies', cookies: header_cookies).to_pdf
 ```
 
 
