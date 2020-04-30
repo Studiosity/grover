@@ -86,7 +86,7 @@ class Grover
 
             // Setup viewport options (if provided)
             const viewport = options.viewport; delete options.viewport;
-            if (viewport != undefined) {
+            if (viewport != undefined && (viewport.width != undefined && viewport.height != undefined)) {
               await page.setViewport(viewport);
             }
 
@@ -123,6 +123,17 @@ class Grover
             const executeScript = options.executeScript; delete options.executeScript;
             if (executeScript != undefined) {
               await page.evaluate(executeScript);
+            }
+
+            // Override viewport with document body offsetHeight & offsetWidth, if viewport object is provided and the width or height isn't specified.
+            if (viewport != undefined && (viewport.width == undefined || viewport.height == undefined)) {
+              let vport = {};
+              vport['height'] = await page.evaluate(() => document.body.offsetHeight)
+              vport['width'] = await page.evaluate(() => document.body.offsetWidth)
+              if(viewport.width != undefined) { vport['width'] = viewport.width }
+              if(viewport.height != undefined) { vport['height'] = viewport.height }
+              const override = Object.assign(page.viewport(), vport);
+              await page.setViewport(override);
             }
 
             // If we're running puppeteer in headless mode, return the converted PDF
