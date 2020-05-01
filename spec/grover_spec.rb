@@ -391,6 +391,14 @@ describe Grover do
 
     let(:image) { MiniMagick::Image.read screenshot }
 
+    shared_examples 'it adjusts unspecified viewport dimension to document body offset dimension' do
+      it { expect(screenshot.unpack('C*')).to start_with "\x89PNG\r\n\x1A\n".unpack('C*') }
+      it { expect(image.type).to eq 'PNG' }
+      # The viewport should adjust to match the document body width
+      it { expect(image.dimensions).to eq [400, 200] }
+      it { expect(mean_colour_statistics(image)).to eq %w[165 42 42] }
+    end
+
     context 'when passing through a valid URL' do
       let(:url_or_html) { 'https://media.gettyimages.com/photos/tabby-cat-selfie-picture-id1151094724?s=2048x2048' }
 
@@ -443,22 +451,14 @@ describe Grover do
         let(:url_or_html) { '<html><body style="background-color: brown;height: 200px;"></body></html>' }
         let(:options) { { viewport: { width: 400 } } }
 
-        it { expect(screenshot.unpack('C*')).to start_with "\x89PNG\r\n\x1A\n".unpack('C*') }
-        it { expect(image.type).to eq 'PNG' }
-        # The viewport should adjust to match the document body height
-        it { expect(image.dimensions).to eq [400, 200] }
-        it { expect(mean_colour_statistics(image)).to eq %w[165 42 42] }
+        it_behaves_like 'it adjusts unspecified viewport dimension to document body offset dimension'
       end
 
       context 'with only height' do
         let(:url_or_html) { '<html><body style="background-color: brown;width: 400px;"></body></html>' }
         let(:options) { { viewport: { height: 200 } } }
 
-        it { expect(screenshot.unpack('C*')).to start_with "\x89PNG\r\n\x1A\n".unpack('C*') }
-        it { expect(image.type).to eq 'PNG' }
-        # The viewport should adjust to match the document body width
-        it { expect(image.dimensions).to eq [400, 200] }
-        it { expect(mean_colour_statistics(image)).to eq %w[165 42 42] }
+        it_behaves_like 'it adjusts unspecified viewport dimension to document body offset dimension'
       end
     end
 
