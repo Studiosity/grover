@@ -402,7 +402,8 @@ describe Grover do
       # don't really want to rely on pixel testing the website screenshot
       # so we'll check it's mean colour is roughly what we expect
       it do
-        expect(image.data.dig('imageStatistics', 'all', 'mean').to_f).
+        all = MiniMagick.imagemagick7? ? 'Overall' : 'all'
+        expect(image.data.dig('imageStatistics', all, 'mean').to_f).
           to be_within(1).of(97.7473).  # ImageMagick 6.9.3-1 (version used by Travis CI)
           or be_within(1).of(161.497)   # ImageMagick 6.9.10-84
       end
@@ -435,6 +436,30 @@ describe Grover do
       it { expect(image.type).to eq 'PNG' }
       it { expect(image.dimensions).to eq [400, 500] }
       it { expect(mean_colour_statistics(image)).to eq %w[165 42 42] }
+    end
+
+    context 'when passing through viewport options with only the width or height' do
+      context 'with only width' do
+        let(:url_or_html) { '<html><body style="background-color: brown;height: 200px;"></body></html>' }
+        let(:options) { { viewport: { width: 400 } } }
+
+        it { expect(screenshot.unpack('C*')).to start_with "\x89PNG\r\n\x1A\n".unpack('C*') }
+        it { expect(image.type).to eq 'PNG' }
+        # The viewport should adjust to match the document body height
+        it { expect(image.dimensions).to eq [400, 200] }
+        it { expect(mean_colour_statistics(image)).to eq %w[165 42 42] }
+      end
+
+      context 'with only height' do
+        let(:url_or_html) { '<html><body style="background-color: brown;width: 400px;"></body></html>' }
+        let(:options) { { viewport: { height: 200 } } }
+
+        it { expect(screenshot.unpack('C*')).to start_with "\x89PNG\r\n\x1A\n".unpack('C*') }
+        it { expect(image.type).to eq 'PNG' }
+        # The viewport should adjust to match the document body width
+        it { expect(image.dimensions).to eq [400, 200] }
+        it { expect(mean_colour_statistics(image)).to eq %w[165 42 42] }
+      end
     end
 
     context 'when passing viewport options to Grover with meta tags' do
@@ -609,6 +634,8 @@ describe Grover do
   end
 
   def mean_colour_statistics(image)
-    %w[red green blue].map { |colour| image.data.dig('channelStatistics', colour, 'mean').to_s }
+    colours = %w[red green blue]
+    colours = colours.map(&:capitalize) if MiniMagick.imagemagick7?
+    colours.map { |colour| image.data.dig('channelStatistics', colour, 'mean').to_s }
   end
 end

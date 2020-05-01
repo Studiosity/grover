@@ -3,3 +3,4 @@ Gemfile.lock
 package-lock.json
 /node_modules
 /coverage
+spec/examples.txt

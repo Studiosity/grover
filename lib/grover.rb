@@ -84,9 +84,9 @@ class Grover
               request_options.timeout = timeout;
             }
 
-            // Setup viewport options (if provided)
+            // Setup viewport options (ONLY if width and height are provided)
             const viewport = options.viewport; delete options.viewport;
-            if (viewport != undefined && (viewport.width != undefined && viewport.height != undefined)) {
+            if (viewport != undefined && viewport.width && viewport.height) {
               await page.setViewport(viewport);
             }
 
@@ -125,13 +125,14 @@ class Grover
               await page.evaluate(executeScript);
             }
 
-            // Override viewport with document body offsetHeight & offsetWidth, if viewport object is provided and the width or height isn't specified.
+            // Override viewport with document body offsetHeight or offsetWidth, if viewport object is provided and the width or height isn't specified.
+            // This will auto adjust the viewport to the document body size. Very useful in a situation where by only the viewport width or height is known
             if (viewport != undefined && (viewport.width == undefined || viewport.height == undefined)) {
               let vport = {};
               vport['height'] = await page.evaluate(() => document.body.offsetHeight)
               vport['width'] = await page.evaluate(() => document.body.offsetWidth)
-              if(viewport.width != undefined) { vport['width'] = viewport.width }
-              if(viewport.height != undefined) { vport['height'] = viewport.height }
+              if(viewport.width) { vport['width'] = viewport.width }
+              if(viewport.height) { vport['height'] = viewport.height }
               const override = Object.assign(page.viewport(), vport);
               await page.setViewport(override);
             }
