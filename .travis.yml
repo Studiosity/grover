@@ -4,6 +4,7 @@ env:
   jobs:
     - PUPPETEER_VERSION=1.20.0
     - PUPPETEER_VERSION=2.1.1
+    - PUPPETEER_VERSION=3.0.4
 
 language: ruby
 rvm:
