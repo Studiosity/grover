@@ -15,6 +15,9 @@ Lint/RaiseException:
 Lint/StructNewOverride:
   Enabled: true
 
+Metrics/AbcSize:
+    Max: 20
+
 Metrics/BlockLength:
   Exclude:
     - "**/*_spec.rb"
@@ -28,8 +31,11 @@ RSpec/ExampleLength:
 RSpec/MessageSpies:
   EnforcedStyle: receive
 
+RSpec/MultipleExpectations:
+  Max: 4
+
 RSpec/NestedGroups:
-  Max: 5
+  Max: 6
 
 Style/Documentation:
   Exclude:

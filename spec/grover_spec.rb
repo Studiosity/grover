@@ -36,405 +36,181 @@ describe Grover do
   describe '#to_pdf' do
     subject(:to_pdf) { grover.to_pdf }
 
-    let(:pdf_reader) { PDF::Reader.new pdf_io }
-    let(:pdf_io) { StringIO.new to_pdf }
-    let(:pdf_text_content) { Grover::Utils.squish(pdf_reader.pages.first.text) }
-    let(:large_text) { '<style>.text { font-size: 14px; }</style>' }
-    let(:default_header) { Grover::DEFAULT_HEADER_TEMPLATE }
-    let(:basic_header_footer_options) do
-      {
-        display_header_footer: true,
-        display_url: 'http://www.example.net/foo/bar',
-        margin: {
-          top: '1in',
-          bottom: '1in'
-        }
-      }
+    let(:processor) { instance_double 'Grover::Processor' }
+
+    before { allow(Grover::Processor).to receive(:new).with(Dir.pwd).and_return processor }
+
+    it 'calls to Grover::Processor' do
+      expect(processor).to receive(:convert).with(:pdf, url_or_html, {}).and_return 'some PDF content'
+      expect(to_pdf).to eq 'some PDF content'
     end
 
-    context 'when passing through a valid URL' do
-      # we need to add the language for test stability
-      # if not added explicitly, google can respond with a different locale
-      # based on IP address geo-lookup, timezone, etc.
-      let(:url_or_html) { 'https://www.google.com/?gl=us' }
+    context 'when path option is specified' do
+      subject(:to_pdf) { grover.to_pdf(path) }
 
-      it { is_expected.to start_with "%PDF-1.4\n" }
-      it { expect(pdf_reader.page_count).to eq 1 }
-      it { expect(pdf_text_content).to include "I'm Feeling Lucky" }
-    end
+      let(:path) { '/foo/bar' }
 
-    context 'when passing through an invalid URL' do
-      let(:url_or_html) { 'https://fake.invalid' }
-
-      it do
-        expect do
-          to_pdf
-        end.to raise_error Schmooze::JavaScript::Error, %r{net::ERR_NAME_NOT_RESOLVED at https://fake.invalid}
-      end
-    end
-
-    context 'when passing through html' do
-      let(:url_or_html) { '<html><body><h1>Hey there</h1></body></html>' }
-
-      it { is_expected.to start_with "%PDF-1.4\n" }
-      it { expect(pdf_reader.page_count).to eq 1 }
-      it { expect(pdf_text_content).to eq 'Hey there' }
-    end
-
-    context 'when passing through options to Grover' do
-      let(:url_or_html) { '<html><head><title>Paaage</title></head><body><h1>Hey there</h1></body></html>' }
-
-      context 'when options includes A4 page format' do
-        let(:options) { { format: 'A4' } }
-
-        it { expect(pdf_reader.pages.first.attributes).to include(MediaBox: [0, 0, 594.95996, 841.91998]) }
+      it 'calls to Grover::Processor with the path specified' do
+        expect(processor).to(
+          receive(:convert).
+            with(:pdf, url_or_html, 'path' => '/foo/bar').
+            and_return('some PDF content')
+        )
+        expect(to_pdf).to eq 'some PDF content'
       end
 
-      context 'when options includes Letter page format' do
-        let(:options) { { format: 'Letter' } }
+      context 'when the path provided is not a String' do
+        let(:path) { 1234 }
 
-        it { expect(pdf_reader.pages.first.attributes).to include(MediaBox: [0, 0, 612, 792]) }
-      end
-
-      context 'when the page contains valid meta options' do
-        let(:url_or_html) do
-          Grover::Utils.squish(<<-HTML)
-            <html>
-              <head>
-                <title>Paaage</title>
-                <meta name="grover-format" content="A3" />
-              </head>
-              <body>
-                <h1>Hey there</h1>
-              </body>
-            </html>
-          HTML
-        end
-
-        it do
-          # For some reason, the Mac platform results in a weird page height (not double the A4 width)
-          expect(pdf_reader.pages.first.attributes).
-            to include(MediaBox: [0, 0, 841.91998, 1188]).      # Mac platform with older ImageMagick
-            or include(MediaBox: [0, 0, 841.91998, 1189.91992]) # All others
-        end
-      end
-
-      context 'when the page contains meta options with escaped content' do
-        let(:options) { basic_header_footer_options.merge(header_template: large_text) }
-        let(:url_or_html) do
-          Grover::Utils.squish(<<-HTML)
-            <html>
-              <head>
-                <meta name="grover-footer_template"
-                      content="<div class='text'>Footer with &quot;quotes&quot; in it</div>" />
-              </head>
-              <body>
-                <h1>Hey there</h1>
-              </body>
-            </html>
-          HTML
-        end
-
-        it { expect(pdf_text_content).to eq 'Hey there Footer with "quotes" in it' }
-      end
-
-      context 'when the page contains a line starting with `http`' do
-        let(:options) { basic_header_footer_options.merge(header_template: large_text) }
-        let(:url_or_html) do
-          <<~HTML
-            <html>
-              <head>
-                <meta name="grover-footer_template" content="<div class='text'>Footer content</div>" />
-              </head>
-              <body>
-                <h1>Hey there</h1>
-            http://example.com
-              </body>
-            </html>
-          HTML
-        end
-
-        it { expect(pdf_text_content).to eq 'Hey there http://example.com Footer content' }
-      end
-
-      context 'when the page contains meta options with boolean content' do
-        let(:options) { basic_header_footer_options.merge(header_template: 'We dont expect to see this...') }
-        let(:url_or_html) do
-          Grover::Utils.squish(<<-HTML)
-            <html>
-              <head>
-                <meta name="grover-display_header_footer" content='false' />
-              </head>
-              <body>
-                <h1>Hey there</h1>
-              </body>
-            </html>
-          HTML
-        end
-
-        it { expect(pdf_text_content).to eq 'Hey there' }
-      end
-
-      context 'when the page contains invalid meta options' do
-        let(:url_or_html) do
-          Grover::Utils.squish(<<-HTML)
-            <html>
-              <head>
-                <title>Paaage</title>
-                <meta name="grover-margin-top" content="totes-invalid" />
-              </head>
-              <body>
-                <h1>Hey there</h1>
-              </body>
-            </html>
-          HTML
-        end
-
-        it do
-          expect do
-            to_pdf
-          end.to raise_error Schmooze::JavaScript::Error, /Failed to parse parameter value: totes-invalid/
-        end
-      end
-
-      context 'when options include header and footer enabled' do
-        let(:options) { basic_header_footer_options.merge(header_template: "#{large_text}#{default_header}") }
-
-        it do
-          date = Date.today.strftime '%-m/%-d/%Y'
-          expect(pdf_text_content).to eq "#{date} Paaage Hey there http://www.example.net/foo/bar 1/1"
-        end
-      end
-
-      context 'when options override header template' do
-        let(:options) do
-          basic_header_footer_options.merge(header_template: "#{large_text}<div class='text'>Excellente</div>")
-        end
-
-        it { expect(pdf_text_content).to eq 'Excellente Hey there http://www.example.net/foo/bar 1/1' }
-      end
-
-      context 'when header template includes the display url marker' do
-        let(:options) do
-          basic_header_footer_options.merge(
-            header_template: "#{large_text}<div class='text'>abc<span class='url'></span>def</div>"
+        it 'calls to Grover::Processor without the path specified' do
+          expect(processor).to(
+            receive(:convert).
+              with(:pdf, url_or_html, {}).
+              and_return('some PDF content')
           )
-        end
-
-        it do
-          expect(pdf_text_content).to(
-            eq('abchttp://www.example.net/foo/bardef Hey there http://www.example.net/foo/bar 1/1')
-          )
+          expect(to_pdf).to eq 'some PDF content'
         end
       end
+    end
 
-      context 'when options override footer template' do
-        let(:options) do
-          basic_header_footer_options.merge(
-            footer_template: "#{large_text}<div class='text'>great <span class='url'></span> page</div>"
-          )
-        end
+    context 'when root_path is overridden' do
+      let(:options) { { root_path: 'foo/bar/baz' } }
 
-        it do
-          date = Date.today.strftime '%-m/%-d/%Y'
-          expect(pdf_text_content).to eq "#{date} Paaage Hey there great http://www.example.net/foo/bar page"
-        end
-      end
-
-      context 'when display_url option is not provided' do
-        let(:options) { basic_header_footer_options.tap { |hash| hash.delete(:display_url) } }
-
-        it 'uses the default `example.com` for the footer URL' do
-          date = Date.today.strftime '%-m/%-d/%Y'
-          expect(pdf_text_content).to eq "#{date} Paaage Hey there http://example.com/ 1/1"
-        end
-      end
-
-      context 'when passing through launch params' do
-        let(:options) { { launch_args: launch_args } }
-        let(:launch_args) { [] }
-        let(:url_or_html) do
-          <<-HTML
-            <html>
-              #{head}
-              <body>
-                Speech recognition is <span id="test" />
-                <script type="text/javascript">
-                  var speechSupported = "webkitSpeechRecognition" in window;
-                  document.getElementById("test").innerHTML = speechSupported ? "supported" : "not supported"
-                </script>
-              </body>
-            </html>
-          HTML
-        end
-        let(:head) { '' }
-
-        it { expect(pdf_text_content).to eq 'Speech recognition is supported' }
-
-        context 'when launch params specify disabling the speech API' do
-          let(:launch_args) { ['--disable-speech-api'] }
-
-          it { expect(pdf_text_content).to eq 'Speech recognition is not supported' }
-        end
-
-        context 'when disabling speech API via launch params in meta tags' do
-          let(:head) { %(<meta name="grover-launch_args" content="['--disable-speech-api']" />) }
-
-          it { expect(pdf_text_content).to eq 'Speech recognition is not supported' }
-        end
-      end
-
-      context 'when passing through wait_until option' do
-        let(:url_or_html) do
-          <<-HTML
-            <html>
-              <body>
-                Delayed JavaScript <span id="test">did not run</span>
-                <script type="text/javascript">
-                  setTimeout(function() { document.getElementById("test").innerHTML = "ran"; }, 250);
-                </script>
-              </body>
-            </html>
-          HTML
-        end
-
-        it { expect(pdf_text_content).to eq 'Delayed JavaScript ran' }
-
-        context 'when setting wait_until option to load' do
-          let(:options) { { wait_until: 'load' } }
-
-          it { expect(pdf_text_content).to eq 'Delayed JavaScript did not run' }
-        end
-      end
-
-      context 'when options include executable_path' do
-        let(:options) { { executable_path: '/totes/invalid/path' } }
-
-        it do
-          expect do
-            to_pdf
-          end.to raise_error Schmooze::JavaScript::Error,
-                             %r{Failed to launch (chrome|the browser process)! spawn /totes/invalid/path}
-        end
-      end
-
-      context 'when requesting a URI requiring basic authentication' do
-        let(:url_or_html) { 'https://jigsaw.w3.org/HTTP/Basic/' }
-
-        it { expect(pdf_text_content).to eq 'Unauthorized access You are denied access to this resource.' }
-
-        context 'when passing through `username` and `password` options' do
-          let(:options) { { username: 'guest', password: 'guest' } }
-
-          it { expect(pdf_text_content).to eq 'Your browser made it!' }
-        end
-      end
-
-      context 'when passing through cookies option' do
-        let(:url_or_html) { 'http://www.html-kit.com/tools/cookietester' }
-        let(:options) { { cookies: [{ name: 'grover-test', value: 'nom nom nom', domain: 'www.html-kit.com' }] } }
-
-        it { expect(pdf_text_content).to include '1. Cookie named "grover-test' }
-        it { expect(pdf_text_content).to include 'nom nom nom' }
+      it 'calls to Grover::Processor with overridden path' do
+        expect(Grover::Processor).to receive(:new).with('foo/bar/baz').and_return processor
+        expect(processor).to receive(:convert).with(:pdf, url_or_html, {}).and_return 'some PDF content'
+        expect(to_pdf).to eq 'some PDF content'
       end
     end
 
     context 'when global options are defined' do
-      let(:url_or_html) { '<html><body><h1>Hey there</h1></body></html>' }
-      let(:options) { basic_header_footer_options.merge(header_template: large_text) }
+      let(:global_options) { { header_template: 'Some header' } }
 
-      before { allow(described_class.configuration).to receive(:options).and_return(options) }
+      before { allow(described_class.configuration).to receive(:options).and_return global_options }
 
-      it { expect(pdf_text_content).to eq 'Hey there http://www.example.net/foo/bar 1/1' }
+      it 'builds options and passes them through to the processor' do
+        expect(processor).to(
+          receive(:convert).
+            with(:pdf, url_or_html, 'headerTemplate' => 'Some header').
+            and_return('some PDF content')
+        )
+        expect(to_pdf).to eq 'some PDF content'
+      end
+
+      context 'when global options include front and back cover paths' do
+        let(:global_options) { { front_cover_path: '/front', back_cover_path: '/back' } }
+
+        it 'excludes front and back cover paths from options passed to processor' do
+          expect(processor).to receive(:convert).with(:pdf, url_or_html, {}).and_return 'some PDF content'
+          expect(to_pdf).to eq 'some PDF content'
+          expect(grover.front_cover_path).to eq '/front'
+          expect(grover.back_cover_path).to eq '/back'
+        end
+      end
+
+      context 'when instance options are provided' do
+        let(:options) { { header_template: 'instance header', footer_template: 'instance footer' } }
+
+        it 'builds options, overriding global options, and passes them through to the processor' do
+          expect(processor).to(
+            receive(:convert).
+              with(:pdf, url_or_html, 'headerTemplate' => 'instance header', 'footerTemplate' => 'instance footer').
+              and_return('some PDF content')
+          )
+          expect(to_pdf).to eq 'some PDF content'
+        end
+      end
+
+      context 'when instance options have string keys' do
+        let(:options) { { 'header_template' => 'instance header', 'footer_template' => 'instance footer' } }
+
+        it 'builds options, overriding global options, and passes them through to the processor' do
+          expect(processor).to(
+            receive(:convert).
+              with(:pdf, url_or_html, 'headerTemplate' => 'instance header', 'footerTemplate' => 'instance footer').
+              and_return('some PDF content')
+          )
+          expect(to_pdf).to eq 'some PDF content'
+        end
+      end
     end
 
-    context 'when HTML includes screen only content' do
+    context 'when options include front and back cover paths' do
+      let(:options) { { front_cover_path: '/front', back_cover_path: '/back' } }
+
+      it 'excludes front and back cover paths from options passed to processor' do
+        expect(processor).to receive(:convert).with(:pdf, url_or_html, {}).and_return 'some PDF content'
+        expect(to_pdf).to eq 'some PDF content'
+        expect(grover.front_cover_path).to eq '/front'
+        expect(grover.back_cover_path).to eq '/back'
+      end
+    end
+
+    context 'when the page contains meta options with escaped content' do
       let(:url_or_html) do
-        <<-HTML
-          <html>
-            <head>
-              <style>
-                @media not screen {
-                  .screen-only { display: none }
-                }
-              </style>
-            </head>
-            <body>
-              <h1>Hey there</h1>
-              <div class="screen-only">This should only display for screen media</div>
-            </body>
-          </html>
+        Grover::Utils.squish(<<-HTML)
+        <html>
+          <head>
+            <meta name="grover-footer_template"
+                  content="<div class='text'>Footer with &quot;quotes&quot; in it</div>" />
+          </head>
+          <body>
+            <h1>Hey there</h1>
+          </body>
+        </html>
         HTML
       end
 
-      it { expect(pdf_text_content).to eq 'Hey there' }
-
-      context 'with emulate_media set to `screen`' do
-        before { allow(described_class.configuration).to receive(:options).and_return(emulate_media: 'screen') }
-
-        it { expect(pdf_text_content).to eq 'Hey there This should only display for screen media' }
+      it 'builds options and passes them through to the processor' do
+        expect(processor).to(
+          receive(:convert).
+            with(:pdf, url_or_html, 'footerTemplate' => "<div class='text'>Footer with \"quotes\" in it</div>").
+            and_return('some PDF content')
+        )
+        expect(to_pdf).to eq 'some PDF content'
       end
     end
 
-    context 'when evaluate option is specified' do
-      let(:url_or_html) { '<html><body></body></html>' }
-      let(:options) { basic_header_footer_options.merge(execute_script: script) }
-      let(:script) { 'document.getElementsByTagName("body")[0].innerText = "Some evaluated content"' }
-      let(:date) { Date.today.strftime '%-m/%-d/%Y' }
+    context 'when specifying an array of launch args in meta tags' do
+      let(:url_or_html) do
+        Grover::Utils.squish(<<-HTML)
+        <html>
+          <head>
+            <meta name="grover-launch_args" content="['--disable-speech-api']" />
+          </head>
+        </html>
+        HTML
+      end
 
-      it { expect(pdf_text_content).to eq "#{date} Some evaluated content http://www.example.net/foo/bar 1/1" }
-    end
-  end
-
-  describe '#screenshot' do
-    subject(:screenshot) { grover.screenshot }
-
-    let(:image) { MiniMagick::Image.read screenshot }
-
-    context 'when passing through a valid URL' do
-      let(:url_or_html) { 'https://media.gettyimages.com/photos/tabby-cat-selfie-picture-id1151094724?s=2048x2048' }
-
-      # default screenshot is PNG 800w x 600h
-      it { expect(screenshot.unpack('C*')).to start_with "\x89PNG\r\n\x1A\n".unpack('C*') }
-      it { expect(image.type).to eq 'PNG' }
-      it { expect(image.dimensions).to eq [800, 600] }
-
-      # don't really want to rely on pixel testing the website screenshot
-      # so we'll check it's mean colour is roughly what we expect
-      it do
-        expect(image.data.dig('imageStatistics', MiniMagick.imagemagick7? ? 'Overall' : 'all', 'mean').to_f).
-          to be_within(1).of(97.7473).  # ImageMagick 6.9.3-1 (version used by Travis CI)
-          or be_within(1).of(161.497)   # ImageMagick 6.9.10-84
+      it 'builds options and passes them through to the processor' do
+        expect(processor).to(
+          receive(:convert).
+            with(:pdf, url_or_html, 'launchArgs' => ['--disable-speech-api']).
+            and_return('some PDF content')
+        )
+        expect(to_pdf).to eq 'some PDF content'
       end
     end
 
-    context 'when passing through html' do
-      let(:url_or_html) { '<html><body style="background-color: blue"></body></html>' }
+    context 'when the page contains meta options with boolean content' do
+      let(:url_or_html) do
+        Grover::Utils.squish(<<-HTML)
+        <html>
+          <head>
+            <meta name="grover-display_header_footer" content='false' />
+          </head>
+        </html>
+        HTML
+      end
 
-      it { expect(screenshot.unpack('C*')).to start_with "\x89PNG\r\n\x1A\n".unpack('C*') }
-      it { expect(image.type).to eq 'PNG' }
-      it { expect(image.dimensions).to eq [800, 600] }
-      it { expect(mean_colour_statistics(image)).to eq %w[0 0 255] }
-    end
-
-    context 'when passing through clip options to Grover' do
-      let(:url_or_html) { '<html><body style="background-color: red"></body></html>' }
-      let(:options) { { clip: { x: 0, y: 0, width: 200, height: 100 } } }
-
-      it { expect(screenshot.unpack('C*')).to start_with "\x89PNG\r\n\x1A\n".unpack('C*') }
-      it { expect(image.type).to eq 'PNG' }
-      it { expect(image.dimensions).to eq [200, 100] }
-      it { expect(mean_colour_statistics(image)).to eq %w[255 0 0] }
-    end
-
-    context 'when passing through viewport options to Grover' do
-      let(:url_or_html) { '<html><body style="background-color: brown"></body></html>' }
-      let(:options) { { viewport: { width: 400, height: 500 } } }
-
-      it { expect(screenshot.unpack('C*')).to start_with "\x89PNG\r\n\x1A\n".unpack('C*') }
-      it { expect(image.type).to eq 'PNG' }
-      it { expect(image.dimensions).to eq [400, 500] }
-      it { expect(mean_colour_statistics(image)).to eq %w[165 42 42] }
+      it 'builds options and passes them through to the processor' do
+        expect(processor).to(
+          receive(:convert).
+            with(:pdf, url_or_html, 'displayHeaderFooter' => false).
+            and_return('some PDF content')
+        )
+        expect(to_pdf).to eq 'some PDF content'
+      end
     end
 
     context 'when passing viewport options to Grover with meta tags' do
@@ -447,41 +223,253 @@ describe Grover do
               <meta name="grover-viewport-width" content="200" />
               <meta name="grover-viewport-device_scale_factor" content="2.5" />
             </head>
-            <body>
-              <h1>Hey there</h1>
-            </body>
           </html>
         HTML
       end
 
-      it { expect(image.dimensions).to eq [500, 250] }
+      it 'builds options and passes them through to the processor' do
+        expect(processor).to(
+          receive(:convert).
+            with(:pdf, url_or_html, 'viewport' => { 'height' => 100, 'width' => 200, 'deviceScaleFactor' => 2.5 }).
+            and_return('some PDF content')
+        )
+        expect(to_pdf).to eq 'some PDF content'
+      end
+    end
+  end
+
+  describe '#screenshot' do
+    subject(:screenshot) { grover.screenshot }
+
+    let(:processor) { instance_double 'Grover::Processor' }
+
+    before { allow(Grover::Processor).to receive(:new).with(Dir.pwd).and_return processor }
+
+    it 'calls to Grover::Processor' do
+      expect(processor).to receive(:convert).with(:screenshot, url_or_html, {}).and_return 'some image content'
+      expect(screenshot).to eq 'some image content'
+    end
+
+    context 'when path option is specified' do
+      subject(:screenshot) { grover.screenshot(path: '/foo/bar') }
+
+      it 'calls to Grover::Processor with the path specified' do
+        expect(processor).to(
+          receive(:convert).
+            with(:screenshot, url_or_html, 'path' => '/foo/bar').
+            and_return('some image content')
+        )
+        expect(screenshot).to eq 'some image content'
+      end
+    end
+
+    context 'when format option is specified' do
+      subject(:screenshot) { grover.screenshot(format: format) }
+
+      context 'when format is png' do
+        let(:format) { 'png' }
+
+        it 'calls to Grover::Processor with the type specified' do
+          expect(processor).to(
+            receive(:convert).
+              with(:screenshot, url_or_html, 'type' => 'png').
+              and_return('some image content')
+          )
+          expect(screenshot).to eq 'some image content'
+        end
+      end
+
+      context 'when format is jpeg' do
+        let(:format) { 'jpeg' }
+
+        it 'calls to Grover::Processor with the type specified' do
+          expect(processor).to(
+            receive(:convert).
+              with(:screenshot, url_or_html, 'type' => 'jpeg').
+              and_return('some image content')
+          )
+          expect(screenshot).to eq 'some image content'
+        end
+      end
+
+      context 'when format is bmp' do
+        let(:format) { 'bmp' }
+
+        it 'calls to Grover::Processor without the type specified' do
+          expect(processor).to receive(:convert).with(:screenshot, url_or_html, {}).and_return 'some image content'
+          expect(screenshot).to eq 'some image content'
+        end
+      end
+    end
+
+    context 'when root_path is overridden' do
+      let(:options) { { root_path: 'foo/bar/baz' } }
+
+      it 'calls to Grover::Processor with overridden path' do
+        expect(Grover::Processor).to receive(:new).with('foo/bar/baz').and_return processor
+        expect(processor).to receive(:convert).with(:screenshot, url_or_html, {}).and_return 'some image content'
+        expect(screenshot).to eq 'some image content'
+      end
+    end
+
+    context 'when global options are defined' do
+      let(:global_options) { { header_template: 'Some header' } }
+
+      before { allow(described_class.configuration).to receive(:options).and_return global_options }
+
+      it 'builds options and passes them through to the processor' do
+        expect(processor).to(
+          receive(:convert).
+            with(:screenshot, url_or_html, 'headerTemplate' => 'Some header').
+            and_return('some image content')
+        )
+        expect(screenshot).to eq 'some image content'
+      end
+
+      context 'when global options include front and back cover paths' do
+        let(:global_options) { { front_cover_path: '/front', back_cover_path: '/back' } }
+
+        it 'excludes front and back cover paths from options passed to processor' do
+          expect(processor).to receive(:convert).with(:screenshot, url_or_html, {}).and_return 'some image content'
+          expect(screenshot).to eq 'some image content'
+          expect(grover.front_cover_path).to eq '/front'
+          expect(grover.back_cover_path).to eq '/back'
+        end
+      end
+
+      context 'when instance options are provided' do
+        let(:options) { { header_template: 'instance header', footer_template: 'instance footer' } }
+
+        it 'builds options, overriding global options, and passes them through to the processor' do
+          expect(processor).to(
+            receive(:convert).
+              with(
+                :screenshot,
+                url_or_html,
+                'headerTemplate' => 'instance header', 'footerTemplate' => 'instance footer'
+              ).
+              and_return('some image content')
+          )
+          expect(screenshot).to eq 'some image content'
+        end
+      end
+
+      context 'when instance options have string keys' do
+        let(:options) { { 'header_template' => 'instance header', 'footer_template' => 'instance footer' } }
+
+        it 'builds options, overriding global options, and passes them through to the processor' do
+          expect(processor).to(
+            receive(:convert).
+              with(
+                :screenshot,
+                url_or_html,
+                'headerTemplate' => 'instance header', 'footerTemplate' => 'instance footer'
+              ).
+              and_return('some image content')
+          )
+          expect(screenshot).to eq 'some image content'
+        end
+      end
+    end
+
+    context 'when options include front and back cover paths' do
+      let(:options) { { front_cover_path: '/front', back_cover_path: '/back' } }
+
+      it 'excludes front and back cover paths from options passed to processor' do
+        expect(processor).to receive(:convert).with(:screenshot, url_or_html, {}).and_return 'some image content'
+        expect(screenshot).to eq 'some image content'
+        expect(grover.front_cover_path).to eq '/front'
+        expect(grover.back_cover_path).to eq '/back'
+      end
+    end
+
+    context 'when passing viewport options to Grover with meta tags' do
+      let(:url_or_html) do
+        Grover::Utils.squish(<<-HTML)
+          <html>
+            <head>
+              <title>Paaage</title>
+              <meta name="grover-viewport-height" content="100" />
+              <meta name="grover-viewport-width" content="200" />
+              <meta name="grover-viewport-device_scale_factor" content="2.5" />
+            </head>
+          </html>
+        HTML
+      end
+
+      it 'builds options and passes them through to the processor' do
+        expect(processor).to(
+          receive(:convert).
+            with(
+              :screenshot,
+              url_or_html,
+              'viewport' => { 'height' => 100, 'width' => 200, 'deviceScaleFactor' => 2.5 }
+            ).
+            and_return('some image content')
+        )
+        expect(screenshot).to eq 'some image content'
+      end
     end
   end
 
   describe '#to_png' do
     subject(:to_png) { grover.to_png }
 
-    let(:image) { MiniMagick::Image.read to_png }
-    let(:url_or_html) { '<html><body style="background-color: green"></body></html>' }
+    let(:processor) { instance_double 'Grover::Processor' }
 
-    it { expect(to_png.unpack('C*')).to start_with "\x89PNG\r\n\x1A\n".unpack('C*') }
-    it { expect(image.type).to eq 'PNG' }
-    it { expect(image.dimensions).to eq [800, 600] }
-    it { expect(mean_colour_statistics(image)).to eq %w[0 128 0] }
+    before { allow(Grover::Processor).to receive(:new).with(Dir.pwd).and_return processor }
+
+    it 'calls to Grover::Processor' do
+      expect(processor).to(
+        receive(:convert).
+          with(:screenshot, url_or_html, 'type' => 'png').
+          and_return('some PNG content')
+      )
+      expect(to_png).to eq 'some PNG content'
+    end
+
+    context 'when path option is specified' do
+      subject(:to_png) { grover.to_png('/foo/bar') }
+
+      it 'calls to Grover::Processor with the path specified' do
+        expect(processor).to(
+          receive(:convert).
+            with(:screenshot, url_or_html, 'path' => '/foo/bar', 'type' => 'png').
+            and_return('some PNG content')
+        )
+        expect(to_png).to eq 'some PNG content'
+      end
+    end
   end
 
   describe '#to_jpeg' do
     subject(:to_jpeg) { grover.to_jpeg }
 
-    let(:image) { MiniMagick::Image.read to_jpeg }
-    let(:url_or_html) { '<html><body style="background-color: purple"></body></html>' }
+    let(:processor) { instance_double 'Grover::Processor' }
 
-    it { expect(to_jpeg.unpack('C*')).to start_with [0xFF, 0xD8, 0xFF] }
-    it { expect(to_jpeg[6..9]).to eq 'JFIF' }
-    it { expect(to_jpeg.unpack('C*')).to end_with [0xFF, 0xD9] }
-    it { expect(image.type).to eq 'JPEG' }
-    it { expect(image.dimensions).to eq [800, 600] }
-    it { expect(mean_colour_statistics(image)).to eq %w[129 0 127] }
+    before { allow(Grover::Processor).to receive(:new).with(Dir.pwd).and_return processor }
+
+    it 'calls to Grover::Processor' do
+      expect(processor).to(
+        receive(:convert).
+          with(:screenshot, url_or_html, 'type' => 'jpeg').
+          and_return('some JPG content')
+      )
+      expect(to_jpeg).to eq 'some JPG content'
+    end
+
+    context 'when path option is specified' do
+      subject(:to_jpeg) { grover.to_jpeg('/foo/bar') }
+
+      it 'calls to Grover::Processor with the path specified' do
+        expect(processor).to(
+          receive(:convert).
+            with(:screenshot, url_or_html, 'path' => '/foo/bar', 'type' => 'jpeg').
+            and_return('some JPG content')
+        )
+        expect(to_jpeg).to eq 'some JPG content'
+      end
+    end
   end
 
   describe '#front_cover_path' do
@@ -606,11 +594,5 @@ describe Grover do
 
   describe '.configure' do
     it { expect { |b| described_class.configure(&b) }.to yield_with_args(described_class.configuration) }
-  end
-
-  def mean_colour_statistics(image)
-    colours = %w[red green blue]
-    colours = colours.map(&:capitalize) if MiniMagick.imagemagick7?
-    colours.map { |colour| image.data.dig('channelStatistics', colour, 'mean').to_s }
   end
 end

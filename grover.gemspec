@@ -24,7 +24,6 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'combine_pdf', '~> 1.0'
   spec.add_dependency 'nokogiri', '~> 1.0'
-  spec.add_dependency 'schmooze', '~> 0.2'
 
   spec.add_development_dependency 'mini_magick', '~> 4.9'
   spec.add_development_dependency 'pdf-reader', '~> 2.2'

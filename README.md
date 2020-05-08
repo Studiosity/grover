@@ -1,4 +1,4 @@
-[![Travis Build Status](https://img.shields.io/travis/Studiosity/grover.svg?style=flat)](https://travis-ci.org/Studiosity/grover)
+[![Travis Build Status](https://img.shields.io/travis/Studiosity/grover/master.svg?style=flat)](https://travis-ci.org/Studiosity/grover)
 [![Maintainability](https://api.codeclimate.com/v1/badges/37609653789bcf2c8d94/maintainability)](https://codeclimate.com/github/Studiosity/grover/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/37609653789bcf2c8d94/test_coverage)](https://codeclimate.com/github/Studiosity/grover/test_coverage)
 [![Gem Version](https://badge.fury.io/rb/grover.svg)](https://badge.fury.io/rb/grover)
@@ -334,6 +334,9 @@ both succeed
 Thanks are given to the great work done in the [PDFKit project](https://github.com/pdfkit/pdfkit).
 The middleware and HTML preprocessing components were used heavily in the implementation of Grover.
 
+Thanks are also given to the excellent [Schmooze project](https://github.com/Shopify/schmooze).
+The Ruby to NodeJS interface in Grover is heavily based off that work. Grover previously used that gem,
+however migrated away due to differing requirements over persistence/cleanup of the NodeJS worker process.  
 
 ## License
 
