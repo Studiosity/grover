@@ -6,6 +6,15 @@ Layout/DotPosition:
 Layout/LineLength:
   Max: 120
 
+Layout/SpaceAroundMethodCallOperator:
+  Enabled: true
+
+Lint/RaiseException:
+  Enabled: true
+
+Lint/StructNewOverride:
+  Enabled: true
+
 Metrics/BlockLength:
   Exclude:
     - "**/*_spec.rb"
@@ -25,3 +34,15 @@ RSpec/NestedGroups:
 Style/Documentation:
   Exclude:
     - "lib/active_support_ext/**/*.rb"
+
+Style/ExponentialNotation:
+  Enabled: true
+
+Style/HashEachMethods:
+  Enabled: true
+
+Style/HashTransformKeys:
+  Enabled: true
+
+Style/HashTransformValues:
+  Enabled: true

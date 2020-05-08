@@ -402,7 +402,7 @@ describe Grover do
       # don't really want to rely on pixel testing the website screenshot
       # so we'll check it's mean colour is roughly what we expect
       it do
-        expect(image.data.dig('imageStatistics', 'all', 'mean').to_f).
+        expect(image.data.dig('imageStatistics', MiniMagick.imagemagick7? ? 'Overall' : 'all', 'mean').to_f).
           to be_within(1).of(97.7473).  # ImageMagick 6.9.3-1 (version used by Travis CI)
           or be_within(1).of(161.497)   # ImageMagick 6.9.10-84
       end
@@ -609,6 +609,8 @@ describe Grover do
   end
 
   def mean_colour_statistics(image)
-    %w[red green blue].map { |colour| image.data.dig('channelStatistics', colour, 'mean').to_s }
+    colours = %w[red green blue]
+    colours = colours.map(&:capitalize) if MiniMagick.imagemagick7?
+    colours.map { |colour| image.data.dig('channelStatistics', colour, 'mean').to_s }
   end
 end

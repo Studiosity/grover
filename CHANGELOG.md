@@ -1,7 +1,8 @@
 # Changelog
 
 ## Unreleased
-- None
+### Fixed
+- [#52](https://github.com/Studiosity/grover/pull/52) Fix specs to work with ImageMagick 7 ([@inspiredstuffs][])
 
 ## [0.11.4](releases/tag/v0.11.4) - 2020-04-25
 ### Added
@@ -195,3 +196,4 @@
 [@jnimety]: https://github.com/jnimety
 [@willkoehler]: https://github.com/willkoehler
 [@Richacinas]: https://github.com/Richacinas
+[@inspiredstuffs]: https://github.com/inspiredstuffs 
