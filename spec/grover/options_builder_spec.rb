@@ -7,7 +7,7 @@ describe Grover::OptionsBuilder do
   subject(:built_options) { described_class.new(options, url_or_html) }
 
   let(:url_or_html) { 'https://google.com' }
-  let(:options) {}
+  let(:options) { {} }
   let(:global_config) { { cache: false, quality: 95 } }
 
   before { allow(Grover.configuration).to receive(:options).and_return(global_config) }
@@ -93,5 +93,68 @@ describe Grover::OptionsBuilder do
         }
       )
     end
+  end
+
+  context 'when the page contains meta options with escaped content' do
+    let(:url_or_html) do
+      Grover::Utils.squish(<<-HTML)
+        <html>
+          <head>
+            <meta name="grover-footer_template"
+                  content="<div class='text'>Footer with &quot;quotes&quot; in it</div>" />
+          </head>
+          <body>
+            <h1>Hey there</h1>
+          </body>
+        </html>
+      HTML
+    end
+
+    it { is_expected.to include('footer_template' => %(<div class='text'>Footer with "quotes" in it</div>)) }
+  end
+
+  context 'when specifying an array of launch args in meta tags' do
+    let(:url_or_html) do
+      Grover::Utils.squish(<<-HTML)
+        <html>
+          <head>
+            <meta name="grover-launch_args" content="['--disable-speech-api']" />
+          </head>
+        </html>
+      HTML
+    end
+
+    it { is_expected.to include('launch_args' => ['--disable-speech-api']) }
+  end
+
+  context 'when the page contains meta options with boolean content' do
+    let(:url_or_html) do
+      Grover::Utils.squish(<<-HTML)
+        <html>
+          <head>
+            <meta name="grover-display_header_footer" content='false' />
+          </head>
+        </html>
+      HTML
+    end
+
+    it { is_expected.to include('display_header_footer' => false) }
+  end
+
+  context 'when passing viewport options to Grover with meta tags' do
+    let(:url_or_html) do
+      Grover::Utils.squish(<<-HTML)
+        <html>
+          <head>
+            <title>Paaage</title>
+            <meta name="grover-viewport-height" content="100" />
+            <meta name="grover-viewport-width" content="200" />
+            <meta name="grover-viewport-device_scale_factor" content="2.5" />
+          </head>
+        </html>
+      HTML
+    end
+
+    it { is_expected.to include('viewport' => { 'height' => 100, 'width' => 200, 'device_scale_factor' => 2.5 }) }
   end
 end

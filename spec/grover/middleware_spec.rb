@@ -33,7 +33,6 @@ describe Grover::Middleware do
     @env # rubocop:disable RSpec/InstanceVariable
   end
 
-  # rubocop:disable RSpec/MultipleExpectations
   describe '#call' do
     describe 'response content type' do
       context 'when requesting a PDF' do
@@ -777,5 +776,4 @@ describe Grover::Middleware do
       end
     end
   end
-  # rubocop:enable RSpec/MultipleExpectations
 end
