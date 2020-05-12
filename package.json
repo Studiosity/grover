@@ -1,6 +1,6 @@
 {
   "name": "grover",
-  "version": "0.11.4",
+  "version": "0.12.1",
   "description": "A Ruby gem to transform HTML into PDFs using Google Puppeteer/Chromium",
   "repository": {
     "type": "git",

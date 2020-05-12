@@ -1,8 +1,14 @@
 # Changelog
 
 ## Unreleased
+- None
+
+## [0.12.1](releases/tag/v0.12.1) - 2020-05-12
 ### Fixed
 - [#52](https://github.com/Studiosity/grover/pull/52) Fix specs to work with ImageMagick 7 ([@inspiredstuffs][])
+
+### Changed
+- [#53](https://github.com/Studiosity/grover/pull/53) Remove Schmooze in favour of built in fork
 
 ## [0.11.4](releases/tag/v0.11.4) - 2020-04-25
 ### Added
