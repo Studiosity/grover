@@ -250,12 +250,15 @@ end
 ```
 
 ## Cover pages
+
 Since the header/footer for Puppeteer is configured globally, displaying of front/back cover
 pages (with potentially different headers/footers etc) is not possible.
 
-To get around this, Grover's middleware allows you to specify relative paths for the cover page contents
-via `front_cover_path` and `back_cover_path` either via the global configuration, or via meta tags.
-These paths (with query parameters) are then requested from the downstream app.
+To get around this, Grover's middleware allows you to specify relative paths for the cover page contents. For direct execution, you can make multiple calls and combine the resulting PDFs together.
+
+**Using middleware**
+
+You can specify relative paths to the cover page contents using the `front_cover_path` and `back_cover_path` options either via the global configuration, or via meta tags. These paths (with query parameters) are then requested from the downstream app.
 
 The cover pages are converted to PDF in isolation, and then combined together with the original PDF response,
 before being returned back up through the Rack stack.
@@ -279,6 +282,23 @@ Or via the meta tags in the original response:
   </head>
   ...
 </html>
+```
+
+**Direct execution
+
+To add a cover page using direct execution, you can make multiple calls and combine the results using the `combine_pdfs` gem.
+
+```rb
+require 'combine_pdf'
+
+  # ...
+
+  def invoke(file_path)
+    pdf = CombinePDF.parse(Grover.new(pdf_report_url).to_pdf)
+    pdf >> CombinePDF.parse(Grover.new(pdf_front_cover_url).to_pdf)
+    pdf << CombinePDF.parse(Grover.new(pdf_back_cover_url).to_pdf)
+    pdf.save file_path
+  end
 ```
 
 ## Running on Heroku
