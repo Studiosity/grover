@@ -97,9 +97,14 @@ class Grover
     def create_grover_for_response(response)
       body = response.respond_to?(:body) ? response.body : response.join
       body = body.join if body.is_a?(Array)
-
       body = HTMLPreprocessor.process body, root_url, protocol
-      Grover.new(body, display_url: request_url)
+
+      options = { display_url: request_url }
+      if (cookies = cookies_from_env).any?
+        options[:cookies] = cookies
+      end
+
+      Grover.new(body, options)
     end
 
     def add_cover_content(grover)
@@ -175,6 +180,13 @@ class Grover
       env['rack.input'] = StringIO.new
       env.delete 'CONTENT_LENGTH'
       env.delete 'RAW_POST_DATA'
+    end
+
+    def cookies_from_env
+      env['HTTP_COOKIE'].to_s.split('; ').map do |cookie|
+        key, value = cookie.split '='
+        { name: key, value: value, domain: env['HTTP_HOST'] }
+      end
     end
   end
 end
