@@ -380,7 +380,8 @@ describe Grover::Middleware do
       it 'passes through cookies to Grover' do
         expect(Grover).to(
           receive(:new).
-            with('Grover McGroveryface',
+            with(
+              'Grover McGroveryface',
               display_url: 'http://www.example.org/test',
               cookies: [{ domain: 'www.example.org', name: 'key', value: 'value' }]
             ).and_return(grover)
