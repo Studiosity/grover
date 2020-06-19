@@ -382,11 +382,11 @@ describe Grover::Middleware do
           receive(:new).
             with('Grover McGroveryface',
               display_url: 'http://www.example.org/test',
-              cookies: [{:domain=>"www.example.org", :name=>"key", :value=>"value;"}]
+              cookies: [{ domain: 'www.example.org', name: 'key', value: 'value' }]
             ).and_return(grover)
         )
         expect(grover).to receive(:to_pdf).with(no_args).and_return 'A converted PDF'
-        get 'http://www.example.org/test.pdf', nil, { 'HTTP_COOKIE' => 'key=value;' }
+        get 'http://www.example.org/test.pdf', nil, { 'HTTP_COOKIE' => 'key=value' }
         expect(last_response.body).to eq 'A converted PDF'
       end
 
@@ -424,19 +424,6 @@ describe Grover::Middleware do
           expect(last_response.body).to eq 'A converted PNG'
         end
       end
-
-      it 'passes through cookies to Grover' do
-        expect(Grover).to(
-          receive(:new).
-            with('Grover McGroveryface',
-              display_url: 'http://www.example.org/test',
-              cookies: [{:domain=>"www.example.org", :name=>"key", :value=>"value;"}]
-            ).and_return(grover)
-        )
-        expect(grover).to receive(:to_pdf).with(no_args).and_return 'A converted PDF'
-        get 'http://www.example.org/test.png', nil, { 'HTTP_COOKIE' => 'key=value;' }
-        expect(last_response.body).to eq 'A converted PDF'
-      end
     end
 
     describe 'jpeg conversion' do
@@ -461,19 +448,6 @@ describe Grover::Middleware do
           get 'http://www.example.org/test.jpeg'
           expect(last_response.body).to eq 'A converted JPEG'
         end
-      end
-
-      it 'passes through cookies to Grover' do
-        expect(Grover).to(
-          receive(:new).
-            with('Grover McGroveryface',
-              display_url: 'http://www.example.org/test',
-              cookies: [{:domain=>"www.example.org", :name=>"key", :value=>"value;"}]
-            ).and_return(grover)
-        )
-        expect(grover).to receive(:to_pdf).with(no_args).and_return 'A converted PDF'
-        get 'http://www.example.org/test.jpeg', nil, { 'HTTP_COOKIE' => 'key=value;' }
-        expect(last_response.body).to eq 'A converted PDF'
       end
     end
 

@@ -100,6 +100,7 @@ class Grover
       body = HTMLPreprocessor.process body, root_url, protocol
 
       options = { display_url: request_url }
+
       if (cookies = cookies_from_env).any?
         options[:cookies] = cookies
       end
