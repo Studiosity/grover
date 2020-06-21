@@ -144,7 +144,7 @@ Grover.new('<some URI with basic authentication', username: 'the username', pass
 #### Adding cookies
 To set request cookies when requesting a URL, pass an array of hashes as such
 _N.B._ Only the `name` and `value` properties are required.
-See [page.setCookies](https://github.com/puppeteer/puppeteer/blob/master/docs/api.md#pagesetcookiecookies) documentation for more details.
+See [page.setCookies](https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pagesetcookiecookies) documentation for more details.
 
 ```ruby
 myCookies = [
@@ -169,6 +169,32 @@ And give that array to Grover:
 
 ```ruby
 Grover.new('<some URI with cookies', cookies: header_cookies).to_pdf
+```
+
+#### Adding style tags
+To add style tags, pass an array of style tag options as such
+See [page.addStyleTag](https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pageaddstyletagoptions) documentation for more details.
+
+```ruby
+style_tag_options = [
+  { url: 'http://example.com/style.css' },
+  { path: 'style.css' },
+  { content: '.body{background: red}' }
+]
+Grover.new('<html><body><h1>Heading</h1></body></html>', style_tag_options: style_tag_options).to_pdf
+```
+
+#### Adding script tags
+To add script tags, pass an array of script tag options as such
+See [page.addScriptTag](https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pageaddscripttagoptions) documentation for more details.
+
+```ruby
+script_tag_options = [
+  { url: 'http://example.com/script.js' },
+  { path: 'script.js' },
+  { content: 'document.querySelector('h1').style.display = "none"' }
+]
+Grover.new('<html><body><h1>Heading</h1></body></html>', script_tag_options: script_tag_options).to_pdf
 ```
 
 
