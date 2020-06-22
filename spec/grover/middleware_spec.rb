@@ -387,7 +387,7 @@ describe Grover::Middleware do
             ).and_return(grover)
         )
         expect(grover).to receive(:to_pdf).with(no_args).and_return 'A converted PDF'
-        get 'http://www.example.org/test.pdf', nil, { 'HTTP_COOKIE' => 'key=value' }
+        get 'http://www.example.org/test.pdf', nil, 'HTTP_COOKIE' => 'key=value'
         expect(last_response.body).to eq 'A converted PDF'
       end
 
