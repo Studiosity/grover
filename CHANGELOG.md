@@ -1,7 +1,8 @@
 # Changelog
 
 ## Unreleased
-- None
+### Fixed
+- [#66](https://github.com/Studiosity/grover/pull/66) Fix bug masking NodeJS launch failures
 
 ## [0.12.1](releases/tag/v0.12.1) - 2020-05-12
 ### Fixed
