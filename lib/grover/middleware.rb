@@ -100,7 +100,9 @@ class Grover
       body = HTMLPreprocessor.process body, root_url, protocol
 
       options = { display_url: request_url }
-      cookies = cookies_from_env
+      cookies = Rack::Utils.parse_cookies(env).map do |name, value|
+        { name: name, value: value, domain: env['HTTP_HOST'] }
+      end
       options[:cookies] = cookies if cookies.any?
 
       Grover.new(body, options)
@@ -179,13 +181,6 @@ class Grover
       env['rack.input'] = StringIO.new
       env.delete 'CONTENT_LENGTH'
       env.delete 'RAW_POST_DATA'
-    end
-
-    def cookies_from_env
-      env['HTTP_COOKIE'].to_s.split('; ').map do |cookie|
-        key, value = cookie.split '='
-        { name: key, value: value, domain: env['HTTP_HOST'] }
-      end
     end
   end
 end
