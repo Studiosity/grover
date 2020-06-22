@@ -5,7 +5,7 @@
 
 # Grover
 
-A Ruby gem to transform HTML into PDFs, PNGs or JPEGs using [Google Puppeteer](https://github.com/GoogleChrome/puppeteer)
+A Ruby gem to transform HTML into PDFs, PNGs or JPEGs using [Google Puppeteer](https://github.com/puppeteer/puppeteer)
 and [Chromium](https://www.chromium.org/Home).
 
 ![Grover](/Grover.jpg "Grover")
@@ -82,7 +82,7 @@ page content and devtools.
 ## Configuration
 Grover can be configured to adjust the layout of the resulting PDF/image.
 
-For available PDF options, see https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagepdfoptions
+For available PDF options, see https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pagepdfoptions
 
 Also available are the `emulate_media`, `cache`, `viewport`, `timeout` and `launch_args` options.
 
@@ -109,12 +109,12 @@ Grover.configure do |config|
 end
 ```
 
-For available PNG/JPEG options, see https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagescreenshotoptions
+For available PNG/JPEG options, see https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pagescreenshotoptions
 
 Note that by default the `full_page` option is set to false and you will get a 800x600 image. You can either specify
 the image size using the `clip` options, or capture the entire page with `full_page` set to `true`.
 
-For `viewport` options, see https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagesetviewportviewport
+For `viewport` options, see https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pagesetviewportviewport
 
 For `launch_args` options, see http://peter.sh/experiments/chromium-command-line-switches/
 Launch parameter args can also be provided using a meta tag:
@@ -124,7 +124,7 @@ Launch parameter args can also be provided using a meta tag:
 ```
 
 For `wait_until` option, default for URLs is `networkidle2` and for HTML content `networkidle0`.
-For available options see https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagegotourl-options
+For available options see https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pagegotourl-options
 
 The Chrome/Chromium executable path can be overridden with the `executable_path` option.
 
@@ -309,13 +309,13 @@ require 'combine_pdf'
 
 To run Grover (Puppeteer) on Heroku there are two steps.
 
-First add the buildpack for puppeteer by running the following command on your heroku applicaiton.
-Make sure the the puppeteer buildpack runs before the main ruby buildpack.
+First add the buildpack for Puppeteer by running the following command on your Heroku application.
+Make sure the the Puppeteer buildpack runs before the main ruby buildpack.
 
     heroku buildpacks:add jontewks/puppeteer --index=1 [--remote yourappname]
 
 Next, tell Grover to run Puppeteer in the "no-sandbox" mode by setting an ENV variable
-`GROVER_NO_SANDBOX=true` on your app dyno. Be carefull to make sure that you trust all
+`GROVER_NO_SANDBOX=true` on your app dyno. Be careful to make sure that you trust all
 the HTML/JS that you provide to Grover.
 
     heroku config:set GROVER_NO_SANDBOX=true [--remote yourappname]
