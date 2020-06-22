@@ -4,6 +4,9 @@
 ### Fixed
 - [#66](https://github.com/Studiosity/grover/pull/66) Fix bug masking NodeJS launch failures
 
+### Added
+- [#63](https://github.com/Studiosity/grover/pull/63) Ensure cookies from incoming request are passed to Grover via Middleware ([@braindeaf][])
+
 ## [0.12.1](releases/tag/v0.12.1) - 2020-05-12
 ### Fixed
 - [#52](https://github.com/Studiosity/grover/pull/52) Fix specs to work with ImageMagick 7 ([@inspiredstuffs][])
@@ -32,7 +35,7 @@
 
 ## [0.10.1](releases/tag/v0.10.1) - 2020-01-13
 ### Fixed
-- [#39](https://github.com/Studiosity/grover/pull/39) Fix middleware thread safety issue ([@jnimety][]) 
+- [#39](https://github.com/Studiosity/grover/pull/39) Fix middleware thread safety issue ([@jnimety][])
 
 ## [0.9.2](releases/tag/v0.9.2) - 2019-12-27
 ### Added
@@ -66,10 +69,10 @@
 ## [0.7.4](releases/tag/v0.7.4) - 2019-07-09
 ### Breaking change
 - [#18](https://github.com/Studiosity/grover/pull/18) Use `GROVER_NO_SANDBOX` for disabling sandbox ([@koenhandekyn][])
- 
+
 ## [0.7.3](releases/tag/v0.7.3) - 2019-05-23
 ### Fixed
-- [#14](https://github.com/Studiosity/grover/pull/14) Metadata options not included if source contained *any* line starting with `http` 
+- [#14](https://github.com/Studiosity/grover/pull/14) Metadata options not included if source contained *any* line starting with `http`
 - [#15](https://github.com/Studiosity/grover/pull/15) Add magic comment for freezing string literals
 
 ## [0.7.2](releases/tag/v0.7.2) - 2019-01-22
@@ -90,7 +93,7 @@
 
 ### Breaking change
 - The `{{display_url}}` header/footer hack was removed in favour of passing the URL via `display_url` option
-  (for middleware/raw HTML only) 
+  (for middleware/raw HTML only)
 
 ## [0.5.5](releases/tag/v0.5.5) - 2018-09-20
 ### Fixed
@@ -118,7 +121,7 @@
 
 ## [0.4.3](releases/tag/v0.4.3) - 2018-09-10
 ### Added
-- Pass through flag to indicate to upstream middleware/app that Grover has interacted with the environment 
+- Pass through flag to indicate to upstream middleware/app that Grover has interacted with the environment
 
 ## [0.4.2](releases/tag/v0.4.2) - 2018-09-09
 ### Fixed
@@ -166,11 +169,11 @@
 - Processor support for inline HTML (render via the URI rather than trying to `setContent`)
 
 ### Changed
-- Minor refactor of middleware for readability 
+- Minor refactor of middleware for readability
 
 ## [0.2.0](releases/tag/v0.2.0) - 2018-08-23
 ### Added
-- Rack middleware for rendering upstream HTML as PDF (based heavily on PDFKit middleware) 
+- Rack middleware for rendering upstream HTML as PDF (based heavily on PDFKit middleware)
 - Allow PDF processor to handle inline HTML
 
 ### Fixed
@@ -190,17 +193,18 @@
 ## [0.1.0](releases/tag/v0.1.0) - 2018-08-22
 ### Added
 - First pass at PDF processor
-- Console script for expediting development 
+- Console script for expediting development
 
 ## [0.0.1](releases/tag/v0.0.1) - 2018-08-22
 ### Added
-- Initial gem framework 
+- Initial gem framework
 
 [@koenhandekyn]: https://github.com/koenhandekyn
 [@joergschiller]: https://github.com/joergschiller
 [@ryansmith23]: https://github.com/ryansmith23
-[@rwtaylor]: https://github.com/rwtaylor 
+[@rwtaylor]: https://github.com/rwtaylor
 [@jnimety]: https://github.com/jnimety
 [@willkoehler]: https://github.com/willkoehler
 [@Richacinas]: https://github.com/Richacinas
-[@inspiredstuffs]: https://github.com/inspiredstuffs 
+[@inspiredstuffs]: https://github.com/inspiredstuffs
+[@braindeaf]: https://github.com/braindeaf

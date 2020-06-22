@@ -97,9 +97,15 @@ class Grover
     def create_grover_for_response(response)
       body = response.respond_to?(:body) ? response.body : response.join
       body = body.join if body.is_a?(Array)
-
       body = HTMLPreprocessor.process body, root_url, protocol
-      Grover.new(body, display_url: request_url)
+
+      options = { display_url: request_url }
+      cookies = Rack::Utils.parse_cookies(env).map do |name, value|
+        { name: name, value: value, domain: env['HTTP_HOST'] }
+      end
+      options[:cookies] = cookies if cookies.any?
+
+      Grover.new(body, options)
     end
 
     def add_cover_content(grover)
