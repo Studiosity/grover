@@ -307,18 +307,24 @@ require 'combine_pdf'
 
 ## Running on Heroku
 
-To run Grover (Puppeteer) on Heroku there are two steps.
+To run Grover (Puppeteer) on Heroku follow these steps:
+1. Add the `node` buildpack. Puppeteer requires a node environment to run.
+    ```
+    heroku buildpacks:add heroku/nodejs --index=1 [--remote yourappname]
+    ```
 
-First add the buildpack for Puppeteer by running the following command on your Heroku application.
-Make sure the the Puppeteer buildpack runs before the main ruby buildpack.
+1. Add the [`puppeteer` buildpack](https://elements.heroku.com/buildpacks/jontewks/puppeteer-heroku-buildpack).
+Make sure the `puppeteer` buildpack runs after the `node` buildpack and before the main `ruby` buildpack.
+    ```
+    heroku buildpacks:add jontewks/puppeteer --index=2 [--remote yourappname]
+    ```
 
-    heroku buildpacks:add jontewks/puppeteer --index=1 [--remote yourappname]
-
-Next, tell Grover to run Puppeteer in the "no-sandbox" mode by setting an ENV variable
-`GROVER_NO_SANDBOX=true` on your app dyno. Be careful to make sure that you trust all
-the HTML/JS that you provide to Grover.
-
+1. Next, tell Grover to run Puppeteer in the "no-sandbox" mode by setting an ENV variable
+`GROVER_NO_SANDBOX=true` on your app dyno. Make sure that you trust all
+the HTML/JS you provide to Grover.
+    ```
     heroku config:set GROVER_NO_SANDBOX=true [--remote yourappname]
+    ```
 
 ## Debugging
 If you're having trouble with converting the HTML content, you can enable some debugging options to help. These can be
