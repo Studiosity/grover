@@ -126,7 +126,7 @@ Launch parameter args can also be provided using a meta tag:
 For `wait_until` option, default for URLs is `networkidle2` and for HTML content `networkidle0`.
 For available options see https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pagegotourl-options
 
-The `wait_for_selector` option can also be used to wait until an element appears on the page.
+The `wait_for_selector` option can also be used to wait until an element appears on the page. Additional waiting parameters can be set with the `wait_for_selector_options` options hash. For available options, see: https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pagewaitforselectorselector-options.
 
 The Chrome/Chromium executable path can be overridden with the `executable_path` option.
 
