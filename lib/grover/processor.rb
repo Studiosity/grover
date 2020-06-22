@@ -22,7 +22,7 @@ class Grover
 
       result['data'].pack('C*')
     ensure
-      cleanup_process
+      cleanup_process if stdin
     end
 
     private

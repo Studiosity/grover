@@ -144,6 +144,14 @@ describe Grover::Processor do
             expect { convert }.to raise_error Grover::JavaScript::UnknownError, 'Some unknown thing happened'
           end
         end
+
+        context 'when the call to launch Node raises an error' do
+          it 'raises the error' do
+            expect(Open3).to receive(:popen3).and_raise Errno::ENOENT, 'node'
+
+            expect { convert }.to raise_error Errno::ENOENT, 'No such file or directory - node'
+          end
+        end
       end
 
       context 'when passing through html' do
