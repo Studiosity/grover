@@ -399,6 +399,53 @@ describe Grover::Processor do
 
         it { expect(pdf_text_content).to eq "#{date} Some evaluated content http://www.example.net/foo/bar 1/1" }
       end
+
+      context 'when wait for selector option is specified' do
+        let(:url_or_html) do
+          <<-HTML
+            <html>
+              <body></body>
+
+              <script>
+                setTimeout(function() {
+                  document.body.innerHTML = '<h1>Hey there</h1>';
+                }, 100);
+              </script>
+            </html>
+          HTML
+        end
+        let(:options) { basic_header_footer_options.merge('waitForSelector' => 'h1') }
+        let(:date) { Date.today.strftime '%-m/%-d/%Y' }
+
+        it { expect(pdf_text_content).to eq "#{date} Hey there http://www.example.net/foo/bar 1/1" }
+      end
+
+      context 'when wait for selector option is specified with options' do
+        let(:url_or_html) do
+          <<-HTML
+            <html>
+              <body>
+                <p id="loading">Loading</p>
+              </body>
+
+              <script>
+                setTimeout(function() {
+                  document.getElementById('loading').remove()
+                }, 100);
+              </script>
+            </html>
+          HTML
+        end
+        let(:options) do
+          basic_header_footer_options.merge(
+            'waitForSelector' => '#loading',
+            'waitForSelectorOptions' => { 'hidden' => true }
+          )
+        end
+        let(:date) { Date.today.strftime '%-m/%-d/%Y' }
+
+        it { expect(pdf_text_content).to eq "#{date} http://www.example.net/foo/bar 1/1" }
+      end
     end
 
     context 'when converting to an image' do
