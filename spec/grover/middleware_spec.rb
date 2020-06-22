@@ -377,6 +377,20 @@ describe Grover::Middleware do
         expect(last_response.body).to eq 'A converted PDF'
       end
 
+      it 'passes through cookies to Grover' do
+        expect(Grover).to(
+          receive(:new).
+            with(
+              'Grover McGroveryface',
+              display_url: 'http://www.example.org/test',
+              cookies: [{ domain: 'www.example.org', name: 'key', value: 'value' }]
+            ).and_return(grover)
+        )
+        expect(grover).to receive(:to_pdf).with(no_args).and_return 'A converted PDF'
+        get 'http://www.example.org/test.pdf', nil, 'HTTP_COOKIE' => 'key=value'
+        expect(last_response.body).to eq 'A converted PDF'
+      end
+
       context 'when app configuration has PDF middleware disabled' do
         before { allow(Grover.configuration).to receive(:use_pdf_middleware).and_return false }
 

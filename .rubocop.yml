@@ -23,7 +23,7 @@ Metrics/BlockLength:
     - "**/*_spec.rb"
 
 Metrics/ClassLength:
-  Max: 135
+  Max: 140
 
 RSpec/ExampleLength:
   Max: 12
