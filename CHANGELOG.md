@@ -1,10 +1,11 @@
 # Changelog
 
 ## Unreleased
+### Fixed
+- [#66](https://github.com/Studiosity/grover/pull/66) Fix bug masking NodeJS launch failures
 
 ### Added
-- (https://github.com/Studiosity/grover/pull/63) Ensure cookies from incoming request are passed to Grover via Middleware
-
+- [#63](https://github.com/Studiosity/grover/pull/63) Ensure cookies from incoming request are passed to Grover via Middleware ([@braindeaf][])
 
 ## [0.12.1](releases/tag/v0.12.1) - 2020-05-12
 ### Fixed
@@ -206,3 +207,4 @@
 [@willkoehler]: https://github.com/willkoehler
 [@Richacinas]: https://github.com/Richacinas
 [@inspiredstuffs]: https://github.com/inspiredstuffs
+[@braindeaf]: https://github.com/braindeaf
