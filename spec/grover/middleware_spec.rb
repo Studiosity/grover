@@ -383,11 +383,14 @@ describe Grover::Middleware do
             with(
               'Grover McGroveryface',
               display_url: 'http://www.example.org/test',
-              cookies: [{ domain: 'www.example.org', name: 'key', value: 'value' }]
+              cookies: [
+                { domain: 'www.example.org', name: 'key', value: 'value' },
+                { domain: 'www.example.org', name: 'escaped', value: '%26%3D%3D'}
+              ]
             ).and_return(grover)
         )
         expect(grover).to receive(:to_pdf).with(no_args).and_return 'A converted PDF'
-        get 'http://www.example.org/test.pdf', nil, 'HTTP_COOKIE' => 'key=value'
+        get 'http://www.example.org/test.pdf', nil, 'HTTP_COOKIE' => 'key=value; escaped=%26%3D%3D'
         expect(last_response.body).to eq 'A converted PDF'
       end
 

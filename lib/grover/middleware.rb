@@ -101,7 +101,7 @@ class Grover
 
       options = { display_url: request_url }
       cookies = Rack::Utils.parse_cookies(env).map do |name, value|
-        { name: name, value: value, domain: env['HTTP_HOST'] }
+        { name: name, value: Rack::Utils.escape(value), domain: env['HTTP_HOST'] }
       end
       options[:cookies] = cookies if cookies.any?
 
