@@ -144,6 +144,14 @@ describe Grover::Processor do
             expect { convert }.to raise_error Grover::JavaScript::UnknownError, 'Some unknown thing happened'
           end
         end
+
+        context 'when the call to launch Node raises an error' do
+          it 'raises the error' do
+            expect(Open3).to receive(:popen3).and_raise Errno::ENOENT, 'node'
+
+            expect { convert }.to raise_error Errno::ENOENT, 'No such file or directory - node'
+          end
+        end
       end
 
       context 'when passing through html' do
@@ -390,6 +398,53 @@ describe Grover::Processor do
         let(:date) { Date.today.strftime '%-m/%-d/%Y' }
 
         it { expect(pdf_text_content).to eq "#{date} Some evaluated content http://www.example.net/foo/bar 1/1" }
+      end
+
+      context 'when wait for selector option is specified' do
+        let(:url_or_html) do
+          <<-HTML
+            <html>
+              <body></body>
+
+              <script>
+                setTimeout(function() {
+                  document.body.innerHTML = '<h1>Hey there</h1>';
+                }, 100);
+              </script>
+            </html>
+          HTML
+        end
+        let(:options) { basic_header_footer_options.merge('waitForSelector' => 'h1') }
+        let(:date) { Date.today.strftime '%-m/%-d/%Y' }
+
+        it { expect(pdf_text_content).to eq "#{date} Hey there http://www.example.net/foo/bar 1/1" }
+      end
+
+      context 'when wait for selector option is specified with options' do
+        let(:url_or_html) do
+          <<-HTML
+            <html>
+              <body>
+                <p id="loading">Loading</p>
+              </body>
+
+              <script>
+                setTimeout(function() {
+                  document.getElementById('loading').remove()
+                }, 100);
+              </script>
+            </html>
+          HTML
+        end
+        let(:options) do
+          basic_header_footer_options.merge(
+            'waitForSelector' => '#loading',
+            'waitForSelectorOptions' => { 'hidden' => true }
+          )
+        end
+        let(:date) { Date.today.strftime '%-m/%-d/%Y' }
+
+        it { expect(pdf_text_content).to eq "#{date} http://www.example.net/foo/bar 1/1" }
       end
     end
 
