@@ -353,13 +353,15 @@ describe Grover::Processor do
             {
               'cookies' => [
                 { 'name' => 'grover-test', 'value' => 'nom nom nom', 'domain' => 'cookie-renderer.herokuapp.com' },
-                { 'name' => 'other-domain', 'value' => 'should not display', 'domain' => 'example.com' }
+                { 'name' => 'other-domain', 'value' => 'should not display', 'domain' => 'example.com' },
+                { 'name' => 'escaped', 'value' => '%26%3D%3D', 'domain' => 'cookie-renderer.herokuapp.com' }
               ]
             }
           end
 
-          it { expect(pdf_text_content).to include 'Request contained 1 cookie' }
+          it { expect(pdf_text_content).to include 'Request contained 2 cookies' }
           it { expect(pdf_text_content).to include '1. grover-test nom nom nom' }
+          it { expect(pdf_text_content).to include '2. escaped %26%3D%3D' }
         end
       end
 
