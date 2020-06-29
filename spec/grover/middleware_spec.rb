@@ -379,16 +379,12 @@ describe Grover::Middleware do
 
       { 'key' => 'value', 'escaped' => '%26%3D%3D' }.each do |k, v|
         it 'passes cookies to Grover' do
-          expect(Grover).to(
-            receive(:new).
-              with(
-                'Grover McGroveryface',
-                display_url: 'http://www.example.org/test',
-                cookies: [
-                  { domain: 'www.example.org', name: k, value: v }
-                ]
-              ).and_return(grover)
-          )
+          expect(Grover).to receive(:new).with(
+            'Grover McGroveryface',
+            display_url: 'http://www.example.org/test',
+            cookies: [{ domain: 'www.example.org', name: k, value: v }]
+          ).and_return(grover)
+
           expect(grover).to receive(:to_pdf).with(no_args).and_return 'A converted PDF'
           get 'http://www.example.org/test.pdf', nil, 'HTTP_COOKIE' => "#{k}=#{v}"
           expect(last_response.body).to eq 'A converted PDF'
