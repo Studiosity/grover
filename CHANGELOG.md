@@ -1,12 +1,13 @@
 # Changelog
 
 ## Unreleased
+- None
 
+## [0.12.3](releases/tag/v0.12.3) - 2020-07-01
 ### Fixed
 - [#70](https://github.com/Studiosity/grover/pull/70) Ensure cookies are escaped when passing cookies via middleware ([@braindeaf][])
 
 ## [0.12.2](releases/tag/v0.12.2) - 2020-06-23
-
 ### Fixed
 - [#66](https://github.com/Studiosity/grover/pull/66) Fix bug masking NodeJS launch failures
 
