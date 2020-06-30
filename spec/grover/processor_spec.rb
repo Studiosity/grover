@@ -361,7 +361,7 @@ describe Grover::Processor do
 
           it { expect(pdf_text_content).to include 'Request contained 2 cookies' }
           it { expect(pdf_text_content).to include '1. grover-test nom nom nom' }
-          it { expect(pdf_text_content).to include '2. escaped %26%3D%3D' }
+          it { expect(pdf_text_content).to include '2. escaped &==' }
         end
       end
 
