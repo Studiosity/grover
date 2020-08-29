@@ -16,6 +16,7 @@ Gem::Specification.new do |spec|
   SUMMARY
   spec.homepage    = 'https://github.com/Studiosity/grover'
   spec.license     = 'MIT'
+  spec.required_ruby_version = ['>= 2.5.0', '< 2.8.0']
 
   spec.files         = `git ls-files lib`.split("\n")
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
