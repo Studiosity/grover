@@ -9,7 +9,7 @@ class Grover
   # Much of this code was sourced from the PDFKit project
   # @see https://github.com/pdfkit/pdfkit
   #
-  class Middleware
+  class Middleware # rubocop:disable Metrics/ClassLength
     def initialize(app)
       @app = app
       @pdf_request = false
@@ -30,6 +30,8 @@ class Grover
       response = update_response response, headers if grover_request? && html_content?(headers)
 
       [status, headers, response]
+    ensure
+      restore_env_from_grover_request(env) if grover_request?
     end
 
     private
@@ -94,7 +96,7 @@ class Grover
       end
     end
 
-    def create_grover_for_response(response)
+    def create_grover_for_response(response) # rubocop:disable Metrics/AbcSize
       body = response.respond_to?(:body) ? response.body : response.join
       body = body.join if body.is_a?(Array)
       body = HTMLPreprocessor.process body, root_url, protocol
@@ -135,9 +137,22 @@ class Grover
     end
 
     def configure_env_for_grover_request(env)
-      env['PATH_INFO'] = env['REQUEST_URI'] = path_without_extension
+      # Save the env params we're overriding so we can restore them after the response is fetched
+      @pre_request_env_params = env.slice('PATH_INFO', 'REQUEST_URI', 'HTTP_ACCEPT')
+
+      # Override path/URI so any downstream middleware/app doesn't try actioning the request as PDF
+      env['PATH_INFO'] = path_without_extension
+      env['REQUEST_URI'] = @request.url
       env['HTTP_ACCEPT'] = concat(env['HTTP_ACCEPT'], Rack::Mime.mime_type('.html'))
       env['Rack-Middleware-Grover'] = 'true'
+    end
+
+    def restore_env_from_grover_request(env)
+      return unless @pre_request_env_params.is_a? Hash
+
+      # Restore the path/URI so any upstream middleware doesn't get confused
+      env.merge! @pre_request_env_params
+      env['REQUEST_URI'] = @request.url unless @pre_request_env_params.key? 'REQUEST_URI'
     end
 
     def concat(accepts, type)

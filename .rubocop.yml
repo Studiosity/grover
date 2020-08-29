@@ -12,27 +12,51 @@ Layout/LineLength:
 Layout/SpaceAroundMethodCallOperator:
   Enabled: true
 
+Lint/BinaryOperatorWithIdenticalOperands:
+  Enabled: true
+
 Lint/DeprecatedOpenSSLConstant:
+  Enabled: true
+
+Lint/DuplicateElsifCondition:
+  Enabled: true
+
+Lint/DuplicateRescueException:
+  Enabled: true
+
+Lint/EmptyConditionalBody:
+  Enabled: true
+
+Lint/FloatComparison:
+  Enabled: true
+
+Lint/MissingSuper:
   Enabled: true
 
 Lint/MixedRegexpCaptureTypes:
   Enabled: true
 
+Lint/OutOfRangeRegexpRef:
+  Enabled: true
+
 Lint/RaiseException:
+  Enabled: true
+
+Lint/SelfAssignment:
   Enabled: true
 
 Lint/StructNewOverride:
   Enabled: true
 
-Metrics/AbcSize:
-    Max: 20
+Lint/TopLevelReturnWithArgument:
+  Enabled: true
+
+Lint/UnreachableLoop:
+  Enabled: true
 
 Metrics/BlockLength:
   Exclude:
     - "**/*_spec.rb"
-
-Metrics/ClassLength:
-  Max: 140
 
 RSpec/ExampleLength:
   Max: 12
@@ -41,19 +65,46 @@ RSpec/MessageSpies:
   EnforcedStyle: receive
 
 RSpec/MultipleExpectations:
-  Max: 4
+  Max: 6
+
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false
 
 RSpec/NestedGroups:
   Max: 6
+
+Style/AccessorGrouping:
+  Enabled: true
+
+Style/ArrayCoercion:
+  Enabled: true
+
+Style/BisectedAttrAccessor:
+  Enabled: true
+
+Style/CaseLikeIf:
+  Enabled: true
 
 Style/Documentation:
   Exclude:
     - "lib/active_support_ext/**/*.rb"
 
+Style/ExplicitBlockArgument:
+  Enabled: true
+
 Style/ExponentialNotation:
   Enabled: true
 
+Style/GlobalStdStream:
+  Enabled: true
+
+Style/HashAsLastArrayItem:
+  Enabled: true
+
 Style/HashEachMethods:
+  Enabled: true
+
+Style/HashLikeCase:
   Enabled: true
 
 Style/HashTransformKeys:
@@ -62,7 +113,16 @@ Style/HashTransformKeys:
 Style/HashTransformValues:
   Enabled: true
 
+Style/OptionalBooleanParameter:
+  Enabled: true
+
+Style/RedundantAssignment:
+  Enabled: true
+
 Style/RedundantFetchBlock:
+  Enabled: true
+
+Style/RedundantFileExtensionInRequire:
   Enabled: true
 
 Style/RedundantRegexpCharacterClass:
@@ -71,5 +131,11 @@ Style/RedundantRegexpCharacterClass:
 Style/RedundantRegexpEscape:
   Enabled: true
 
+Style/SingleArgumentDig:
+  Enabled: true
+
 Style/SlicingWithRange:
+  Enabled: true
+
+Style/StringConcatenation:
   Enabled: true
