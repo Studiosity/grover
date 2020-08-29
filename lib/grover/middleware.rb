@@ -27,12 +27,11 @@ class Grover
 
       configure_env_for_grover_request(env) if grover_request?
       status, headers, response = @app.call(env)
-      if grover_request?
-        response = update_response response, headers if html_content?(headers)
-        restore_env_from_grover_request(env)
-      end
+      response = update_response response, headers if grover_request? && html_content?(headers)
 
       [status, headers, response]
+    ensure
+      restore_env_from_grover_request(env) if grover_request?
     end
 
     private
@@ -149,6 +148,8 @@ class Grover
     end
 
     def restore_env_from_grover_request(env)
+      return unless @pre_request_env_params.is_a? Hash
+
       # Restore the path/URI so any upstream middleware doesn't get confused
       env.merge! @pre_request_env_params
       env['REQUEST_URI'] = @request.url unless @pre_request_env_params.key? 'REQUEST_URI'
