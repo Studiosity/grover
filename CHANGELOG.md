@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased
+- None
+
+## [0.13.1](releases/tag/v0.13.1) - 2020-08-30
 ### Fixed
 - [#79](https://github.com/Studiosity/grover/pull/79) Fix bug in middleware where path/URI weren't restored after calling downstream
 
