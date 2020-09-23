@@ -1,5 +1,8 @@
 *.gem
 Gemfile.lock
 package-lock.json
+yarn.lock
+.bundle
 /node_modules
 /coverage
+/vendor
