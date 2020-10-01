@@ -431,6 +431,50 @@ describe Grover::Middleware do
         get 'http://www.example.org/test.pdf'
         expect(last_response.body.bytesize).to eq Grover.new('Processed McProcessyface').to_pdf.bytesize
       end
+
+      context 'with root_url specified' do
+        subject(:mock_app) do
+          builder = Rack::Builder.new
+          builder.use described_class, root_url: 'http://example.com/'
+          builder.run downstream
+          builder.to_app
+        end
+
+        it 'calls to the HTML preprocessor with the original HTML and the specified root_url' do
+          expect(Grover::HTMLPreprocessor).to(
+            receive(:process).
+              with('Grover McGroveryface', 'http://example.com/', 'http').
+              and_return('Processed McProcessyface')
+          )
+          get 'http://www.example.org/test.pdf'
+          expect(last_response.body.bytesize).to eq Grover.new('Processed McProcessyface').to_pdf.bytesize
+        end
+      end
+
+      context 'converts relative paths' do
+        let(:response) { ['src="/asdf"'] }
+
+        context 'with root_url specified' do
+          subject(:mock_app) do
+            builder = Rack::Builder.new
+            builder.use described_class, root_url: 'http://example.com/'
+            builder.run downstream
+            builder.to_app
+          end
+
+          it 'uses the specified root_url' do
+            get 'http://www.example.org/test.pdf'
+            expect(last_response.body.bytesize).to eq Grover.new('src="http://example.com/asdf"').to_pdf.bytesize
+          end
+        end
+
+        context 'without root_url specified' do
+          it 'uses the detected root_url (request url)' do
+            get 'http://www.example.org/test.pdf'
+            expect(last_response.body.bytesize).to eq Grover.new('src="http://www.example.org/asdf"').to_pdf.bytesize
+          end
+        end
+      end
     end
 
     describe 'pdf conversion' do
