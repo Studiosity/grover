@@ -455,16 +455,25 @@ describe Grover::Middleware do
         end
       end
 
-      context 'converts relative paths' do
+      context 'when path is relative' do
         let(:response) { ['src="/asdf"'] }
 
-        context 'with root_url specified' do
+        context 'with root_url specified via middleware args' do
           subject(:mock_app) do
             builder = Rack::Builder.new
             builder.use described_class, root_url: 'http://example.com/'
             builder.run downstream
             builder.to_app
           end
+
+          it 'uses the specified root_url' do
+            get 'http://www.example.org/test.pdf'
+            expect(last_response.body.bytesize).to eq Grover.new('src="http://example.com/asdf"').to_pdf.bytesize
+          end
+        end
+
+        context 'with root_url set in configuration' do
+          before { allow(Grover.configuration).to receive(:options).and_return({ root_url: 'http://example.com/' }) }
 
           it 'uses the specified root_url' do
             get 'http://www.example.org/test.pdf'

@@ -16,9 +16,7 @@ class Grover
       @png_request = false
       @jpeg_request = false
 
-      options = Grover.configuration.options
-      @root_url = options[:root_url]
-      @root_url = args.last[:root_url] if args.last.is_a? Hash
+      @root_url = args.last.is_a?(Hash) ? args.last[:root_url] : Grover.configuration.options[:root_url]
     end
 
     def call(env)
