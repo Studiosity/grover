@@ -482,10 +482,10 @@ describe Grover do
     it 'calls to Grover::Processor' do
       allow(processor).to(
         receive(:convert).
-          with(:screenshot, url_or_html, 'type' => 'jpeg').
-          and_return('some JPG content')
+          with(:screenshot, url_or_html, 'type' => 'png').
+          and_return('some PNG content')
       )
-      expect(processor).to receive(:convert).with(:screenshot, url_or_html, 'type' => 'jpeg')
+      expect(processor).to receive(:convert).with(:screenshot, url_or_html, 'type' => 'png')
       expect(to_png).to eq 'some PNG content'
     end
 
@@ -495,10 +495,10 @@ describe Grover do
       it 'calls to Grover::Processor with the path specified' do
         allow(processor).to(
           receive(:convert).
-            with(:screenshot, url_or_html, 'type' => 'jpeg').
-            and_return('some JPG content')
+            with(:screenshot, url_or_html, 'type' => 'png').
+            and_return('some PNG content')
         )
-        expect(processor).to receive(:convert).with(:screenshot, url_or_html, 'type' => 'jpeg')
+        expect(processor).to receive(:convert).with(:screenshot, url_or_html, 'type' => 'png')
         expect(to_png).to eq 'some PNG content'
       end
     end
