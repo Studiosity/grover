@@ -1,5 +1,9 @@
 require: rubocop-rspec
 
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 2.5
+
 Layout/DotPosition:
   EnforcedStyle: trailing
 
@@ -59,7 +63,7 @@ Metrics/BlockLength:
     - "**/*_spec.rb"
 
 RSpec/ExampleLength:
-  Max: 12
+  Max: 20
 
 RSpec/MessageSpies:
   EnforcedStyle: receive

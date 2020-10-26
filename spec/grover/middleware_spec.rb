@@ -423,10 +423,14 @@ describe Grover::Middleware do
 
     describe 'preprocessor' do
       it 'calls to the HTML preprocessor with the original HTML' do
-        expect(Grover::HTMLPreprocessor).to(
+        allow(Grover::HTMLPreprocessor).to(
           receive(:process).
             with('Grover McGroveryface', 'http://www.example.org/', 'http').
             and_return('Processed McProcessyface')
+        )
+        expect(Grover::HTMLPreprocessor).to(
+          receive(:process).
+            with('Grover McGroveryface', 'http://www.example.org/', 'http')
         )
         get 'http://www.example.org/test.pdf'
         expect(last_response.body.bytesize).to eq Grover.new('Processed McProcessyface').to_pdf.bytesize
@@ -437,25 +441,32 @@ describe Grover::Middleware do
       let(:grover) { instance_double Grover, show_front_cover?: false, show_back_cover?: false }
 
       it 'passes through the request URL (sans extension) to Grover' do
-        expect(Grover).to(
+        allow(Grover).to(
           receive(:new).
             with('Grover McGroveryface', display_url: 'http://www.example.org/test').
             and_return(grover)
         )
-        expect(grover).to receive(:to_pdf).with(no_args).and_return 'A converted PDF'
+        allow(grover).to receive(:to_pdf).with(no_args).and_return 'A converted PDF'
+        expect(Grover).to receive(:new).with('Grover McGroveryface', display_url: 'http://www.example.org/test')
+        expect(grover).to receive(:to_pdf).with(no_args)
         get 'http://www.example.org/test.pdf'
         expect(last_response.body).to eq 'A converted PDF'
       end
 
       { 'key' => 'value', 'escaped' => '%26%3D%3D' }.each do |k, v|
         it 'passes cookies to Grover' do
-          expect(Grover).to receive(:new).with(
+          allow(Grover).to receive(:new).with(
             'Grover McGroveryface',
             display_url: 'http://www.example.org/test',
             cookies: [{ domain: 'www.example.org', name: k, value: v }]
           ).and_return(grover)
-
-          expect(grover).to receive(:to_pdf).with(no_args).and_return 'A converted PDF'
+          allow(grover).to receive(:to_pdf).with(no_args).and_return 'A converted PDF'
+          expect(Grover).to receive(:new).with(
+            'Grover McGroveryface',
+            display_url: 'http://www.example.org/test',
+            cookies: [{ domain: 'www.example.org', name: k, value: v }]
+          )
+          expect(grover).to receive(:to_pdf).with(no_args)
           get 'http://www.example.org/test.pdf', nil, 'HTTP_COOKIE' => "#{k}=#{v}"
           expect(last_response.body).to eq 'A converted PDF'
         end
@@ -485,12 +496,14 @@ describe Grover::Middleware do
         before { allow(Grover.configuration).to receive(:use_png_middleware).and_return true }
 
         it 'passes through the request URL (sans extension) to Grover' do
-          expect(Grover).to(
+          allow(Grover).to(
             receive(:new).
               with('Grover McGroveryface', display_url: 'http://www.example.org/test').
               and_return(grover)
           )
-          expect(grover).to receive(:to_png).with(no_args).and_return 'A converted PNG'
+          allow(grover).to receive(:to_png).with(no_args).and_return 'A converted PNG'
+          expect(Grover).to receive(:new).with('Grover McGroveryface', display_url: 'http://www.example.org/test')
+          expect(grover).to receive(:to_png).with(no_args)
           get 'http://www.example.org/test.png'
           expect(last_response.body).to eq 'A converted PNG'
         end
@@ -510,12 +523,14 @@ describe Grover::Middleware do
         before { allow(Grover.configuration).to receive(:use_jpeg_middleware).and_return true }
 
         it 'passes through the request URL (sans extension) to Grover' do
-          expect(Grover).to(
+          allow(Grover).to(
             receive(:new).
               with('Grover McGroveryface', display_url: 'http://www.example.org/test').
               and_return(grover)
           )
-          expect(grover).to receive(:to_jpeg).with(no_args).and_return 'A converted JPEG'
+          allow(grover).to receive(:to_jpeg).with(no_args).and_return 'A converted JPEG'
+          expect(Grover).to receive(:new).with('Grover McGroveryface', display_url: 'http://www.example.org/test')
+          expect(grover).to receive(:to_jpeg).with(no_args)
           get 'http://www.example.org/test.jpeg'
           expect(last_response.body).to eq 'A converted JPEG'
         end

@@ -29,7 +29,7 @@ before_script:
   - ./cc-test-reporter before-build
 
 script:
-  - rubocop
+  - bundle exec rubocop
   - bundle exec rspec
 
 after_script:
