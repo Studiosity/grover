@@ -292,7 +292,7 @@ Or via the meta tags in the original response:
 ### Direct execution
 
 To add a cover page using direct execution, you can make multiple calls and combine the results using the
-`combine_pdfs` gem.
+`combine_pdf` gem.
 
 ```rb
 require 'combine_pdf'
