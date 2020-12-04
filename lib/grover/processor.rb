@@ -90,6 +90,8 @@ class Grover
       else
         raise Grover::JavaScript.const_get(error_class, false), message
       end
+    rescue JSON::ParserError
+      raise Grover::Error, 'Malformed worker response'
     rescue Errno::EPIPE, IOError
       raise Grover::Error, "Worker process failed:\n#{stderr.read}"
     end

@@ -152,6 +152,17 @@ describe Grover::Processor do
             expect { convert }.to raise_error Errno::ENOENT, 'No such file or directory - node'
           end
         end
+
+        context 'when the worker returns an invalid response' do
+          before do
+            allow(stdout).to receive(:gets).and_return '["ok"]', '["ok",invalid_response]'
+            allow(stdin).to receive(:puts).with '["pdf","http://google.com",{}]'
+          end
+
+          it 'raises an Error' do
+            expect { convert }.to raise_error Grover::Error, 'Malformed worker response'
+          end
+        end
       end
 
       context 'when passing through html' do
