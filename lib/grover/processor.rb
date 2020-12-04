@@ -76,7 +76,7 @@ class Grover
       @package_json ||= JSON.parse(File.read(package_json_path))
     end
 
-    def call_js_method(method, url_or_html, options) # rubocop:disable Metrics/MethodLength
+    def call_js_method(method, url_or_html, options) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
       stdin.puts JSON.dump([method, url_or_html, options])
       input = stdout.gets
       raise Errno::EPIPE, "Can't read from worker" if input.nil?
