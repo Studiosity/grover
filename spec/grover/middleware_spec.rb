@@ -436,7 +436,7 @@ describe Grover::Middleware do
         expect(last_response.body.bytesize).to eq Grover.new('Processed McProcessyface').to_pdf.bytesize
       end
 
-      context 'with root_url specified' do
+      context 'with root_url specified as an argument' do
         subject(:mock_app) do
           builder = Rack::Builder.new
           builder.use described_class, root_url: 'http://example.com/'
@@ -445,17 +445,21 @@ describe Grover::Middleware do
         end
 
         it 'calls to the HTML preprocessor with the original HTML and the specified root_url' do
-          expect(Grover::HTMLPreprocessor).to(
+          allow(Grover::HTMLPreprocessor).to(
             receive(:process).
               with('Grover McGroveryface', 'http://example.com/', 'http').
               and_return('Processed McProcessyface')
+          )
+          expect(Grover::HTMLPreprocessor).to(
+            receive(:process).
+              with('Grover McGroveryface', 'http://example.com/', 'http')
           )
           get 'http://www.example.org/test.pdf'
           expect(last_response.body.bytesize).to eq Grover.new('Processed McProcessyface').to_pdf.bytesize
         end
       end
 
-      context 'when path is relative' do
+      context 'when the response contains relative paths' do
         let(:response) { ['src="/asdf"'] }
 
         context 'with root_url specified via middleware args' do
@@ -469,6 +473,15 @@ describe Grover::Middleware do
           it 'uses the specified root_url' do
             get 'http://www.example.org/test.pdf'
             expect(last_response.body.bytesize).to eq Grover.new('src="http://example.com/asdf"').to_pdf.bytesize
+          end
+
+          context 'when the root_url is also set in configuration' do
+            before { allow(Grover.configuration).to receive(:options).and_return({ root_url: 'http://other.domain/' }) }
+
+            it 'uses the specified root_url in the middleware initializer' do
+              get 'http://www.example.org/test.pdf'
+              expect(last_response.body.bytesize).to eq Grover.new('src="http://example.com/asdf"').to_pdf.bytesize
+            end
           end
         end
 
