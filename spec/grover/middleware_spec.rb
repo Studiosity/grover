@@ -476,7 +476,7 @@ describe Grover::Middleware do
           end
 
           context 'when the root_url is also set in configuration' do
-            before { allow(Grover.configuration).to receive(:options).and_return({ root_url: 'http://other.domain/' }) }
+            before { allow(Grover.configuration).to receive(:root_url).and_return 'http://other.domain/' }
 
             it 'uses the specified root_url in the middleware initializer' do
               get 'http://www.example.org/test.pdf'
@@ -486,7 +486,7 @@ describe Grover::Middleware do
         end
 
         context 'with root_url set in configuration' do
-          before { allow(Grover.configuration).to receive(:options).and_return({ root_url: 'http://example.com/' }) }
+          before { allow(Grover.configuration).to receive(:root_url).and_return 'http://example.com/' }
 
           it 'uses the specified root_url' do
             get 'http://www.example.org/test.pdf'

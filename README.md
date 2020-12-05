@@ -225,6 +225,25 @@ Grover.configure do |config|
 end
 ```
 
+### root_url
+The `root_url` option can be specified either when configuring the middleware or as a global option. This is needed
+when running the Grover middleware behind a URL rewriting proxy or within a containerised system.
+
+As a middleware option:
+```ruby
+# in application.rb
+require 'grover'
+config.middleware.use Grover::Middleware, root_url: 'https://my.external.domain'
+```
+
+or as a global option:
+```ruby
+# config/initializers/grover.rb
+Grover.configure do |config|
+  config.root_url = 'https://my.external.domain'
+end
+```
+
 #### ignore_path
 The `ignore_path` configuration option can be used to tell Grover's middleware whether it should handle/modify
 the response. There are three ways to set up the `ignore_path`:
