@@ -3,6 +3,13 @@
 ## Unreleased
 - None
 
+## [0.13.2](releases/tag/v0.13.2) - 2020-12-06
+### Fixed
+- [#92](https://github.com/Studiosity/grover/pull/92) Fix handling of malformed worker responses ([@ckhall][])
+
+### Added
+- [#79](https://github.com/Studiosity/grover/pull/79) Add root_url option to middleware ([@anamba][])
+
 ## [0.13.1](releases/tag/v0.13.1) - 2020-08-30
 ### Fixed
 - [#79](https://github.com/Studiosity/grover/pull/79) Fix bug in middleware where path/URI weren't restored after calling downstream
@@ -220,3 +227,6 @@
 [@Richacinas]: https://github.com/Richacinas
 [@inspiredstuffs]: https://github.com/inspiredstuffs
 [@braindeaf]: https://github.com/braindeaf
+[@ckhall]: https://github.com/ckhall
+[@anamba]: https://github.com/anamba
+ 
