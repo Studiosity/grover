@@ -25,4 +25,16 @@ describe Grover::Configuration do
       it { is_expected.to eq 'fooPrefix-' }
     end
   end
+
+  describe '#root_url' do
+    subject(:root_url) { configuration.root_url }
+
+    it { is_expected.to be_nil }
+
+    context 'when configured differently' do
+      before { configuration.root_url = 'https://my.domain' }
+
+      it { is_expected.to eq 'https://my.domain' }
+    end
+  end
 end

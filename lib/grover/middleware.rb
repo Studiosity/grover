@@ -10,11 +10,14 @@ class Grover
   # @see https://github.com/pdfkit/pdfkit
   #
   class Middleware # rubocop:disable Metrics/ClassLength
-    def initialize(app)
+    def initialize(app, *args)
       @app = app
       @pdf_request = false
       @png_request = false
       @jpeg_request = false
+
+      @root_url =
+        args.last.is_a?(Hash) && args.last.key?(:root_url) ? args.last[:root_url] : Grover.configuration.root_url
     end
 
     def call(env)
