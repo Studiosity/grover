@@ -33,8 +33,8 @@ class Grover
   #   see https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagepdfoptions
   #
   def initialize(url, options = {})
-    @url = url
-    @options = OptionsBuilder.new(options, url)
+    @url = url.to_s
+    @options = OptionsBuilder.new(options, @url)
     @root_path = @options.delete 'root_path'
     @front_cover_path = @options.delete 'front_cover_path'
     @back_cover_path = @options.delete 'back_cover_path'
