@@ -31,6 +31,14 @@ describe Grover do
         it { expect(new.instance_variable_get('@options')).to eq('page_size' => 'A4') }
       end
     end
+
+    context 'when url provided is `nil`' do
+      subject(:new) { described_class.new(nil) }
+
+      it { expect(new.instance_variable_get('@url')).to eq '' }
+      it { expect(new.instance_variable_get('@root_path')).to be_nil }
+      it { expect(new.instance_variable_get('@options')).to eq({}) }
+    end
   end
 
   describe '#to_pdf' do

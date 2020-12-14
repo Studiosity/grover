@@ -55,6 +55,14 @@ describe Grover::Processor do
         end
       end
 
+      context 'when passing through an empty string' do
+        let(:url_or_html) { '' }
+
+        it { is_expected.to start_with "%PDF-1.4\n" }
+        it { expect(pdf_reader.page_count).to eq 1 }
+        it { expect(pdf_text_content).to eq '' }
+      end
+
       context 'when puppeteer package is not installed' do
         # Temporarily move the node puppeteer folder
         before { FileUtils.move 'node_modules/puppeteer', 'node_modules/puppeteer_temp' }
