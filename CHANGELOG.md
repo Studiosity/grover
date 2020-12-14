@@ -3,6 +3,10 @@
 ## Unreleased
 - None
 
+## [0.13.3](releases/tag/v0.13.3) - 2020-12-15
+### Fixed
+- [#95](https://github.com/Studiosity/grover/pull/95) Handle `nil` and empty string content edge-cases
+
 ## [0.13.2](releases/tag/v0.13.2) - 2020-12-06
 ### Fixed
 - [#92](https://github.com/Studiosity/grover/pull/92) Fix handling of malformed worker responses ([@ckhall][])
