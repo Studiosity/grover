@@ -6,13 +6,14 @@ env:
     - PUPPETEER_VERSION=2.1.1
     - PUPPETEER_VERSION=3.0.4
     - PUPPETEER_VERSION=4.0.1
-    - PUPPETEER_VERSION=5.2.1
+    - PUPPETEER_VERSION=5.5.0
 
 language: ruby
 rvm:
   - 2.5
   - 2.6
   - 2.7
+  - 3.0
 
 before_install:
   - nvm install 10
