@@ -3,6 +3,10 @@
 ## Unreleased
 - None
 
+## [0.14.1](releases/tag/v0.14.1) - 2021-01-16
+### Changed
+- [#99](https://github.com/Studiosity/grover/pull/99) Expand required Ruby version to allow v3.0
+
 ## [0.13.3](releases/tag/v0.13.3) - 2020-12-15
 ### Fixed
 - [#95](https://github.com/Studiosity/grover/pull/95) Handle `nil` and empty string content edge-cases

@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
 class Grover
-  VERSION = '0.13.3'
+  VERSION = '0.14.1'
 end
