@@ -1,7 +1,7 @@
 # Changelog
 
 ## Unreleased
-- None
+- [#106](https://github.com/Studiosity/grover/pull/106) Add support for addStyleTag and addScriptTag
 
 ## [0.14.1](releases/tag/v0.14.1) - 2021-01-16
 ### Changed
