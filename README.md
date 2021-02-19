@@ -192,7 +192,7 @@ See [page.addScriptTag](https://github.com/puppeteer/puppeteer/blob/main/docs/ap
 script_tag_options = [
   { url: 'http://example.com/script.js' },
   { path: 'script.js' },
-  { content: 'document.querySelector('h1').style.display = "none"' }
+  { content: 'document.querySelector("h1").style.display = "none"' }
 ]
 Grover.new('<html><body><h1>Heading</h1></body></html>', script_tag_options: script_tag_options).to_pdf
 ```

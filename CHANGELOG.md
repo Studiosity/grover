@@ -1,7 +1,7 @@
 # Changelog
 
 ## Unreleased
-- [#106](https://github.com/Studiosity/grover/pull/106) Add support for addStyleTag and addScriptTag
+- [#106](https://github.com/Studiosity/grover/pull/106) Add support for addStyleTag and addScriptTag ([@paresharma][])
 
 ## [0.14.1](releases/tag/v0.14.1) - 2021-01-16
 ### Changed
@@ -237,4 +237,4 @@
 [@braindeaf]: https://github.com/braindeaf
 [@ckhall]: https://github.com/ckhall
 [@anamba]: https://github.com/anamba
- 
+[@paresharma]: https://github.com/paresharma
