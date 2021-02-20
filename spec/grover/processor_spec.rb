@@ -467,6 +467,39 @@ describe Grover::Processor do
 
         it { expect(pdf_text_content).to eq "#{date} http://www.example.net/foo/bar 1/1" }
       end
+
+      context 'when passing styles and scripts' do
+        let(:url_or_html) do
+          <<-HTML
+            <html>
+              <body>
+                <h1>Hey there</h1>
+                <h2>Konnichiwa</h2>
+              </body>
+            </html>
+          HTML
+        end
+
+        context 'when style tag options are specified' do
+          let(:options) do
+            {
+              'styleTagOptions' => [{ 'content' => 'h1 { display: none }' }]
+            }
+          end
+
+          it { expect(pdf_text_content).to eq 'Konnichiwa' }
+        end
+
+        context 'when script tag options are specified' do
+          let(:options) do
+            {
+              'scriptTagOptions' => [{ 'content' => 'document.querySelector("h2").style.display = "none"' }]
+            }
+          end
+
+          it { expect(pdf_text_content).to eq 'Hey there' }
+        end
+      end
     end
 
     context 'when converting to an image' do
