@@ -581,5 +581,22 @@ describe Grover::Processor do
         colours.map { |colour| image.data.dig('channelStatistics', colour, 'mean').to_s }
       end
     end
+
+    context 'when rendering HTML' do
+      let(:method) { :content }
+
+      let(:url_or_html) do
+        <<-HTML
+          <html>
+            <head></head>
+            <body>
+              <h1>Hey there</h1>
+            </body>
+          </html>
+        HTML
+      end
+
+      it { expect(convert.gsub(/[[:space:]]+/, '')).to eq url_or_html.gsub(/[[:space:]]+/, '') }
+    end
   end
 end

@@ -34,7 +34,10 @@ pdf = grover.to_pdf
 
 # Get a screenshot
 png = grover.to_png
-jpeg = grover.to_jpeg 
+jpeg = grover.to_jpeg
+
+# Get the HTML content (including DOCTYPE)
+html = grover.to_html
 
 # Options can be provided through meta tags
 Grover.new('<html><head><meta name="grover-page_ranges" content="1-3"')
