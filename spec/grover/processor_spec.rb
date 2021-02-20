@@ -591,12 +591,30 @@ describe Grover::Processor do
             <head></head>
             <body>
               <h1>Hey there</h1>
+              <h2>Konnichiwa</h2>
             </body>
           </html>
         HTML
       end
 
-      it { expect(convert.gsub(/[[:space:]]+/, '')).to eq url_or_html.gsub(/[[:space:]]+/, '') }
+      let(:options) do
+        {
+          'scriptTagOptions' => [{ 'content' => 'document.querySelector("h2").remove()' }]
+        }
+      end
+
+      it 'returns the rendered HTML' do
+        expect(Grover::Utils.squish(convert)).to eq(
+          Grover::Utils.squish(
+            <<-HTML
+              <html><head><script type="">document.querySelector("h2").remove()</script></head>
+              <body>
+                <h1>Hey there</h1>
+              </body></html>
+            HTML
+          )
+        )
+      end
     end
   end
 end
