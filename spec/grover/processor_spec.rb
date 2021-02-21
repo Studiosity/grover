@@ -581,5 +581,40 @@ describe Grover::Processor do
         colours.map { |colour| image.data.dig('channelStatistics', colour, 'mean').to_s }
       end
     end
+
+    context 'when rendering HTML' do
+      let(:method) { :content }
+
+      let(:url_or_html) do
+        <<-HTML
+          <html>
+            <head></head>
+            <body>
+              <h1>Hey there</h1>
+              <h2>Konnichiwa</h2>
+            </body>
+          </html>
+        HTML
+      end
+
+      let(:options) do
+        {
+          'scriptTagOptions' => [{ 'content' => 'document.querySelector("h2").remove()' }]
+        }
+      end
+
+      it 'returns the rendered HTML' do
+        expect(Grover::Utils.squish(convert)).to eq(
+          Grover::Utils.squish(
+            <<-HTML
+              <html><head><script type="">document.querySelector("h2").remove()</script></head>
+              <body>
+                <h1>Hey there</h1>
+              </body></html>
+            HTML
+          )
+        )
+      end
+    end
   end
 end

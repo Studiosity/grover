@@ -51,6 +51,15 @@ class Grover
   end
 
   #
+  # Request URL with provided options and render HTML
+  #
+  # @return [String] The resulting HTML string
+  #
+  def to_html
+    processor.convert :content, @url, normalized_options(path: nil)
+  end
+
+  #
   # Request URL with provided options and create screenshot
   #
   # @param [String] path Optional path to write the screenshot to

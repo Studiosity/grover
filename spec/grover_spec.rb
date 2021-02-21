@@ -545,6 +545,21 @@ describe Grover do
     end
   end
 
+  describe '#to_html' do
+    subject(:to_html) { grover.to_html }
+
+    let(:processor) { instance_double 'Grover::Processor' }
+    let(:expected_html) { '<html><body>Some HTML</body></html>' }
+
+    before { allow(Grover::Processor).to receive(:new).with(Dir.pwd).and_return processor }
+
+    it 'calls to Grover::Processor' do
+      allow(processor).to receive(:convert).with(:content, url_or_html, {}).and_return expected_html
+      expect(processor).to receive(:convert).with(:content, url_or_html, {})
+      expect(to_html).to eq expected_html
+    end
+  end
+
   describe '#front_cover_path' do
     subject(:front_cover_path) { grover.front_cover_path }
 

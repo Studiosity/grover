@@ -19,6 +19,7 @@ class Grover
       ensure_packages_are_initiated
       result = call_js_method method, url_or_html, options
       return unless result
+      return result if result.is_a?(String)
 
       result['data'].pack('C*')
     ensure
