@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased
+- none
+
+## [0.14.2](releases/tag/v0.14.2) - 2021-02-22
 - [#106](https://github.com/Studiosity/grover/pull/106) Add support for addStyleTag and addScriptTag ([@paresharma][])
 - [#107](https://github.com/Studiosity/grover/pull/107) Add support to return the html content ([@paresharma][])
 
