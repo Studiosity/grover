@@ -284,9 +284,23 @@ describe Grover::Utils do
     end
 
     context 'when key has an acronym in it' do
-      let(:object) { { prefer_css_page_size: true } }
+      let(:object) { { prefer_css_page_size: true, bypass_csp: false, extra_http_headers: { 'Foo' => 'Bar' } } }
 
-      it { is_expected.to eq('preferCSSPageSize' => true) }
+      it 'returns the acronym components of the keys uppercase' do
+        expect(normalize_object).to(
+          eq('preferCSSPageSize' => true, 'bypassCSP' => false, 'extraHTTPHeaders' => { 'foo' => 'Bar' })
+        )
+      end
+
+      context 'when excluding the transform of a specific keys values' do
+        subject(:normalize_object) { described_class.normalize_object(object, excluding: ['extraHTTPHeaders']) }
+
+        it 'returns the acronym components of the keys uppercase (but does not transform the extraHTTPHeaders value' do
+          expect(normalize_object).to(
+            eq('preferCSSPageSize' => true, 'bypassCSP' => false, 'extraHTTPHeaders' => { 'Foo' => 'Bar' })
+          )
+        end
+      end
     end
 
     context 'with nested Hashes' do

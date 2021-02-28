@@ -270,6 +270,23 @@ describe Grover do
         expect(to_pdf).to eq 'some PDF content'
       end
     end
+
+    context 'when passing extra HTTP headers' do
+      let(:options) { { extra_http_headers: { 'Foo' => 'Bar', 'baz' => 'Qux' } } }
+
+      it 'does not transform the header keys' do
+        allow(processor).to(
+          receive(:convert).
+            with(:pdf, url_or_html, { 'extraHTTPHeaders' => { 'Foo' => 'Bar', 'baz' => 'Qux' } }).
+            and_return('some PDF content')
+        )
+        expect(processor).to(
+          receive(:convert).
+            with(:pdf, url_or_html, { 'extraHTTPHeaders' => { 'Foo' => 'Bar', 'baz' => 'Qux' } })
+        )
+        expect(to_pdf).to eq 'some PDF content'
+      end
+    end
   end
 
   describe '#screenshot' do
