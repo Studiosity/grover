@@ -1,7 +1,7 @@
 # Changelog
 
 ## Unreleased
-- none
+- [#108](https://github.com/Studiosity/grover/pull/108) Add support for various methods (*should* be feature parity with Puppeteer)
 
 ## [0.14.2](releases/tag/v0.14.2) - 2021-02-22
 - [#106](https://github.com/Studiosity/grover/pull/106) Add support for addStyleTag and addScriptTag ([@paresharma][])
