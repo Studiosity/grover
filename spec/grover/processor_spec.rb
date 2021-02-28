@@ -514,32 +514,35 @@ describe Grover::Processor do
         it { expect(pdf_text_content).to eq "#{date} http://www.example.net/foo/bar 1/1" }
       end
 
-      context 'when wait for timeout option is specified' do
-        let(:url_or_html) do
-          <<-HTML
-            <html>
-              <body>
-                <p id="loading">Loading</p>
-                <p id="content" style="display: none">Loaded</p>
-              </body>
+      # Only test `waitForTimeout` if the Puppeteer supports it
+      if Gem::Version.new(env['PUPPETEER_VERSION']) >= Gem::Version.new('5.3.0')
+        context 'when wait for timeout option is specified' do
+          let(:url_or_html) do
+            <<-HTML
+              <html>
+                <body>
+                  <p id="loading">Loading</p>
+                  <p id="content" style="display: none">Loaded</p>
+                </body>
+  
+                <script>
+                  setTimeout(function() {
+                    document.getElementById('loading').remove();
+                    document.getElementById('content').style.display = 'block';
+                  }, 100);
+                </script>
+              </html>
+            HTML
+          end
+          let(:options) { { 'waitUntil' => 'load' } }
 
-              <script>
-                setTimeout(function() {
-                  document.getElementById('loading').remove();
-                  document.getElementById('content').style.display = 'block';
-                }, 100);
-              </script>
-            </html>
-          HTML
-        end
-        let(:options) { { 'waitUntil' => 'load' } }
+          it { expect(pdf_text_content).to eq 'Loading' }
 
-        it { expect(pdf_text_content).to eq 'Loading' }
+          context 'when waiting for the content load timeout to occur' do
+            let(:options) { { 'waitForTimeout' => 200, 'waitUntil' => 'load' } }
 
-        context 'when waiting for the content load timeout to occur' do
-          let(:options) { { 'waitForTimeout' => 200, 'waitUntil' => 'load' } }
-
-          it { expect(pdf_text_content).to eq 'Loaded' }
+            it { expect(pdf_text_content).to eq 'Loaded' }
+          end
         end
       end
 
