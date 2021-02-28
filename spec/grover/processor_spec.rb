@@ -387,7 +387,7 @@ describe Grover::Processor do
           let(:url_or_html) { 'http://cookie-renderer.herokuapp.com/?type=headers' }
           let(:options) { { 'extraHTTPHeaders' => { 'grover-test' => 'yes it is' } } }
 
-          it { expect(pdf_text_content).to match /Request contained (15|16) headers/ }
+          it { expect(pdf_text_content).to match(/Request contained (15|16) headers/) }
           it { expect(pdf_text_content).to include '1. host cookie-renderer.herokuapp.com' }
           it { expect(pdf_text_content).to include '5. grover-test yes it is' }
         end
@@ -396,7 +396,7 @@ describe Grover::Processor do
           let(:url_or_html) { 'http://cookie-renderer.herokuapp.com/?type=headers' }
           let(:options) { { 'userAgent' => 'Grover user agent' } }
 
-          it { expect(pdf_text_content).to match /Request contained (14|15) headers/ }
+          it { expect(pdf_text_content).to match(/Request contained (14|15) headers/) }
           it { expect(pdf_text_content).to include '1. host cookie-renderer.herokuapp.com' }
           it { expect(pdf_text_content).to include 'user-agent Grover user agent' }
         end
@@ -431,7 +431,7 @@ describe Grover::Processor do
       end
 
       # Only test `emulateMediaFeatures` if the Puppeteer supports it
-      if ENV['PUPPETEER_VERSION'] == '' || Gem::Version.new(ENV['PUPPETEER_VERSION']) >= Gem::Version.new('2.0.0')
+      if puppeteer_version_on_or_after? '2.0.0'
         context 'when the browser timezone is rendered' do
           let(:url_or_html) do
             <<-HTML
@@ -518,7 +518,7 @@ describe Grover::Processor do
       end
 
       # Only test `waitForTimeout` if the Puppeteer supports it
-      if ENV['PUPPETEER_VERSION'] == '' || Gem::Version.new(ENV['PUPPETEER_VERSION']) >= Gem::Version.new('5.3.0')
+      if puppeteer_version_on_or_after? '5.3.0'
         context 'when wait for timeout option is specified' do
           let(:url_or_html) do
             <<-HTML
@@ -635,7 +635,7 @@ describe Grover::Processor do
       end
 
       # Only test `emulateMediaFeatures` if the Puppeteer supports it
-      if ENV['PUPPETEER_VERSION'] == '' || Gem::Version.new(ENV['PUPPETEER_VERSION']) >= Gem::Version.new('2.0.0')
+      if puppeteer_version_on_or_after? '2.0.0'
         context 'when passing through `media_features` options' do
           let(:url_or_html) do
             <<~HTML
