@@ -121,6 +121,21 @@ describe Grover::Utils do
         expect(hash).to eq(foo: [{ bar: 'baz' }])
       end
     end
+
+    context 'when key is included in `excluding` list' do
+      subject(:deep_transform_keys_in_object) do
+        described_class.deep_transform_keys_in_object(hash, excluding: ['FOO']) { |key| key.to_s.upcase }
+      end
+
+      let(:hash) { { foo: [{ bar: 'baz' }] } }
+
+      it { is_expected.to eq('FOO' => [{ bar: 'baz' }]) }
+
+      it 'doesnt modify the original hash' do
+        deep_transform_keys_in_object
+        expect(hash).to eq(foo: [{ bar: 'baz' }])
+      end
+    end
   end
 
   describe '.deep_stringify_keys' do
