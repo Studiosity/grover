@@ -515,7 +515,7 @@ describe Grover::Processor do
       end
 
       # Only test `waitForTimeout` if the Puppeteer supports it
-      if ENV['PUPPETEER_VERSION'].blank? || Gem::Version.new(ENV['PUPPETEER_VERSION']) >= Gem::Version.new('5.3.0')
+      if ENV['PUPPETEER_VERSION'] == '' || Gem::Version.new(ENV['PUPPETEER_VERSION']) >= Gem::Version.new('5.3.0')
         context 'when wait for timeout option is specified' do
           let(:url_or_html) do
             <<-HTML
