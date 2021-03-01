@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased
+- none
+
+## [1.0.0](releases/tag/v1.0.0) - 2021-03-01
 ### Added
 - [#108](https://github.com/Studiosity/grover/pull/108) Add support for various methods to get feature parity with Puppeteer ([@abrom][])
 
