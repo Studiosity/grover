@@ -382,6 +382,24 @@ describe Grover::Processor do
           it { expect(pdf_text_content).to include '1. grover-test nom nom nom' }
           it { expect(pdf_text_content).to include '2. escaped &==' }
         end
+
+        context 'when passing through extra HTTP headers' do
+          let(:url_or_html) { 'http://cookie-renderer.herokuapp.com/?type=headers' }
+          let(:options) { { 'extraHTTPHeaders' => { 'grover-test' => 'yes it is' } } }
+
+          it { expect(pdf_text_content).to match(/Request contained (15|16) headers/) }
+          it { expect(pdf_text_content).to include '1. host cookie-renderer.herokuapp.com' }
+          it { expect(pdf_text_content).to include '5. grover-test yes it is' }
+        end
+
+        context 'when overloading the user agent' do
+          let(:url_or_html) { 'http://cookie-renderer.herokuapp.com/?type=headers' }
+          let(:options) { { 'userAgent' => 'Grover user agent' } }
+
+          it { expect(pdf_text_content).to match(/Request contained (14|15) headers/) }
+          it { expect(pdf_text_content).to include '1. host cookie-renderer.herokuapp.com' }
+          it { expect(pdf_text_content).to include 'user-agent Grover user agent' }
+        end
       end
 
       context 'when HTML includes screen only content' do
@@ -409,6 +427,37 @@ describe Grover::Processor do
           let(:options) { { 'emulateMedia' => 'screen' } }
 
           it { expect(pdf_text_content).to eq 'Hey there This should only display for screen media' }
+        end
+      end
+
+      # Only test `emulateMediaFeatures` if the Puppeteer supports it
+      if puppeteer_version_on_or_after? '2.0.0'
+        context 'when the browser timezone is rendered' do
+          let(:url_or_html) do
+            <<-HTML
+              <html>
+                <body>
+                  Timezone offset is
+                  <div id="timezone"></div>
+                  <script>document.getElementById("timezone").innerHTML = new Date().getTimezoneOffset();</script>
+                </body>
+              </html>
+            HTML
+          end
+
+          it { expect(pdf_text_content).to eq "Timezone offset is #{Time.now.utc_offset / -60}" }
+
+          context 'when timezone is overridden with Brisbane' do
+            let(:options) { { 'timezone' => 'Australia/Brisbane' } }
+
+            it { expect(pdf_text_content).to eq 'Timezone offset is -600' }
+          end
+
+          context 'when timezone is overridden with Dhaka' do
+            let(:options) { { 'timezone' => 'Asia/Dhaka' } }
+
+            it { expect(pdf_text_content).to eq 'Timezone offset is -360' }
+          end
         end
       end
 
@@ -466,6 +515,38 @@ describe Grover::Processor do
         let(:date) { Date.today.strftime '%-m/%-d/%Y' }
 
         it { expect(pdf_text_content).to eq "#{date} http://www.example.net/foo/bar 1/1" }
+      end
+
+      # Only test `waitForTimeout` if the Puppeteer supports it
+      if puppeteer_version_on_or_after? '5.3.0'
+        context 'when wait for timeout option is specified' do
+          let(:url_or_html) do
+            <<-HTML
+              <html>
+                <body>
+                  <p id="loading">Loading</p>
+                  <p id="content" style="display: none">Loaded</p>
+                </body>
+  
+                <script>
+                  setTimeout(function() {
+                    document.getElementById('loading').remove();
+                    document.getElementById('content').style.display = 'block';
+                  }, 100);
+                </script>
+              </html>
+            HTML
+          end
+          let(:options) { { 'waitUntil' => 'load' } }
+
+          it { expect(pdf_text_content).to eq 'Loading' }
+
+          context 'when waiting for the content load timeout to occur' do
+            let(:options) { { 'waitForTimeout' => 200, 'waitUntil' => 'load' } }
+
+            it { expect(pdf_text_content).to eq 'Loaded' }
+          end
+        end
       end
 
       context 'when passing styles and scripts' do
@@ -553,6 +634,38 @@ describe Grover::Processor do
         it { expect(mean_colour_statistics(image)).to eq %w[165 42 42] }
       end
 
+      # Only test `emulateMediaFeatures` if the Puppeteer supports it
+      if puppeteer_version_on_or_after? '2.0.0'
+        context 'when passing through `media_features` options' do
+          let(:url_or_html) do
+            <<~HTML
+              <html>
+                <head>
+                  <style>
+                    body { background-color: red; }
+                    @media (prefers-color-scheme: light) {
+                      body { background-color: green; }
+                    }
+                    @media (prefers-color-scheme: dark) {
+                      body { background-color: blue; }
+                    }
+                  </style>
+                </head>
+                <body></body>
+              </html>
+            HTML
+          end
+          let(:options) do
+            { path: 'foo.png', 'mediaFeatures' => [{ 'name' => 'prefers-color-scheme', 'value' => 'dark' }] }
+          end
+
+          it { expect(convert.unpack('C*')).to start_with "\x89PNG\r\n\x1A\n".unpack('C*') }
+          it { expect(image.type).to eq 'PNG' }
+          it { expect(image.dimensions).to eq [800, 600] }
+          it { expect(mean_colour_statistics(image)).to eq %w[0 0 255] }
+        end
+      end
+
       context 'when specifying type of `png`' do
         let(:url_or_html) { '<html><body style="background-color: green"></body></html>' }
         let(:options) { { type: 'png' } }
@@ -577,8 +690,8 @@ describe Grover::Processor do
 
       def mean_colour_statistics(image)
         colours = %w[red green blue]
-        colours = colours.map(&:capitalize) if MiniMagick.imagemagick7?
-        colours.map { |colour| image.data.dig('channelStatistics', colour, 'mean').to_s }
+        stats = image.data['channelStatistics']
+        colours.map { |colour| stats[colour] || stats[colour.capitalize] }.map { |details| details['mean'].to_s }
       end
     end
 

@@ -144,7 +144,7 @@ class Grover
   end
 
   def normalized_options(path:)
-    normalized_options = Utils.normalize_object @options
+    normalized_options = Utils.normalize_object @options, excluding: ['extraHTTPHeaders']
     normalized_options['path'] = path if path.is_a? ::String
     normalized_options
   end

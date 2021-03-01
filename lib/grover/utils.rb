@@ -6,7 +6,9 @@ class Grover
   #
   class Utils
     ACRONYMS = {
-      'css' => 'CSS'
+      'css' => 'CSS',
+      'csp' => 'CSP',
+      'http' => 'HTTP'
     }.freeze
     private_constant :ACRONYMS
 
@@ -41,11 +43,12 @@ class Grover
     # Copied from active support
     # @see active_support/core_ext/hash/keys.rb
     #
-    def self.deep_transform_keys_in_object(object, &block)
+    def self.deep_transform_keys_in_object(object, excluding: [], &block) # rubocop:disable Metrics/MethodLength
       case object
       when Hash
         object.each_with_object({}) do |(key, value), result|
-          result[yield(key)] = deep_transform_keys_in_object(value, &block)
+          new_key = yield(key)
+          result[new_key] = excluding.include?(new_key) ? value : deep_transform_keys_in_object(value, &block)
         end
       when Array
         object.map { |e| deep_transform_keys_in_object(e, &block) }
@@ -80,8 +83,8 @@ class Grover
     #
     # Recursively normalizes hash objects with camelized string keys
     #
-    def self.normalize_object(object)
-      deep_transform_keys_in_object(object) { |k| normalize_key(k) }
+    def self.normalize_object(object, excluding: [])
+      deep_transform_keys_in_object(object, excluding: excluding) { |k| normalize_key(k) }
     end
 
     #

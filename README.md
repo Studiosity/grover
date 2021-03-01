@@ -98,12 +98,21 @@ Grover.configure do |config|
       top: '5px',
       bottom: '10cm'
     },
+    user_agent: 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0',
     viewport: {
       width: 640,
       height: 480
     },
     prefer_css_page_size: true,
     emulate_media: 'screen',
+    bypass_csp: true,
+    media_features: [{ name: 'prefers-color-scheme', value: 'dark' }],
+    timezone: 'Australia/Sydney',
+    vision_deficiency: 'deuteranopia',
+    extraHTTPHeaders: { 'Accept-Language': 'en-US' },
+    geolocation: { latitude: 59.95, longitude: 30.31667 },
+    focus: '#some-element',
+    hover: '#another-element',
     cache: false,
     timeout: 0, # Timeout in ms. A value of `0` means 'no timeout'
     launch_args: ['--font-render-hinting=medium'],
@@ -122,6 +131,18 @@ For `viewport` options, see https://github.com/puppeteer/puppeteer/blob/main/doc
 For `launch_args` options, see http://peter.sh/experiments/chromium-command-line-switches/
 Launch parameter args can also be provided using a meta tag:
 
+For `timezone` IDs see [ICUs metaZones.txt](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1).
+Passing `nil` disables timezone emulation.
+
+The `vision_deficiency` option can be passed one of `achromatopsia`, `deuteranopia`, `protanopia`, `tritanopia`,
+`blurredVision` or `none`.
+
+The `focus` option takes a CSS selector and will focus on the first matching element after rendering is complete
+(including waiting for the specified `wait_for_selector`).
+
+The `hover` option takes a CSS selector and will hover on the first matching element after rendering is complete
+(including waiting for the specified `wait_for_selector`).
+
 ```html
 <meta name="grover-launch_args" content="['--disable-speech-api']" />
 ```
@@ -130,6 +151,8 @@ For `wait_until` option, default for URLs is `networkidle2` and for HTML content
 For available options see https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pagegotourl-options
 
 The `wait_for_selector` option can also be used to wait until an element appears on the page. Additional waiting parameters can be set with the `wait_for_selector_options` options hash. For available options, see: https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pagewaitforselectorselector-options.
+
+The `wait_for_timeout` option can also be used to wait the specified number of milliseconds have elapsed.
 
 The Chrome/Chromium executable path can be overridden with the `executable_path` option.
 
