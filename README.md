@@ -158,8 +158,6 @@ The `request_failure` option can be used to fail generation if assets fail to lo
 
 The Chrome/Chromium executable path can be overridden with the `executable_path` option.
 
-
-
 Javascript can be executed on the page (after render and before conversion to PDF/image)
 with the `execute_script` option.
 
