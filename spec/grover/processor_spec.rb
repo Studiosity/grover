@@ -490,6 +490,24 @@ describe Grover::Processor do
         it { expect(pdf_text_content).to eq "#{date} Hey there http://www.example.net/foo/bar 1/1" }
       end
 
+      context 'when request failure option is specified' do
+        let(:url_or_html) do
+          <<-HTML
+            <html>
+              <body>
+                <img src="http://foo.bar/baz.img" />
+              </body>
+            </html>
+          HTML
+        end
+        let(:options) { basic_header_footer_options.merge('requestFailure' => true) }
+        it do
+          expect do
+            convert
+          end.to raise_error Grover::JavaScript::RequestFailedError, %r{net::ERR_NAME_NOT_RESOLVED at http://foo.bar/baz.img}
+        end
+      end
+
       context 'when wait for selector option is specified with options' do
         let(:url_or_html) do
           <<-HTML
