@@ -154,7 +154,8 @@ The `wait_for_selector` option can also be used to wait until an element appears
 
 The `wait_for_timeout` option can also be used to wait the specified number of milliseconds have elapsed.
 
-The `request_failure` option can be used to fail generation if assets fail to load.
+The `request_failure` option, when enabled, will raise a `Grover::JavaScript::RequestFailedError`
+if the initial content request or any subsequent asset request returns a bad response or times out.
 
 The Chrome/Chromium executable path can be overridden with the `executable_path` option.
 
