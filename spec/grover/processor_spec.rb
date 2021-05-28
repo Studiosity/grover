@@ -501,6 +501,7 @@ describe Grover::Processor do
           HTML
         end
         let(:options) { basic_header_footer_options.merge('requestFailure' => true) }
+
         it do
           expect do
             convert
