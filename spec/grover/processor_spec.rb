@@ -490,22 +490,48 @@ describe Grover::Processor do
         it { expect(pdf_text_content).to eq "#{date} Hey there http://www.example.net/foo/bar 1/1" }
       end
 
-      context 'when request failure option is specified' do
-        let(:url_or_html) do
-          <<-HTML
-            <html>
-              <body>
-                <img src="http://foo.bar/baz.img" />
-              </body>
-            </html>
-          HTML
-        end
-        let(:options) { basic_header_footer_options.merge('requestFailure' => true) }
+      context 'when raise on request failure option is specified' do
+        let(:options) { basic_header_footer_options.merge('raiseOnRequestFailure' => true) }
+        let(:date) { Date.today.strftime '%-m/%-d/%Y' }
 
-        it do
-          expect do
-            convert
-          end.to raise_error Grover::JavaScript::RequestFailedError, %r{net::ERR_NAME_NOT_RESOLVED at http://foo.bar/baz.img}
+        context 'raises when a failure occurs' do
+          let(:url_or_html) do
+            <<-HTML
+              <html>
+                <body>
+                  <img src="http://foo.bar/baz.img" />
+                </body>
+              </html>
+            HTML
+          end
+
+          it do
+            expect do
+              convert
+            end.to raise_error Grover::JavaScript::RequestFailedError, %r{net::ERR_NAME_NOT_RESOLVED at http://foo.bar/baz.img}
+          end
+        end
+
+        context "handles redirects without raising an error" do
+          it { expect(pdf_text_content).to match "#{date} Google" }
+        end
+
+
+        context "loads images successfully" do
+          let(:url_or_html) do
+            <<-HTML
+              <html>
+                <body>
+                  <img src="https://placekitten.com/200/200" />
+                </body>
+              </html>
+            HTML
+          end
+
+          it do
+            _, stream = pdf_reader.pages.first.xobjects.first
+            expect(stream.hash[:Subtype]).to eq :Image
+          end
         end
       end
 
