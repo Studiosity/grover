@@ -494,7 +494,7 @@ describe Grover::Processor do
         let(:options) { basic_header_footer_options.merge('raiseOnRequestFailure' => true) }
         let(:date) { Date.today.strftime '%-m/%-d/%Y' }
 
-        context 'raises when a failure occurs' do
+        context 'when a failure occurs it raises an error' do
           let(:url_or_html) do
             <<-HTML
               <html>
@@ -512,12 +512,11 @@ describe Grover::Processor do
           end
         end
 
-        context "handles redirects without raising an error" do
+        context 'when assets have redirects PDFs are generated successfully' do
           it { expect(pdf_text_content).to match "#{date} Google" }
         end
 
-
-        context "loads images successfully" do
+        context 'with images' do
           let(:url_or_html) do
             <<-HTML
               <html>
