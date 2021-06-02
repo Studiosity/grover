@@ -3,6 +3,10 @@
 ## Unreleased
 - none
 
+## [1.0.1](releases/tag/v1.0.1) - 2021-06-02
+### Added
+- [#112](https://github.com/Studiosity/grover/pull/112) Add flag to fail conversion if source or assets fail to load ([@deanmarano][])
+
 ## [1.0.0](releases/tag/v1.0.0) - 2021-03-01
 ### Added
 - [#108](https://github.com/Studiosity/grover/pull/108) Add support for various methods to get feature parity with Puppeteer ([@abrom][])
@@ -248,3 +252,4 @@
 [@ckhall]: https://github.com/ckhall
 [@anamba]: https://github.com/anamba
 [@paresharma]: https://github.com/paresharma
+[@deanmarano]: https://github.com/deanmarano
