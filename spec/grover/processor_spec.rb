@@ -490,6 +490,68 @@ describe Grover::Processor do
         it { expect(pdf_text_content).to eq "#{date} Hey there http://www.example.net/foo/bar 1/1" }
       end
 
+      context 'when raise on request failure option is specified' do
+        let(:options) { basic_header_footer_options.merge('raiseOnRequestFailure' => true) }
+        let(:date) { Date.today.strftime '%-m/%-d/%Y' }
+
+        context 'when a failure occurs it raises an error' do
+          let(:url_or_html) do
+            <<-HTML
+              <html>
+                <body>
+                  <img src="http://foo.bar/baz.img" />
+                </body>
+              </html>
+            HTML
+          end
+
+          it do
+            expect do
+              convert
+            end.to raise_error Grover::JavaScript::RequestFailedError, 'net::ERR_NAME_NOT_RESOLVED at http://foo.bar/baz.img'
+          end
+        end
+
+        context 'when a 404 occurs it raises an error' do
+          let(:url_or_html) do
+            <<-HTML
+              <html>
+                <body>
+                  <img src="https://google.com/404.jpg" />
+                </body>
+              </html>
+            HTML
+          end
+
+          it do
+            expect do
+              convert
+            end.to raise_error Grover::JavaScript::RequestFailedError, '404 https://google.com/404.jpg'
+          end
+        end
+
+        context 'when assets have redirects PDFs are generated successfully' do
+          it { expect(pdf_text_content).to match "#{date} Google" }
+        end
+
+        context 'with images' do
+          let(:url_or_html) do
+            <<-HTML
+              <html>
+                <body>
+                  <img src="https://placekitten.com/200/200" />
+                </body>
+              </html>
+            HTML
+          end
+
+          it do
+            _, stream = pdf_reader.pages.first.xobjects.first
+            expect(stream.hash[:Subtype]).to eq :Image
+          end
+        end
+      end
+
       context 'when wait for selector option is specified with options' do
         let(:url_or_html) do
           <<-HTML

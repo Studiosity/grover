@@ -154,6 +154,9 @@ The `wait_for_selector` option can also be used to wait until an element appears
 
 The `wait_for_timeout` option can also be used to wait the specified number of milliseconds have elapsed.
 
+The `raise_on_request_failure` option, when enabled, will raise a `Grover::JavaScript::RequestFailedError`
+if the initial content request or any subsequent asset request returns a bad response or times out.
+
 The Chrome/Chromium executable path can be overridden with the `executable_path` option.
 
 Javascript can be executed on the page (after render and before conversion to PDF/image)
