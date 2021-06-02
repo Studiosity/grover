@@ -508,7 +508,25 @@ describe Grover::Processor do
           it do
             expect do
               convert
-            end.to raise_error Grover::JavaScript::RequestFailedError, %r{net::ERR_NAME_NOT_RESOLVED at http://foo.bar/baz.img}
+            end.to raise_error Grover::JavaScript::RequestFailedError, 'net::ERR_NAME_NOT_RESOLVED at http://foo.bar/baz.img'
+          end
+        end
+
+        context 'when a 404 occurs it raises an error' do
+          let(:url_or_html) do
+            <<-HTML
+              <html>
+                <body>
+                  <img src="https://google.com/404.jpg" />
+                </body>
+              </html>
+            HTML
+          end
+
+          it do
+            expect do
+              convert
+            end.to raise_error Grover::JavaScript::RequestFailedError, '404 https://google.com/404.jpg'
           end
         end
 
