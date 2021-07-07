@@ -162,6 +162,19 @@ The Chrome/Chromium executable path can be overridden with the `executable_path`
 Javascript can be executed on the page (after render and before conversion to PDF/image)
 with the `execute_script` option.
 
+#### Remote Chromium
+
+By default, Grover launches a local Chromium instance. You can connect to a remote/external
+Chromium with the `browser_ws_endpoint` options.
+
+For example, to connect to the <https://browserless.io> service:
+
+```ruby
+options = {"browser_ws_endpoint": "wss://chrome.browserless.io/?token=#{ENV["BROWSERLESS_API_TOKEN"])}"}
+grover = Grover.new("https://mysite.com/path/to/thing", options)
+File.open("grover.png", "wb") { |f| f << grover.to_png }
+```
+
 #### Basic authentication
 For requesting a page with basic authentication, `username` and `password` options can be provided. Note that this
 only really makes sense if you're calling Grover directly (and not via middleware).
