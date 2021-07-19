@@ -626,6 +626,21 @@ describe Grover::Processor do
         let(:date) { Date.today.strftime '%-m/%-d/%Y' }
 
         it { expect(pdf_text_content).to eq "#{date} Hey there http://www.example.net/foo/bar 1/1" }
+
+        context 'when waiting for function takes too long' do
+          let(:options) do
+            basic_header_footer_options.merge(
+              'waitForFunction' => 'document.getElementById("test") !== null',
+              'waitForFunctionOptions' => { "polling": 50, "timeout": 250 }
+            )
+          end
+
+          it 'raises a JavaScript error if waitForFunction fails' do
+            expect do
+              pdf_text_content
+            end.to raise_error Grover::JavaScript::Error
+          end
+        end
       end
 
       # Only test `waitForTimeout` if the Puppeteer supports it
