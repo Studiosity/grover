@@ -497,7 +497,10 @@ describe Grover::Processor do
               <body></body>
 
               <script>
+                var doneProcessing = false
+
                 setTimeout(function() {
+                  doneProcessing = true
                   document.body.innerHTML = '<h1 id="test">Hey there</h1>';
                 }, 100);
               </script>
@@ -506,12 +509,54 @@ describe Grover::Processor do
         end
         let(:options) do
           basic_header_footer_options.merge(
-            'waitForFunction' => 'document.getElementById("test") !== null'
+            'waitForFunction' => 'doneProcessing === true'
           )
         end
         let(:date) { Date.today.strftime '%-m/%-d/%Y' }
 
         it { expect(pdf_text_content).to eq "#{date} Hey there http://www.example.net/foo/bar 1/1" }
+      end
+
+      context 'when wait for function option is specified with options' do
+        let(:url_or_html) do
+          <<-HTML
+            <html>
+              <body></body>
+
+              <script>
+                var doneProcessing = false
+
+                function startProcessing() {
+                  setTimeout(function() {
+                    doneProcessing = true
+                    document.body.innerHTML = '<p>Hello, world!</p>';
+                  }, 500);
+                }
+              </script>
+            </html>
+          HTML
+        end
+        let(:wait_function_timeout) { 1000 }
+        let(:options) do
+          basic_header_footer_options.merge(
+            'executeScript' => 'startProcessing()',
+            'waitForFunction' => 'doneProcessing === true',
+            'waitForFunctionOptions' => { "polling": 50, "timeout": wait_function_timeout }
+          )
+        end
+        let(:date) { Date.today.strftime '%-m/%-d/%Y' }
+
+        it { expect(pdf_text_content).to eq "#{date} Hello, world! http://www.example.net/foo/bar 1/1" }
+
+        context 'when waiting for function takes too long' do
+          let(:wait_function_timeout) { 100 }
+
+          it 'raises a JavaScript error if waitForFunction fails' do
+            expect do
+              pdf_text_content
+            end.to raise_error Grover::JavaScript::TimeoutError, /waiting for function failed/
+          end
+        end
       end
 
       context 'when raise on request failure option is specified' do
@@ -601,46 +646,6 @@ describe Grover::Processor do
         let(:date) { Date.today.strftime '%-m/%-d/%Y' }
 
         it { expect(pdf_text_content).to eq "#{date} http://www.example.net/foo/bar 1/1" }
-      end
-
-      context 'when wait for function option is specified with options' do
-        let(:url_or_html) do
-          <<-HTML
-            <html>
-              <body></body>
-
-              <script>
-                setTimeout(function() {
-                  document.body.innerHTML = '<h1 id="test">Hey there</h1>';
-                }, 500);
-              </script>
-            </html>
-          HTML
-        end
-        let(:options) do
-          basic_header_footer_options.merge(
-            'waitForFunction' => 'document.getElementById("test") !== null',
-            'waitForFunctionOptions' => { "polling": 50, "timeout": 750 }
-          )
-        end
-        let(:date) { Date.today.strftime '%-m/%-d/%Y' }
-
-        it { expect(pdf_text_content).to eq "#{date} Hey there http://www.example.net/foo/bar 1/1" }
-
-        context 'when waiting for function takes too long' do
-          let(:options) do
-            basic_header_footer_options.merge(
-              'waitForFunction' => 'document.getElementById("test") !== null',
-              'waitForFunctionOptions' => { "polling": 50, "timeout": 250 }
-            )
-          end
-
-          it 'raises a JavaScript error if waitForFunction fails' do
-            expect do
-              pdf_text_content
-            end.to raise_error Grover::JavaScript::Error
-          end
-        end
       end
 
       # Only test `waitForTimeout` if the Puppeteer supports it
