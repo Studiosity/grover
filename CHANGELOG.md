@@ -3,6 +3,10 @@
 ## Unreleased
 - none
 
+## [1.0.2](releases/tag/v1.0.2) - 2021-07-21
+### Added
+- [#117](https://github.com/Studiosity/grover/pull/117) Add waitForFunction support ([@rafraser][])
+
 ## [1.0.1](releases/tag/v1.0.1) - 2021-06-02
 ### Added
 - [#112](https://github.com/Studiosity/grover/pull/112) Add flag to fail conversion if source or assets fail to load ([@deanmarano][])
@@ -253,3 +257,4 @@
 [@anamba]: https://github.com/anamba
 [@paresharma]: https://github.com/paresharma
 [@deanmarano]: https://github.com/deanmarano
+[@rafraser]: https://github.com/rafraser
