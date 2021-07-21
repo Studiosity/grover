@@ -152,6 +152,8 @@ For available options see https://github.com/puppeteer/puppeteer/blob/main/docs/
 
 The `wait_for_selector` option can also be used to wait until an element appears on the page. Additional waiting parameters can be set with the `wait_for_selector_options` options hash. For available options, see: https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pagewaitforselectorselector-options.
 
+The `wait_for_function` option can be used to wait until a specific function returns a truthy value. Additional parameters can be set with the `wait_for_function_options` options hash. For available options, see: https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pagewaitforfunctionpagefunction-options-args
+
 The `wait_for_timeout` option can also be used to wait the specified number of milliseconds have elapsed.
 
 The `raise_on_request_failure` option, when enabled, will raise a `Grover::JavaScript::RequestFailedError`
