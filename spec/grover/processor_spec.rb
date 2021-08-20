@@ -13,7 +13,7 @@ describe Grover::Processor do
     let(:date) do
       # New version of Chromium (v93) that comes with v10.2.0 of puppeteer uses a different date format
       date_format = puppeteer_version_on_or_after?('10.2.0') ? '%-m/%-d/%y, %-l:%M %p' : '%-m/%-d/%Y'
-      Date.today.strftime date_format
+      Time.now.strftime date_format
     end
 
     context 'when converting to PDF' do
