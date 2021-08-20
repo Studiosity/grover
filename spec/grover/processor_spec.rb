@@ -10,6 +10,11 @@ describe Grover::Processor do
 
     let(:url_or_html) { 'http://google.com' }
     let(:options) { {} }
+    let(:date) do
+      # New version of Chromium (v93) that comes with v10.2.0 of puppeteer uses a different date format
+      date_format = puppeteer_version_on_or_after?('10.2.0') ? '%-m/%-d/%y, %-l:%M %p' : '%-m/%-d/%Y'
+      Date.today.strftime date_format
+    end
 
     context 'when converting to PDF' do
       let(:method) { :pdf }
@@ -173,7 +178,7 @@ describe Grover::Processor do
         end
       end
 
-      context 'when passing through html' do
+      context 'when passing through HTML' do
         let(:url_or_html) { '<html><body><h1>Hey there</h1></body></html>' }
 
         it { is_expected.to start_with "%PDF-1.4\n" }
@@ -239,10 +244,7 @@ describe Grover::Processor do
         context 'when options include header and footer enabled' do
           let(:options) { basic_header_footer_options.merge('headerTemplate' => "#{large_text}#{default_header}") }
 
-          it do
-            date = Date.today.strftime '%-m/%-d/%Y'
-            expect(pdf_text_content).to eq "#{date} Paaage Hey there http://www.example.net/foo/bar 1/1"
-          end
+          it { expect(pdf_text_content).to eq "#{date} Paaage Hey there http://www.example.net/foo/bar 1/1" }
         end
 
         context 'when options override header template' do
@@ -271,10 +273,7 @@ describe Grover::Processor do
           let(:options) { basic_header_footer_options.merge('footerTemplate' => footer_template) }
           let(:footer_template) { "#{large_text}<div class='text'>great <span class='url'></span> page</div>" }
 
-          it do
-            date = Date.today.strftime '%-m/%-d/%Y'
-            expect(pdf_text_content).to eq "#{date} Paaage Hey there great http://www.example.net/foo/bar page"
-          end
+          it { expect(pdf_text_content).to eq "#{date} Paaage Hey there great http://www.example.net/foo/bar page" }
 
           context 'when template contains quotes' do
             let(:footer_template) { %(<div class='text'>Footer with "quotes" in it</div>) }
@@ -287,7 +286,6 @@ describe Grover::Processor do
           let(:options) { basic_header_footer_options.tap { |hash| hash.delete('displayUrl') } }
 
           it 'uses the default `example.com` for the footer URL' do
-            date = Date.today.strftime '%-m/%-d/%Y'
             expect(pdf_text_content).to eq "#{date} Paaage Hey there http://example.com/ 1/1"
           end
         end
@@ -465,7 +463,6 @@ describe Grover::Processor do
         let(:url_or_html) { '<html><body></body></html>' }
         let(:options) { basic_header_footer_options.merge('executeScript' => script) }
         let(:script) { 'document.getElementsByTagName("body")[0].innerText = "Some evaluated content"' }
-        let(:date) { Date.today.strftime '%-m/%-d/%Y' }
 
         it { expect(pdf_text_content).to eq "#{date} Some evaluated content http://www.example.net/foo/bar 1/1" }
       end
@@ -485,7 +482,6 @@ describe Grover::Processor do
           HTML
         end
         let(:options) { basic_header_footer_options.merge('waitForSelector' => 'h1') }
-        let(:date) { Date.today.strftime '%-m/%-d/%Y' }
 
         it { expect(pdf_text_content).to eq "#{date} Hey there http://www.example.net/foo/bar 1/1" }
       end
@@ -512,7 +508,6 @@ describe Grover::Processor do
             'waitForFunction' => 'doneProcessing === true'
           )
         end
-        let(:date) { Date.today.strftime '%-m/%-d/%Y' }
 
         it { expect(pdf_text_content).to eq "#{date} Hey there http://www.example.net/foo/bar 1/1" }
       end
@@ -544,7 +539,6 @@ describe Grover::Processor do
             'waitForFunctionOptions' => { "polling": 50, "timeout": wait_function_timeout }
           )
         end
-        let(:date) { Date.today.strftime '%-m/%-d/%Y' }
 
         it { expect(pdf_text_content).to eq "#{date} Hello, world! http://www.example.net/foo/bar 1/1" }
 
@@ -561,7 +555,6 @@ describe Grover::Processor do
 
       context 'when raise on request failure option is specified' do
         let(:options) { basic_header_footer_options.merge('raiseOnRequestFailure' => true) }
-        let(:date) { Date.today.strftime '%-m/%-d/%Y' }
 
         context 'when a failure occurs it raises an error' do
           let(:url_or_html) do
@@ -643,7 +636,6 @@ describe Grover::Processor do
             'waitForSelectorOptions' => { 'hidden' => true }
           )
         end
-        let(:date) { Date.today.strftime '%-m/%-d/%Y' }
 
         it { expect(pdf_text_content).to eq "#{date} http://www.example.net/foo/bar 1/1" }
       end
@@ -736,13 +728,34 @@ describe Grover::Processor do
         end
       end
 
-      context 'when passing through html' do
+      context 'when passing through HTML' do
         let(:url_or_html) { '<html><body style="background-color: blue"></body></html>' }
 
         it { expect(convert.unpack('C*')).to start_with "\x89PNG\r\n\x1A\n".unpack('C*') }
         it { expect(image.type).to eq 'PNG' }
         it { expect(image.dimensions).to eq [800, 600] }
         it { expect(mean_colour_statistics(image)).to eq %w[0 0 255] }
+      end
+
+      context 'when HTML requests external assets' do
+        let(:url_or_html) do
+          <<~HTML
+            <html>
+              <head>
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css"
+                      integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We"
+                      crossorigin="anonymous">                
+              </head>
+              <body class="bg-dark"></body>
+            </html>
+          HTML
+        end
+
+        it { expect(convert.unpack('C*')).to start_with "\x89PNG\r\n\x1A\n".unpack('C*') }
+        it { expect(image.type).to eq 'PNG' }
+        it { expect(image.dimensions).to eq [800, 600] }
+        # If the remote asset hasn't loaded this would just be white. i.e ["255", "255", "255"]
+        it { expect(mean_colour_statistics(image)).to eq %w[33 37 41] }
       end
 
       context 'when passing through clip options to Grover' do
