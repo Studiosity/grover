@@ -1,24 +1,28 @@
 env:
   global:
     - CC_TEST_REPORTER_ID=5cfed40102c670b5c9e509730782b751939ddbe53fc57c317b718f635bab1ce8
+  jobs:
+    - PUPPETEER_VERSION=1.20.0
+    - PUPPETEER_VERSION=2.1.1
+    - PUPPETEER_VERSION=3.3.0
+    - PUPPETEER_VERSION=4.0.1
+    - PUPPETEER_VERSION=5.5.0
+    - PUPPETEER_VERSION=6.0.0
+    - PUPPETEER_VERSION=7.1.0
+    - PUPPETEER_VERSION=8.0.0
+    - PUPPETEER_VERSION=9.1.1
+    - PUPPETEER_VERSION=10.2.0
+
+rvm: 3.0
 
 jobs:
   include:
     - rvm: 2.5
+      env: PUPPETEER_VERSION=10.2.0
     - rvm: 2.6
+      env: PUPPETEER_VERSION=10.2.0
     - rvm: 2.7
-    - rvm: 3.0
-      env:
-        - PUPPETEER_VERSION=1.20.0
-        - PUPPETEER_VERSION=2.1.1
-        - PUPPETEER_VERSION=3.3.0
-        - PUPPETEER_VERSION=4.0.1
-        - PUPPETEER_VERSION=5.5.0
-        - PUPPETEER_VERSION=6.0.0
-        - PUPPETEER_VERSION=7.1.0
-        - PUPPETEER_VERSION=8.0.0
-        - PUPPETEER_VERSION=9.1.1
-        - PUPPETEER_VERSION=10.2.0
+      env: PUPPETEER_VERSION=10.2.0
 
 language: ruby
 
