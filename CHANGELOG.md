@@ -3,6 +3,10 @@
 ## Unreleased
 - none
 
+## [1.0.3](releases/tag/v1.0.3) - 2021-08-22
+### Fixed
+- [#1122](https://github.com/Studiosity/grover/pull/122) Fix external asset request interception with Puppeteer v10.2.0 ([@mkalygin][])
+
 ## [1.0.2](releases/tag/v1.0.2) - 2021-07-21
 ### Added
 - [#117](https://github.com/Studiosity/grover/pull/117) Add waitForFunction support ([@rafraser][])
@@ -258,3 +262,4 @@
 [@paresharma]: https://github.com/paresharma
 [@deanmarano]: https://github.com/deanmarano
 [@rafraser]: https://github.com/rafraser
+[@mkalygin]: https://github.com/mkalygin
