@@ -592,6 +592,22 @@ describe Grover::Processor do
           end
         end
 
+        context 'when a 304 occurs it does not raise an error' do
+          let(:url_or_html) do
+            <<-HTML
+              <html>
+                <body>
+                  <img src="https://httpstat.us/304" />
+                </body>
+              </html>
+            HTML
+          end
+
+          it do
+            convert
+          end
+        end
+
         context 'when assets have redirects PDFs are generated successfully' do
           it { expect(pdf_text_content).to match "#{date} Google" }
         end
