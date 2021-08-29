@@ -825,6 +825,19 @@ describe Grover::Processor do
         end
       end
 
+      # Only test `emulateVisionDeficiency` if the Puppeteer supports it
+      if puppeteer_version_on_or_after? '3.2.0'
+        context 'when vision deficiency is set to `deuteranopia`' do
+          let(:url_or_html) { '<html><body style="background-color: red"></body></html>' }
+          let(:options) { { 'visionDeficiency' => 'deuteranopia' } }
+
+          it { expect(convert.unpack('C*')).to start_with "\x89PNG\r\n\x1A\n".unpack('C*') }
+          it { expect(image.type).to eq 'PNG' }
+          it { expect(image.dimensions).to eq [800, 600] }
+          it { expect(mean_colour_statistics(image)).to eq %w[94 71 0] }
+        end
+      end
+
       context 'when specifying type of `png`' do
         let(:url_or_html) { '<html><body style="background-color: green"></body></html>' }
         let(:options) { { type: 'png' } }
