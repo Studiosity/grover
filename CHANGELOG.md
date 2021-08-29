@@ -3,6 +3,10 @@
 ## Unreleased
 - none
 
+## [1.0.5](releases/tag/v1.0.5) - 2021-08-30
+### Fixed
+- [#128](https://github.com/Studiosity/grover/pull/128) Fix error in processor.js when using the vision_deficiency option ([@julianwegkamp][])
+
 ## [1.0.4](releases/tag/v1.0.4) - 2021-08-27
 ### Fixed
 - [#126](https://github.com/Studiosity/grover/pull/126) Do not consider http 304 a request failure ([@lucasluitjes][])
@@ -268,3 +272,4 @@
 [@rafraser]: https://github.com/rafraser
 [@mkalygin]: https://github.com/mkalygin
 [@lucasluitjes]: https://github.com/lucasluitjes
+[@julianwegkamp]: https://github.com/julianwegkamp
