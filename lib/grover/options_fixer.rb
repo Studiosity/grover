@@ -34,13 +34,13 @@ class Grover
     def fix_boolean_options!
       fix_options!(
         'display_header_footer', 'full_page', 'landscape', 'omit_background', 'prefer_css_page_size',
-        'print_background', 'viewport.has_touch', 'viewport.is_landscape', 'viewport.is_mobile'
+        'print_background', 'viewport.has_touch', 'viewport.is_landscape', 'viewport.is_mobile', 'bypass_csp'
       ) { |value| !FALSE_VALUES.include?(value) }
     end
 
     def fix_integer_options!
       fix_options!(
-        'viewport.height', 'viewport.width',
+        'viewport.height', 'viewport.width', 'wait_for_timeout',
         &:to_i
       )
     end
@@ -48,6 +48,7 @@ class Grover
     def fix_float_options!
       fix_options!(
         'clip.height', 'clip.width', 'clip.x', 'clip.y', 'quality', 'scale', 'viewport.device_scale_factor',
+        'geolocation.latitude', 'geolocation.longitude',
         &:to_f
       )
     end

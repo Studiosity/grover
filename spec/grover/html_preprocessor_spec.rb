@@ -9,13 +9,13 @@ describe Grover::HTMLPreprocessor do
     let(:root_url) { 'http://example.com/' }
     let(:protocol) { 'http' }
 
-    context 'when html is empty' do
+    context 'when HTML is empty' do
       let(:html) { '' }
 
       it { is_expected.to eq '' }
     end
 
-    context 'when html doesnt have any relative URLs' do
+    context 'when HTML doesnt have any relative URLs' do
       let(:html) { '<html><body>Some Content</body></html>' }
 
       it { is_expected.to eq html }

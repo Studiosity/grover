@@ -33,8 +33,8 @@ class Grover
   #   see https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagepdfoptions
   #
   def initialize(url, options = {})
-    @url = url
-    @options = OptionsBuilder.new(options, url)
+    @url = url.to_s
+    @options = OptionsBuilder.new(options, @url)
     @root_path = @options.delete 'root_path'
     @front_cover_path = @options.delete 'front_cover_path'
     @back_cover_path = @options.delete 'back_cover_path'
@@ -48,6 +48,15 @@ class Grover
   #
   def to_pdf(path = nil)
     processor.convert :pdf, @url, normalized_options(path: path)
+  end
+
+  #
+  # Request URL with provided options and render HTML
+  #
+  # @return [String] The resulting HTML string
+  #
+  def to_html
+    processor.convert :content, @url, normalized_options(path: nil)
   end
 
   #
@@ -135,7 +144,7 @@ class Grover
   end
 
   def normalized_options(path:)
-    normalized_options = Utils.normalize_object @options
+    normalized_options = Utils.normalize_object @options, excluding: ['extraHTTPHeaders']
     normalized_options['path'] = path if path.is_a? ::String
     normalized_options
   end

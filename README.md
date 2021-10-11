@@ -1,4 +1,4 @@
-[![Travis Build Status](https://img.shields.io/travis/Studiosity/grover/master.svg?style=flat)](https://travis-ci.org/Studiosity/grover)
+[![Travis Build Status](https://travis-ci.org/Studiosity/grover.svg?branch=main)](https://travis-ci.org/Studiosity/grover)
 [![Maintainability](https://api.codeclimate.com/v1/badges/37609653789bcf2c8d94/maintainability)](https://codeclimate.com/github/Studiosity/grover/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/37609653789bcf2c8d94/test_coverage)](https://codeclimate.com/github/Studiosity/grover/test_coverage)
 [![Gem Version](https://badge.fury.io/rb/grover.svg)](https://badge.fury.io/rb/grover)
@@ -34,7 +34,10 @@ pdf = grover.to_pdf
 
 # Get a screenshot
 png = grover.to_png
-jpeg = grover.to_jpeg 
+jpeg = grover.to_jpeg
+
+# Get the HTML content (including DOCTYPE)
+html = grover.to_html
 
 # Options can be provided through meta tags
 Grover.new('<html><head><meta name="grover-page_ranges" content="1-3"')
@@ -95,12 +98,21 @@ Grover.configure do |config|
       top: '5px',
       bottom: '10cm'
     },
+    user_agent: 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0',
     viewport: {
       width: 640,
       height: 480
     },
     prefer_css_page_size: true,
     emulate_media: 'screen',
+    bypass_csp: true,
+    media_features: [{ name: 'prefers-color-scheme', value: 'dark' }],
+    timezone: 'Australia/Sydney',
+    vision_deficiency: 'deuteranopia',
+    extraHTTPHeaders: { 'Accept-Language': 'en-US' },
+    geolocation: { latitude: 59.95, longitude: 30.31667 },
+    focus: '#some-element',
+    hover: '#another-element',
     cache: false,
     timeout: 0, # Timeout in ms. A value of `0` means 'no timeout'
     launch_args: ['--font-render-hinting=medium'],
@@ -119,6 +131,18 @@ For `viewport` options, see https://github.com/puppeteer/puppeteer/blob/main/doc
 For `launch_args` options, see http://peter.sh/experiments/chromium-command-line-switches/
 Launch parameter args can also be provided using a meta tag:
 
+For `timezone` IDs see [ICUs metaZones.txt](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1).
+Passing `nil` disables timezone emulation.
+
+The `vision_deficiency` option can be passed one of `achromatopsia`, `deuteranopia`, `protanopia`, `tritanopia`,
+`blurredVision` or `none`.
+
+The `focus` option takes a CSS selector and will focus on the first matching element after rendering is complete
+(including waiting for the specified `wait_for_selector`).
+
+The `hover` option takes a CSS selector and will hover on the first matching element after rendering is complete
+(including waiting for the specified `wait_for_selector`).
+
 ```html
 <meta name="grover-launch_args" content="['--disable-speech-api']" />
 ```
@@ -127,6 +151,13 @@ For `wait_until` option, default for URLs is `networkidle2` and for HTML content
 For available options see https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pagegotourl-options
 
 The `wait_for_selector` option can also be used to wait until an element appears on the page. Additional waiting parameters can be set with the `wait_for_selector_options` options hash. For available options, see: https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pagewaitforselectorselector-options.
+
+The `wait_for_function` option can be used to wait until a specific function returns a truthy value. Additional parameters can be set with the `wait_for_function_options` options hash. For available options, see: https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pagewaitforfunctionpagefunction-options-args
+
+The `wait_for_timeout` option can also be used to wait the specified number of milliseconds have elapsed.
+
+The `raise_on_request_failure` option, when enabled, will raise a `Grover::JavaScript::RequestFailedError`
+if the initial content request or any subsequent asset request returns a bad response or times out.
 
 The Chrome/Chromium executable path can be overridden with the `executable_path` option.
 
@@ -144,7 +175,7 @@ Grover.new('<some URI with basic authentication', username: 'the username', pass
 #### Adding cookies
 To set request cookies when requesting a URL, pass an array of hashes as such
 _N.B._ Only the `name` and `value` properties are required.
-See [page.setCookies](https://github.com/puppeteer/puppeteer/blob/master/docs/api.md#pagesetcookiecookies) documentation for more details.
+See [page.setCookies](https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pagesetcookiecookies) documentation for more details.
 
 ```ruby
 myCookies = [
@@ -169,6 +200,32 @@ And give that array to Grover:
 
 ```ruby
 Grover.new('<some URI with cookies', cookies: header_cookies).to_pdf
+```
+
+#### Adding style tags
+To add style tags, pass an array of style tag options as such
+See [page.addStyleTag](https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pageaddstyletagoptions) documentation for more details.
+
+```ruby
+style_tag_options = [
+  { url: 'http://example.com/style.css' },
+  { path: 'style.css' },
+  { content: '.body{background: red}' }
+]
+Grover.new('<html><body><h1>Heading</h1></body></html>', style_tag_options: style_tag_options).to_pdf
+```
+
+#### Adding script tags
+To add script tags, pass an array of script tag options as such
+See [page.addScriptTag](https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pageaddscripttagoptions) documentation for more details.
+
+```ruby
+script_tag_options = [
+  { url: 'http://example.com/script.js' },
+  { path: 'script.js' },
+  { content: 'document.querySelector("h1").style.display = "none"' }
+]
+Grover.new('<html><body><h1>Heading</h1></body></html>', script_tag_options: script_tag_options).to_pdf
 ```
 
 
@@ -222,6 +279,25 @@ Grover.configure do |config|
   config.use_png_middleware = true
   config.use_jpeg_middleware = true
   config.use_pdf_middleware = false
+end
+```
+
+### root_url
+The `root_url` option can be specified either when configuring the middleware or as a global option. This is needed
+when running the Grover middleware behind a URL rewriting proxy or within a containerised system.
+
+As a middleware option:
+```ruby
+# in application.rb
+require 'grover'
+config.middleware.use Grover::Middleware, root_url: 'https://my.external.domain'
+```
+
+or as a global option:
+```ruby
+# config/initializers/grover.rb
+Grover.configure do |config|
+  config.root_url = 'https://my.external.domain'
 end
 ```
 
@@ -292,7 +368,7 @@ Or via the meta tags in the original response:
 ### Direct execution
 
 To add a cover page using direct execution, you can make multiple calls and combine the results using the
-`combine_pdfs` gem.
+`combine_pdf` gem.
 
 ```rb
 require 'combine_pdf'

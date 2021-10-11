@@ -12,7 +12,10 @@ describe Grover::Middleware do
 
   let(:downstream) do
     lambda do |env|
-      @env = env
+      # take a reference to the original env so we can test the final state
+      @response_env = env
+      # take a copy of the env so we can test the downstream (current) state
+      @request_env = env.deep_dup
       response_size = 0
       response.each { |part| response_size += part.length }
       [200, headers.merge('Content-Length' => response_size.to_s), response]
@@ -29,9 +32,7 @@ describe Grover::Middleware do
   end
   let(:response) { ['Grover McGroveryface'] }
 
-  def request_env
-    @env # rubocop:disable RSpec/InstanceVariable
-  end
+  attr_reader :request_env, :response_env
 
   describe '#call' do
     describe 'response content type' do
@@ -122,11 +123,32 @@ describe Grover::Middleware do
 
     describe 'rack environment' do
       context 'when requesting a PDF' do
-        it 'removes PDF extension from PATH_INFO and REQUEST_URI' do
+        it 'removes PDF extension from request PATH_INFO and REQUEST_URI' do
           get 'http://www.example.org/test.pdf'
+          # env state sent to downstream middleware
           expect(request_env['PATH_INFO']).to eq '/test'
-          expect(request_env['REQUEST_URI']).to eq '/test'
+          expect(request_env['REQUEST_URI']).to eq 'http://www.example.org/test'
           expect(request_env['Rack-Middleware-Grover']).to eq 'true'
+
+          # env state bubbling back up
+          expect(response_env['PATH_INFO']).to eq '/test.pdf'
+          expect(response_env['REQUEST_URI']).to eq 'http://www.example.org/test.pdf'
+          expect(response_env['Rack-Middleware-Grover']).to eq 'true'
+        end
+
+        context 'when request has inline parameters' do
+          it 'includes the parameters in the request URI' do
+            get 'http://www.example.org/test.pdf?def=123&abc=456'
+            # env state sent to downstream middleware
+            expect(request_env['PATH_INFO']).to eq '/test'
+            expect(request_env['REQUEST_URI']).to eq 'http://www.example.org/test?def=123&abc=456'
+            expect(request_env['Rack-Middleware-Grover']).to eq 'true'
+
+            # env state bubbling back up
+            expect(response_env['PATH_INFO']).to eq '/test.pdf'
+            expect(response_env['REQUEST_URI']).to eq 'http://www.example.org/test.pdf?def=123&abc=456'
+            expect(response_env['Rack-Middleware-Grover']).to eq 'true'
+          end
         end
 
         context 'when app configuration has PDF middleware disabled' do
@@ -134,9 +156,15 @@ describe Grover::Middleware do
 
           it 'doesnt assign path environment variables' do
             get 'http://www.example.org/test.pdf'
+            # env state sent to downstream middleware
             expect(request_env['PATH_INFO']).to eq '/test.pdf'
             expect(request_env).not_to have_key 'REQUEST_URI'
             expect(request_env).not_to have_key 'Rack-Middleware-Grover'
+
+            # env state bubbling back up
+            expect(response_env['PATH_INFO']).to eq '/test.pdf'
+            expect(response_env).not_to have_key 'REQUEST_URI'
+            expect(response_env).not_to have_key 'Rack-Middleware-Grover'
           end
         end
       end
@@ -144,19 +172,31 @@ describe Grover::Middleware do
       context 'when requesting a PNG' do
         it 'doesnt assign path environment variables' do
           get 'http://www.example.org/test.png'
+          # env state sent to downstream middleware
           expect(request_env['PATH_INFO']).to eq '/test.png'
           expect(request_env).not_to have_key 'REQUEST_URI'
           expect(request_env).not_to have_key 'Rack-Middleware-Grover'
+
+          # env state bubbling back up
+          expect(response_env['PATH_INFO']).to eq '/test.png'
+          expect(response_env).not_to have_key 'REQUEST_URI'
+          expect(response_env).not_to have_key 'Rack-Middleware-Grover'
         end
 
         context 'when app configuration has PNG middleware enabled' do
           before { allow(Grover.configuration).to receive(:use_png_middleware).and_return true }
 
-          it 'removes PNG extension from PATH_INFO and REQUEST_URI' do
+          it 'removes PNG extension from request PATH_INFO and REQUEST_URI' do
             get 'http://www.example.org/test.png'
+            # env state sent to downstream middleware
             expect(request_env['PATH_INFO']).to eq '/test'
-            expect(request_env['REQUEST_URI']).to eq '/test'
+            expect(request_env['REQUEST_URI']).to eq 'http://www.example.org/test'
             expect(request_env['Rack-Middleware-Grover']).to eq 'true'
+
+            # env state bubbling back up
+            expect(response_env['PATH_INFO']).to eq '/test.png'
+            expect(response_env['REQUEST_URI']).to eq 'http://www.example.org/test.png'
+            expect(response_env['Rack-Middleware-Grover']).to eq 'true'
           end
         end
       end
@@ -164,33 +204,57 @@ describe Grover::Middleware do
       context 'when requesting a JPEG' do
         it 'doesnt assign path environment variables for JPEG' do
           get 'http://www.example.org/test.jpeg'
+          # env state sent to downstream middleware
           expect(request_env['PATH_INFO']).to eq '/test.jpeg'
           expect(request_env).not_to have_key 'REQUEST_URI'
           expect(request_env).not_to have_key 'Rack-Middleware-Grover'
+
+          # env state bubbling back up
+          expect(response_env['PATH_INFO']).to eq '/test.jpeg'
+          expect(response_env).not_to have_key 'REQUEST_URI'
+          expect(response_env).not_to have_key 'Rack-Middleware-Grover'
         end
 
         it 'doesnt assign path environment variables for JPG' do
           get 'http://www.example.org/test.jpg'
+          # env state sent to downstream middleware
           expect(request_env['PATH_INFO']).to eq '/test.jpg'
           expect(request_env).not_to have_key 'REQUEST_URI'
           expect(request_env).not_to have_key 'Rack-Middleware-Grover'
+
+          # env state bubbling back up
+          expect(response_env['PATH_INFO']).to eq '/test.jpg'
+          expect(response_env).not_to have_key 'REQUEST_URI'
+          expect(response_env).not_to have_key 'Rack-Middleware-Grover'
         end
 
         context 'when app configuration has JPEG middleware enabled' do
           before { allow(Grover.configuration).to receive(:use_jpeg_middleware).and_return true }
 
-          it 'removes JPEG extension from PATH_INFO and REQUEST_URI' do
+          it 'removes JPEG extension from request PATH_INFO and REQUEST_URI' do
             get 'http://www.example.org/test.jpeg'
+            # env state sent to downstream middleware
             expect(request_env['PATH_INFO']).to eq '/test'
-            expect(request_env['REQUEST_URI']).to eq '/test'
+            expect(request_env['REQUEST_URI']).to eq 'http://www.example.org/test'
             expect(request_env['Rack-Middleware-Grover']).to eq 'true'
+
+            # env state bubbling back up
+            expect(response_env['PATH_INFO']).to eq '/test.jpeg'
+            expect(response_env['REQUEST_URI']).to eq 'http://www.example.org/test.jpeg'
+            expect(response_env['Rack-Middleware-Grover']).to eq 'true'
           end
 
-          it 'removes JPG extension from PATH_INFO and REQUEST_URI' do
+          it 'removes JPG extension from request PATH_INFO and REQUEST_URI' do
             get 'http://www.example.org/test.jpg'
+            # env state sent to downstream middleware
             expect(request_env['PATH_INFO']).to eq '/test'
-            expect(request_env['REQUEST_URI']).to eq '/test'
+            expect(request_env['REQUEST_URI']).to eq 'http://www.example.org/test'
             expect(request_env['Rack-Middleware-Grover']).to eq 'true'
+
+            # env state bubbling back up
+            expect(response_env['PATH_INFO']).to eq '/test.jpg'
+            expect(response_env['REQUEST_URI']).to eq 'http://www.example.org/test.jpg'
+            expect(response_env['Rack-Middleware-Grover']).to eq 'true'
           end
         end
       end
@@ -198,9 +262,15 @@ describe Grover::Middleware do
       context 'when not requesting a PDF/PNG or JPEG' do
         it 'keeps the original PATH_INFO and not change to REQUEST_URI' do
           get 'http://www.example.org/test.html'
+          # env state sent to downstream middleware
           expect(request_env['PATH_INFO']).to eq '/test.html'
-          expect(request_env['REQUEST_URI']).to be_nil
-          expect(request_env['Rack-Middleware-Grover']).to be_nil
+          expect(request_env).not_to have_key 'REQUEST_URI'
+          expect(request_env).not_to have_key 'Rack-Middleware-Grover'
+
+          # env state bubbling back up
+          expect(response_env['PATH_INFO']).to eq '/test.html'
+          expect(response_env).not_to have_key 'REQUEST_URI'
+          expect(response_env).not_to have_key 'Rack-Middleware-Grover'
         end
       end
     end
@@ -353,13 +423,83 @@ describe Grover::Middleware do
 
     describe 'preprocessor' do
       it 'calls to the HTML preprocessor with the original HTML' do
-        expect(Grover::HTMLPreprocessor).to(
+        allow(Grover::HTMLPreprocessor).to(
           receive(:process).
             with('Grover McGroveryface', 'http://www.example.org/', 'http').
             and_return('Processed McProcessyface')
         )
+        expect(Grover::HTMLPreprocessor).to(
+          receive(:process).
+            with('Grover McGroveryface', 'http://www.example.org/', 'http')
+        )
         get 'http://www.example.org/test.pdf'
         expect(last_response.body.bytesize).to eq Grover.new('Processed McProcessyface').to_pdf.bytesize
+      end
+
+      context 'with root_url specified as an argument' do
+        subject(:mock_app) do
+          builder = Rack::Builder.new
+          builder.use described_class, root_url: 'http://example.com/'
+          builder.run downstream
+          builder.to_app
+        end
+
+        it 'calls to the HTML preprocessor with the original HTML and the specified root_url' do
+          allow(Grover::HTMLPreprocessor).to(
+            receive(:process).
+              with('Grover McGroveryface', 'http://example.com/', 'http').
+              and_return('Processed McProcessyface')
+          )
+          expect(Grover::HTMLPreprocessor).to(
+            receive(:process).
+              with('Grover McGroveryface', 'http://example.com/', 'http')
+          )
+          get 'http://www.example.org/test.pdf'
+          expect(last_response.body.bytesize).to eq Grover.new('Processed McProcessyface').to_pdf.bytesize
+        end
+      end
+
+      context 'when the response contains relative paths' do
+        let(:response) { ['src="/asdf"'] }
+
+        context 'with root_url specified via middleware args' do
+          subject(:mock_app) do
+            builder = Rack::Builder.new
+            builder.use described_class, root_url: 'http://example.com/'
+            builder.run downstream
+            builder.to_app
+          end
+
+          it 'uses the specified root_url' do
+            get 'http://www.example.org/test.pdf'
+            expect(last_response.body.bytesize).to eq Grover.new('src="http://example.com/asdf"').to_pdf.bytesize
+          end
+
+          context 'when the root_url is also set in configuration' do
+            before { allow(Grover.configuration).to receive(:root_url).and_return 'http://other.domain/' }
+
+            it 'uses the specified root_url in the middleware initializer' do
+              get 'http://www.example.org/test.pdf'
+              expect(last_response.body.bytesize).to eq Grover.new('src="http://example.com/asdf"').to_pdf.bytesize
+            end
+          end
+        end
+
+        context 'with root_url set in configuration' do
+          before { allow(Grover.configuration).to receive(:root_url).and_return 'http://example.com/' }
+
+          it 'uses the specified root_url' do
+            get 'http://www.example.org/test.pdf'
+            expect(last_response.body.bytesize).to eq Grover.new('src="http://example.com/asdf"').to_pdf.bytesize
+          end
+        end
+
+        context 'without root_url specified' do
+          it 'uses the detected root_url (request url)' do
+            get 'http://www.example.org/test.pdf'
+            expect(last_response.body.bytesize).to eq Grover.new('src="http://www.example.org/asdf"').to_pdf.bytesize
+          end
+        end
       end
     end
 
@@ -367,25 +507,32 @@ describe Grover::Middleware do
       let(:grover) { instance_double Grover, show_front_cover?: false, show_back_cover?: false }
 
       it 'passes through the request URL (sans extension) to Grover' do
-        expect(Grover).to(
+        allow(Grover).to(
           receive(:new).
             with('Grover McGroveryface', display_url: 'http://www.example.org/test').
             and_return(grover)
         )
-        expect(grover).to receive(:to_pdf).with(no_args).and_return 'A converted PDF'
+        allow(grover).to receive(:to_pdf).with(no_args).and_return 'A converted PDF'
+        expect(Grover).to receive(:new).with('Grover McGroveryface', display_url: 'http://www.example.org/test')
+        expect(grover).to receive(:to_pdf).with(no_args)
         get 'http://www.example.org/test.pdf'
         expect(last_response.body).to eq 'A converted PDF'
       end
 
       { 'key' => 'value', 'escaped' => '%26%3D%3D' }.each do |k, v|
         it 'passes cookies to Grover' do
-          expect(Grover).to receive(:new).with(
+          allow(Grover).to receive(:new).with(
             'Grover McGroveryface',
             display_url: 'http://www.example.org/test',
             cookies: [{ domain: 'www.example.org', name: k, value: v }]
           ).and_return(grover)
-
-          expect(grover).to receive(:to_pdf).with(no_args).and_return 'A converted PDF'
+          allow(grover).to receive(:to_pdf).with(no_args).and_return 'A converted PDF'
+          expect(Grover).to receive(:new).with(
+            'Grover McGroveryface',
+            display_url: 'http://www.example.org/test',
+            cookies: [{ domain: 'www.example.org', name: k, value: v }]
+          )
+          expect(grover).to receive(:to_pdf).with(no_args)
           get 'http://www.example.org/test.pdf', nil, 'HTTP_COOKIE' => "#{k}=#{v}"
           expect(last_response.body).to eq 'A converted PDF'
         end
@@ -415,12 +562,14 @@ describe Grover::Middleware do
         before { allow(Grover.configuration).to receive(:use_png_middleware).and_return true }
 
         it 'passes through the request URL (sans extension) to Grover' do
-          expect(Grover).to(
+          allow(Grover).to(
             receive(:new).
               with('Grover McGroveryface', display_url: 'http://www.example.org/test').
               and_return(grover)
           )
-          expect(grover).to receive(:to_png).with(no_args).and_return 'A converted PNG'
+          allow(grover).to receive(:to_png).with(no_args).and_return 'A converted PNG'
+          expect(Grover).to receive(:new).with('Grover McGroveryface', display_url: 'http://www.example.org/test')
+          expect(grover).to receive(:to_png).with(no_args)
           get 'http://www.example.org/test.png'
           expect(last_response.body).to eq 'A converted PNG'
         end
@@ -440,12 +589,14 @@ describe Grover::Middleware do
         before { allow(Grover.configuration).to receive(:use_jpeg_middleware).and_return true }
 
         it 'passes through the request URL (sans extension) to Grover' do
-          expect(Grover).to(
+          allow(Grover).to(
             receive(:new).
               with('Grover McGroveryface', display_url: 'http://www.example.org/test').
               and_return(grover)
           )
-          expect(grover).to receive(:to_jpeg).with(no_args).and_return 'A converted JPEG'
+          allow(grover).to receive(:to_jpeg).with(no_args).and_return 'A converted JPEG'
+          expect(Grover).to receive(:new).with('Grover McGroveryface', display_url: 'http://www.example.org/test')
+          expect(grover).to receive(:to_jpeg).with(no_args)
           get 'http://www.example.org/test.jpeg'
           expect(last_response.body).to eq 'A converted JPEG'
         end

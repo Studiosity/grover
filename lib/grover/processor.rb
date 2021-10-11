@@ -19,6 +19,7 @@ class Grover
       ensure_packages_are_initiated
       result = call_js_method method, url_or_html, options
       return unless result
+      return result if result.is_a?(String)
 
       result['data'].pack('C*')
     ensure
@@ -76,7 +77,7 @@ class Grover
       @package_json ||= JSON.parse(File.read(package_json_path))
     end
 
-    def call_js_method(method, url_or_html, options) # rubocop:disable Metrics/MethodLength
+    def call_js_method(method, url_or_html, options) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
       stdin.puts JSON.dump([method, url_or_html, options])
       input = stdout.gets
       raise Errno::EPIPE, "Can't read from worker" if input.nil?
@@ -90,6 +91,8 @@ class Grover
       else
         raise Grover::JavaScript.const_get(error_class, false), message
       end
+    rescue JSON::ParserError
+      raise Grover::Error, 'Malformed worker response'
     rescue Errno::EPIPE, IOError
       raise Grover::Error, "Worker process failed:\n#{stderr.read}"
     end
