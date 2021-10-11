@@ -334,12 +334,12 @@ the response. It should be set with a `Proc` which accepts the request (Rack::Re
 # config/initializers/grover.rb
 Grover.configure do |config|
   # assigning a Proc
-  config.ignore_path = ->(req) do
+  config.ignore_request = ->(req) do
     req.host == 'www.example.com'
   end
   # matches `www.example.com/foo/bar/123.png`
 
-  config.ignore_path = ->(req) do
+  config.ignore_request = ->(req) do
     req.headers.has_header?('X-BLOCK')
   end
   # matches `HTTP Header X-BLOCK`
