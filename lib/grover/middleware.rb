@@ -56,16 +56,23 @@ class Grover
     end
 
     def grover_request?
-      (pdf_request || png_request || jpeg_request) && !ignore_request?
+      (pdf_request || png_request || jpeg_request) && !ignore_path? && !ignore_request?
     end
 
-    def ignore_request?
+    def ignore_path?
       ignore_path = Grover.configuration.ignore_path
       case ignore_path
       when String then @request.path.start_with? ignore_path
       when Regexp then !ignore_path.match(@request.path).nil?
       when Proc then ignore_path.call @request.path
       end
+    end
+
+    def ignore_request?
+      ignore_request = Grover.configuration.ignore_request
+      return unless ignore_request.is_a?(Proc)
+
+      ignore_request.call @request
     end
 
     def html_content?(headers)
