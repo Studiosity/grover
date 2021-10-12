@@ -872,10 +872,10 @@ describe Grover::Middleware do
             response = get 'http://www.example.org/foobazbar.pdf'
             expect(response.content_type).to eq 'text/html'
 
-            response = get 'http://www.therealexample.org/foobarbar'
+            response = get 'http://www.therealexample.org/foobazbar'
             expect(response.content_type).to eq 'text/html'
 
-            response = get 'http://www.therealexample.org/foobarbar.pdf'
+            response = get 'http://www.therealexample.org/foobazbar.pdf'
             expect(response.content_type).to eq 'application/pdf'
           end
         end
@@ -887,13 +887,13 @@ describe Grover::Middleware do
             response = get 'http://www.example.org/foobazbar', {}, { 'X-BLOCK' => '1' }
             expect(response.content_type).to eq 'text/html'
 
-            response = get 'http://www.example.org/foobarbar.pdf', {}, { 'X-BLOCK' => '1' }
+            response = get 'http://www.example.org/foobazbar.pdf', {}, { 'X-BLOCK' => '1' }
             expect(response.content_type).to eq 'text/html'
 
             response = get 'http://www.therealexample.org/foobazbar'
             expect(response.content_type).to eq 'text/html'
 
-            response = get 'http://www.therealexample.org/foobarbar.pdf'
+            response = get 'http://www.therealexample.org/foobazbar.pdf'
             expect(response.content_type).to eq 'application/pdf'
           end
         end
