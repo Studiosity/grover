@@ -860,6 +860,46 @@ describe Grover::Middleware do
       end
     end
 
+    describe '#ignore_request?' do
+      context 'when app configuration has a Proc for ignore_request' do
+        context 'with a hostname' do
+          before { allow(Grover.configuration).to receive(:ignore_request).and_return(->(req) { req.host == 'www.example.org' }) }
+
+          it 'request is ignored when the request passed to the proc defined in ignore_request returns true' do
+            response = get 'http://www.example.org/foobazbar'
+            expect(response.content_type).to eq 'text/html'
+
+            response = get 'http://www.example.org/foobazbar.pdf'
+            expect(response.content_type).to eq 'text/html'
+
+            response = get 'http://www.therealexample.org/foobazbar'
+            expect(response.content_type).to eq 'text/html'
+
+            response = get 'http://www.therealexample.org/foobazbar.pdf'
+            expect(response.content_type).to eq 'application/pdf'
+          end
+        end
+
+        context 'with a custom header' do
+          before { allow(Grover.configuration).to receive(:ignore_request).and_return(->(req) { req.has_header?('X-BLOCK') }) }
+
+          it 'request is ignored when the request passed to the proc defined in ignore_request returns true' do
+            response = get 'http://www.example.org/foobazbar', {}, { 'X-BLOCK' => '1' }
+            expect(response.content_type).to eq 'text/html'
+
+            response = get 'http://www.example.org/foobazbar.pdf', {}, { 'X-BLOCK' => '1' }
+            expect(response.content_type).to eq 'text/html'
+
+            response = get 'http://www.therealexample.org/foobazbar'
+            expect(response.content_type).to eq 'text/html'
+
+            response = get 'http://www.therealexample.org/foobazbar.pdf'
+            expect(response.content_type).to eq 'application/pdf'
+          end
+        end
+      end
+    end
+
     context 'with a downstream app that can respond to different paths' do
       let(:downstream) do
         lambda do |env|

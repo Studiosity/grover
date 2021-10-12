@@ -116,7 +116,7 @@ Grover.configure do |config|
     cache: false,
     timeout: 0, # Timeout in ms. A value of `0` means 'no timeout'
     launch_args: ['--font-render-hinting=medium'],
-    wait_until: 'domcontentloaded' 
+    wait_until: 'domcontentloaded'
   }
 end
 ```
@@ -270,8 +270,9 @@ N.B. by default PNG and JPEG are not modified in the middleware to prevent break
 To enable them, there are configuration options for each image type as well as an option to disable the PDF middleware
 (on by default).
 
-If either of the image handling middleware options are enabled, the [ignore_path](#ignore_path) should also
-be configured, otherwise assets are likely to be handled which would likely result in 404 responses.  
+If either of the image handling middleware options are enabled, the [ignore_path](#ignore_path) and/or
+[ignore_request](#ignore_request) should also be configured, otherwise assets are likely to be handled
+which would likely result in 404 responses.  
 
 ```ruby
 # config/initializers/grover.rb
@@ -317,13 +318,33 @@ Grover.configure do |config|
 
   # assigning a Regexp
   config.ignore_path = /my\/path/
-  # matches `www.example.com/foo/my/path/bar.png` 
+  # matches `www.example.com/foo/my/path/bar.png`
 
   # assigning a Proc
   config.ignore_path = ->(path) do
-    /\A\/foo\/.+\/[0-9]+\.png\z/.match path 
+    /\A\/foo\/.+\/[0-9]+\.png\z/.match path
   end
   # matches `www.example.com/foo/bar/123.png`
+end
+```
+
+#### ignore_request
+The `ignore_request` configuration option can be used to tell Grover's middleware whether it should handle/modify
+the response. It should be set with a `Proc` which accepts the request (Rack::Request) as a parameter.
+
+```ruby
+# config/initializers/grover.rb
+Grover.configure do |config|
+  # assigning a Proc
+  config.ignore_request = ->(req) do
+    req.host == 'www.example.com'
+  end
+  # matches `www.example.com/foo/bar/123.png`
+
+  config.ignore_request = ->(req) do
+    req.has_header?('X-BLOCK')
+  end
+  # matches `HTTP Header X-BLOCK`
 end
 ```
 
