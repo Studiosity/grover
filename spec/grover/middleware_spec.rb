@@ -863,7 +863,12 @@ describe Grover::Middleware do
     describe '#ignore_request?' do
       context 'when app configuration has a Proc for ignore_request' do
         context 'with a hostname' do
-          before { allow(Grover.configuration).to receive(:ignore_request).and_return(->(req) { req.host == 'www.example.org' }) }
+          before do
+            allow(Grover.configuration).to(
+              receive(:ignore_request).
+                and_return(->(req) { req.host == 'www.example.org' })
+            )
+          end
 
           it 'request is ignored when the request passed to the proc defined in ignore_request returns true' do
             response = get 'http://www.example.org/foobazbar'
@@ -881,7 +886,12 @@ describe Grover::Middleware do
         end
 
         context 'with a custom header' do
-          before { allow(Grover.configuration).to receive(:ignore_request).and_return(->(req) { req.has_header?('X-BLOCK') }) }
+          before do
+            allow(Grover.configuration).to(
+              receive(:ignore_request).
+                and_return(->(req) { req.has_header?('X-BLOCK') })
+            )
+          end
 
           it 'request is ignored when the request passed to the proc defined in ignore_request returns true' do
             response = get 'http://www.example.org/foobazbar', {}, { 'X-BLOCK' => '1' }
