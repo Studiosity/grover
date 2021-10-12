@@ -1,7 +1,10 @@
 # Changelog
 
 ## Unreleased
-- [#131](https://github.com/Studiosity/grover/pull/128) Add support for ignoring request in addition to request.path ([@braindeaf][])
+- none
+
+## [1.0.6](releases/tag/v1.0.6) - 2021-10-12
+[#131](https://github.com/Studiosity/grover/pull/131) Add support for ignoring request in addition to request.path ([@braindeaf][])
 
 ## [1.0.5](releases/tag/v1.0.5) - 2021-08-30
 ### Fixed
