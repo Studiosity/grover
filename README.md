@@ -270,7 +270,9 @@ N.B. by default PNG and JPEG are not modified in the middleware to prevent break
 To enable them, there are configuration options for each image type as well as an option to disable the PDF middleware
 (on by default).
 
-If either of the image handling middleware options are enabled, the [ignore_path](#ignore_path) and/or [ignore_request](#ignore_request) should also be configured, otherwise assets are likely to be handled which would likely result in 404 responses.  
+If either of the image handling middleware options are enabled, the [ignore_path](#ignore_path) and/or
+[ignore_request](#ignore_request) should also be configured, otherwise assets are likely to be handled
+which would likely result in 404 responses.  
 
 ```ruby
 # config/initializers/grover.rb
@@ -340,7 +342,7 @@ Grover.configure do |config|
   # matches `www.example.com/foo/bar/123.png`
 
   config.ignore_request = ->(req) do
-    req.headers.has_header?('X-BLOCK')
+    req.has_header?('X-BLOCK')
   end
   # matches `HTTP Header X-BLOCK`
 end

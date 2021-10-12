@@ -865,14 +865,14 @@ describe Grover::Middleware do
         context 'with a hostname' do
           before { allow(Grover.configuration).to receive(:ignore_request).and_return(->(req) { req.host == 'www.example.org' }) }
 
-          it 'request is ignored when the request path passed to the proc defined in ignore_request returns true' do
+          it 'request is ignored when the request passed to the proc defined in ignore_request returns true' do
             response = get 'http://www.example.org/foobazbar'
             expect(response.content_type).to eq 'text/html'
 
             response = get 'http://www.example.org/foobazbar.pdf'
             expect(response.content_type).to eq 'text/html'
 
-            response = get 'http://www.example.org/foobarbar'
+            response = get 'http://www.therealexample.org/foobarbar'
             expect(response.content_type).to eq 'text/html'
 
             response = get 'http://www.therealexample.org/foobarbar.pdf'
@@ -883,14 +883,14 @@ describe Grover::Middleware do
         context 'with a custom header' do
           before { allow(Grover.configuration).to receive(:ignore_request).and_return(->(req) { req.has_header?('X-BLOCK') }) }
 
-          it 'request is ignored when the request path passed to the proc defined in ignore_request returns true' do
+          it 'request is ignored when the request passed to the proc defined in ignore_request returns true' do
             response = get 'http://www.example.org/foobazbar', {}, { 'X-BLOCK' => '1' }
             expect(response.content_type).to eq 'text/html'
 
-            response = get 'http://www.example.org/foobazbar.pdf', {}, { 'X-BLOCK' => '1' }
+            response = get 'http://www.example.org/foobarbar.pdf', {}, { 'X-BLOCK' => '1' }
             expect(response.content_type).to eq 'text/html'
 
-            response = get 'http://www.example.org/foobarbar', {}, { 'X-BLOCK' => '1' }
+            response = get 'http://www.therealexample.org/foobazbar'
             expect(response.content_type).to eq 'text/html'
 
             response = get 'http://www.therealexample.org/foobarbar.pdf'
