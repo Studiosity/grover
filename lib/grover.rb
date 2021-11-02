@@ -28,86 +28,77 @@ class Grover
   attr_reader :front_cover_path, :back_cover_path
 
   #
-  # @param [String] url URL of the page to convert
-  # @param [Hash] options Optional parameters to pass to PDF processor
-  #   see https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagepdfoptions
+  # @param [String] root_path Path to the NodeJS package installation
   #
-  def initialize(url, options = {})
-    @url = url.to_s
-    @options = OptionsBuilder.new(options, @url)
-    @root_path = @options.delete 'root_path'
-    @front_cover_path = @options.delete 'front_cover_path'
-    @back_cover_path = @options.delete 'back_cover_path'
+  def initialize(root_path: nil)
+    @root_path = root_path
   end
 
   #
   # Request URL with provided options and create PDF
   #
+  # @param [String] url URL of the page to convert
   # @param [String] path Optional path to write the PDF to
+  # @param [Hash] options Optional parameters to pass to PDF processor
+  #   see https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagepdfoptions
   # @return [String] The resulting PDF data
   #
-  def to_pdf(path = nil)
-    processor.convert :pdf, @url, normalized_options(path: path)
+  def to_pdf(url, path: nil, **options)
+    processor.convert :pdf, url, normalized_options(url: url, path: path, **options)
   end
 
   #
   # Request URL with provided options and render HTML
   #
+  # @param [String] url URL of the page to convert
+  # @param [Hash] options Optional parameters to pass to PDF processor
+  #   see https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagepdfoptions
   # @return [String] The resulting HTML string
   #
-  def to_html
-    processor.convert :content, @url, normalized_options(path: nil)
+  def to_html(url, **options)
+    processor.convert :content, url, normalized_options(url: url, path: nil, **options)
   end
 
   #
   # Request URL with provided options and create screenshot
   #
+  # @param [String] url URL of the page to convert
   # @param [String] path Optional path to write the screenshot to
   # @param [String] format Optional format of the screenshot
+  # @param [Hash] options Optional parameters to pass to PDF processor
+  #   see https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagepdfoptions
   # @return [String] The resulting image data
   #
-  def screenshot(path: nil, format: nil)
-    options = normalized_options(path: path)
+  def screenshot(url, path: nil, format: nil, **options)
+    options = normalized_options(url: url, path: path, **options)
     options['type'] = format if %w[png jpeg].include? format
-    processor.convert :screenshot, @url, options
+    processor.convert :screenshot, url, options
   end
 
   #
   # Request URL with provided options and create PNG
   #
+  # @param [String] url URL of the page to convert
   # @param [String] path Optional path to write the screenshot to
+  # @param [Hash] options Optional parameters to pass to PDF processor
+  #   see https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagepdfoptions
   # @return [String] The resulting PNG data
   #
-  def to_png(path = nil)
-    screenshot path: path, format: 'png'
+  def to_png(url, path: nil, **options)
+    screenshot url, path: path, format: 'png', **options
   end
 
   #
   # Request URL with provided options and create JPEG
   #
+  # @param [String] url URL of the page to convert
   # @param [String] path Optional path to write the screenshot to
+  # @param [Hash] options Optional parameters to pass to PDF processor
+  #   see https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagepdfoptions
   # @return [String] The resulting JPEG data
   #
-  def to_jpeg(path = nil)
-    screenshot path: path, format: 'jpeg'
-  end
-
-  #
-  # Returns whether a front cover (request) path has been specified in the options
-  #
-  # @return [Boolean] Front cover path is configured
-  #
-  def show_front_cover?
-    front_cover_path.is_a?(::String) && front_cover_path.start_with?('/')
-  end
-
-  #
-  # Returns whether a back cover (request) path has been specified in the options
-  #
-  # @return [Boolean] Back cover path is configured
-  #
-  def show_back_cover?
-    back_cover_path.is_a?(::String) && back_cover_path.start_with?('/')
+  def to_jpeg(url, path = nil, **options)
+    screenshot url, path: path, format: 'jpeg', **options
   end
 
   #
@@ -115,10 +106,9 @@ class Grover
   #
   def inspect
     format(
-      '#<%<class_name>s:0x%<object_id>p @url="%<url>s">',
+      '#<%<class_name>s:0x%<object_id>p',
       class_name: self.class.name,
-      object_id: object_id,
-      url: @url
+      object_id: object_id
     )
   end
 
@@ -140,11 +130,13 @@ class Grover
   end
 
   def processor
-    Processor.new(root_path)
+    @processor ||= Processor.new(root_path)
   end
 
-  def normalized_options(path:)
-    normalized_options = Utils.normalize_object @options, excluding: ['extraHTTPHeaders']
+  def normalized_options(url:, path:, **options)
+    parsed_options = OptionsBuilder.new(options, url)
+
+    normalized_options = Utils.normalize_object parsed_options, excluding: ['extraHTTPHeaders']
     normalized_options['path'] = path if path.is_a? ::String
     normalized_options
   end

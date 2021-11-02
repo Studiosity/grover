@@ -12,18 +12,32 @@ class Grover
   class Processor
     def initialize(app_root)
       @app_root = app_root
+      @semaphore = Mutex.new
     end
 
     def convert(method, url_or_html, options)
-      spawn_process
-      ensure_packages_are_initiated
-      result = call_js_method method, url_or_html, options
-      return unless result
-      return result if result.is_a?(String)
+      @semaphore.synchronize do
+        spawn_process
+        result = call_js_method method, url_or_html, options
+        return unless result
+        return result if result.is_a?(String)
 
-      result['data'].pack('C*')
-    ensure
-      cleanup_process if stdin
+        result['data'].pack('C*')
+      end
+    end
+
+    class << self
+      protected
+
+      def finalize(stdin, stdout, stderr, process_thread)
+        proc do
+          stdin.close
+          stdout.close
+          stderr.close
+          Process.kill(0, process_thread.pid)
+          process_thread.value
+        end
+      end
     end
 
     private
@@ -31,11 +45,18 @@ class Grover
     attr_reader :app_root, :stdin, :stdout, :stderr, :wait_thr
 
     def spawn_process
-      @stdin, @stdout, @stderr, @wait_thr = Open3.popen3(
+      return if @wait_thr
+
+      process_data = Open3.popen3(
         'node',
         File.expand_path(File.join(__dir__, 'js/processor.js')),
         chdir: app_root
       )
+
+      @stdin, @stdout, @stderr, @wait_thr = process_data
+      ensure_packages_are_initiated
+
+      ObjectSpace.define_finalizer self, self.class.send(:finalize, *process_data)
     end
 
     def ensure_packages_are_initiated
