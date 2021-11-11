@@ -70,9 +70,9 @@ describe Grover::Processor do
 
       context 'when puppeteer package is not installed' do
         # Temporarily move the node puppeteer folder
-        before { FileUtils.move 'node_modules/puppeteer', 'node_modules/puppeteer_temp' }
+        before { FileUtils.move 'node_modules/puppeteer', './node_modules/puppeteer_temp' }
 
-        after { FileUtils.move 'node_modules/puppeteer_temp', 'node_modules/puppeteer' }
+        after { FileUtils.move 'node_modules/puppeteer_temp', './node_modules/puppeteer' }
 
         it 'raises a DependencyError' do
           expect { convert }.to raise_error Grover::DependencyError, Grover::Utils.squish(<<~ERROR)
@@ -93,6 +93,29 @@ describe Grover::Processor do
             expect { convert }.to raise_error Grover::DependencyError, Grover::Utils.squish(<<~ERROR)
               Cannot find module 'puppeteer'.
               You need to add it to '#{Dir.pwd}/package.json' and run 'npm install'
+            ERROR
+          end
+        end
+
+        context 'when puppeteer-core package is in package.json' do
+          before do
+            FileUtils.copy 'package.json', 'package.json.tmp'
+            FileUtils.cp_r 'node_modules', './node_modules_temp'
+
+            IO.write('package.json', File.open('package.json') { |f| f.read.gsub(/"puppeteer"/, '"puppeteer-core"') })
+            `npm install`
+          end
+
+          after do
+            FileUtils.move 'package.json.tmp', 'package.json'
+            FileUtils.rm_r 'node_modules'
+            FileUtils.move 'node_modules_temp', './node_modules'
+          end
+
+          it 'raises Chrome install error (which will only happen when puppeteer-core has loaded properly)' do
+            expect { convert }.to raise_error Grover::JavaScript::Error, Regexp.new(Grover::Utils.squish(<<~ERROR))
+              Could not find expected browser \\(chrome\\) locally\\.
+              Run `npm install` to download the correct Chromium revision
             ERROR
           end
         end

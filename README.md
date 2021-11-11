@@ -19,9 +19,32 @@ gem 'grover'
 ```
 
 ### Google Puppeteer
+This will also install a compatible version of Chromium
 ```bash
 npm install puppeteer
 ```
+
+
+### Google Puppeteer core
+If you want to manage the installation of Chromium/Chrome/Firefox yourself you can instead install `puppeteer-core`.
+```bash
+npm install puppeteer-core
+```
+You may need to specify to Grover the type of browser and where you have installed it via the options.
+```ruby
+# config/initializers/grover.rb
+Grover.configure do |config|
+  config.options = {
+    product: 'firefox',
+    executable_path: '/my/path/to/firefox'
+  }
+end
+```
+N.B. Per the `puppeteer` documentation:
+> BEWARE: Puppeteer is only guaranteed to work with the bundled Chromium, use at your own risk.
+
+To understand the differences between `puppeteer` and `puppeteer-core` see
+[the puppeteer documentation](https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#puppeteer-vs-puppeteer-core)
 
 
 ## Usage
@@ -159,7 +182,7 @@ The `wait_for_timeout` option can also be used to wait the specified number of m
 The `raise_on_request_failure` option, when enabled, will raise a `Grover::JavaScript::RequestFailedError`
 if the initial content request or any subsequent asset request returns a bad response or times out.
 
-The Chrome/Chromium executable path can be overridden with the `executable_path` option.
+The Chrome/Chromium/Firefox executable path can be overridden with the `executable_path` and `product` options.
 
 Javascript can be executed on the page (after render and before conversion to PDF/image)
 with the `execute_script` option.
