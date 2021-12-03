@@ -745,7 +745,7 @@ describe Grover::Processor do
         end
 
         context 'when the timeout is long' do
-          let(:timeout) { 5000 }
+          let(:timeout) { 10_000 }
 
           it { is_expected.to start_with "%PDF-1.4\n" }
         end
@@ -761,14 +761,14 @@ describe Grover::Processor do
           it_behaves_like 'raises navigation timeout error'
 
           context 'when the timeout is also specified' do
-            let(:timeout) { 5000 }
+            let(:timeout) { 10_000 }
 
             it_behaves_like 'raises navigation timeout error'
           end
         end
 
         context 'when the request timeout is long' do
-          let(:request_timeout) { 5000 }
+          let(:request_timeout) { 10_000 }
 
           it { is_expected.to start_with "%PDF-1.4\n" }
 
@@ -808,7 +808,7 @@ describe Grover::Processor do
           end
 
           context 'when the timeout is also specified' do
-            let(:timeout) { 5000 }
+            let(:timeout) { 10_000 }
 
             if puppeteer_version_on_or_after? '10.4.0'
               it 'will use the convert timeout over the timeout option' do
@@ -824,7 +824,7 @@ describe Grover::Processor do
         end
 
         context 'when the convert timeout is long' do
-          let(:convert_timeout) { 5000 }
+          let(:convert_timeout) { 10_000 }
 
           it { is_expected.to start_with "%PDF-1.4\n" }
 
