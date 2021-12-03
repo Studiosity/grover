@@ -18,6 +18,6 @@
   },
   "homepage": "https://github.com/Studiosity/grover#readme",
   "devDependencies": {
-    "puppeteer": "^10.2.0"
+    "puppeteer": "^12.0.1"
   }
 }

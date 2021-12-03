@@ -467,7 +467,7 @@ describe Grover::Processor do
         it { expect(pdf_text_content).to eq "#{date} Some evaluated content http://www.example.net/foo/bar 1/1" }
       end
 
-      context 'when wait for selector option is specified' do
+      context 'when waitForSelector option is specified' do
         let(:url_or_html) do
           <<-HTML
             <html>
@@ -486,7 +486,7 @@ describe Grover::Processor do
         it { expect(pdf_text_content).to eq "#{date} Hey there http://www.example.net/foo/bar 1/1" }
       end
 
-      context 'when wait for function option is specified' do
+      context 'when waitForFunction option is specified' do
         let(:url_or_html) do
           <<-HTML
             <html>
@@ -512,7 +512,7 @@ describe Grover::Processor do
         it { expect(pdf_text_content).to eq "#{date} Hey there http://www.example.net/foo/bar 1/1" }
       end
 
-      context 'when wait for function option is specified with options' do
+      context 'when waitForFunction option is specified with options' do
         let(:url_or_html) do
           <<-HTML
             <html>
@@ -629,7 +629,7 @@ describe Grover::Processor do
         end
       end
 
-      context 'when wait for selector option is specified with options' do
+      context 'when waitForSelector option is specified with options' do
         let(:url_or_html) do
           <<-HTML
             <html>
@@ -657,7 +657,7 @@ describe Grover::Processor do
 
       # Only test `waitForTimeout` if the Puppeteer supports it
       if puppeteer_version_on_or_after? '5.3.0'
-        context 'when wait for timeout option is specified' do
+        context 'when waitForTimeout option is specified' do
           let(:url_or_html) do
             <<-HTML
               <html>
@@ -717,6 +717,109 @@ describe Grover::Processor do
           end
 
           it { expect(pdf_text_content).to eq 'Hey there' }
+        end
+      end
+
+      context 'when timeout option is specified' do
+        let(:options) { basic_header_footer_options.merge('timeout' => timeout) }
+
+        context 'when the timeout is short' do
+          let(:timeout) { 1 }
+
+          it do
+            expect { convert }.to raise_error Grover::JavaScript::TimeoutError, 'Navigation timeout of 1 ms exceeded'
+          end
+        end
+
+        context 'when the timeout is long' do
+          let(:timeout) { 5000 }
+
+          it { is_expected.to start_with "%PDF-1.4\n" }
+        end
+      end
+
+      context 'when requestTimeout option is specified' do
+        let(:options) { basic_header_footer_options.merge('requestTimeout' => request_timeout, 'timeout' => timeout) }
+        let(:timeout) { nil }
+
+        context 'when the request timeout is short' do
+          let(:request_timeout) { 1 }
+
+          it 'will timeout when navigating to the page' do
+            expect { convert }.to raise_error Grover::JavaScript::TimeoutError, 'Navigation timeout of 1 ms exceeded'
+          end
+
+          context 'when the timeout is also specified' do
+            let(:timeout) { 5000 }
+
+            it 'will use the request timeout over the timeout option' do
+              expect { convert }.to raise_error Grover::JavaScript::TimeoutError, 'Navigation timeout of 1 ms exceeded'
+            end
+          end
+        end
+
+        context 'when the request timeout is long' do
+          let(:request_timeout) { 5000 }
+
+          it { is_expected.to start_with "%PDF-1.4\n" }
+
+          context 'when the timeout is also specified (but something much smaller than the request timeout)' do
+            let(:timeout) { 1 }
+
+            it 'will timeout when trying to convert to PDF' do
+              expect { convert }.to raise_error(
+                                      Grover::JavaScript::TimeoutError,
+                                      'waiting for Page.printToPDF failed: timeout 1ms exceeded'
+                                    )
+            end
+          end
+        end
+      end
+
+      # Only test pdf convert timeout if the Puppeteer supports it
+      if puppeteer_version_on_or_after? '10.4.0'
+        context 'when convertTimeout option is specified' do
+          let(:options) { basic_header_footer_options.merge('convertTimeout' => convert_timeout, 'timeout' => timeout) }
+          let(:timeout) { nil }
+
+          context 'when the convert timeout is short' do
+            let(:convert_timeout) { 1 }
+
+            it 'will raise an error when trying to convert to PDF' do
+              expect { convert }.to raise_error(
+                                      Grover::JavaScript::TimeoutError,
+                                      'waiting for Page.printToPDF failed: timeout 1ms exceeded'
+                                    )
+            end
+
+            context 'when the timeout is also specified' do
+              let(:timeout) { 5000 }
+
+              it 'will use the convert timeout over the timeout option' do
+                expect { convert }.to raise_error(
+                                        Grover::JavaScript::TimeoutError,
+                                        'waiting for Page.printToPDF failed: timeout 1ms exceeded'
+                                      )
+              end
+            end
+          end
+
+          context 'when the convert timeout is long' do
+            let(:convert_timeout) { 5000 }
+
+            it { is_expected.to start_with "%PDF-1.4\n" }
+
+            context 'when the timeout is also specified (but something much smaller than the convert timeout)' do
+              let(:timeout) { 1 }
+
+              it 'will timeout when converting to PDF' do
+                expect { convert }.to raise_error(
+                                        Grover::JavaScript::TimeoutError,
+                                        'waiting for Page.printToPDF failed: timeout 1ms exceeded'
+                                      )
+              end
+            end
+          end
         end
       end
     end
