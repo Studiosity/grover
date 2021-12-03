@@ -13,18 +13,20 @@ env:
     - PUPPETEER_VERSION=7.1.0
     - PUPPETEER_VERSION=8.0.0
     - PUPPETEER_VERSION=9.1.1
-    - PUPPETEER_VERSION=10.2.0
+    - PUPPETEER_VERSION=10.4.0
+    - PUPPETEER_VERSION=11.0.0
+    - PUPPETEER_VERSION=12.0.1
 
 rvm: 3.0
 
 jobs:
   include:
     - rvm: 2.5
-      env: PUPPETEER_VERSION=10.2.0
+      env: PUPPETEER_VERSION=12.0.1
     - rvm: 2.6
-      env: PUPPETEER_VERSION=10.2.0
+      env: PUPPETEER_VERSION=12.0.1
     - rvm: 2.7
-      env: PUPPETEER_VERSION=10.2.0
+      env: PUPPETEER_VERSION=12.0.1
 
 language: ruby
 

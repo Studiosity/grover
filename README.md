@@ -87,7 +87,8 @@ Grover can be configured to adjust the layout of the resulting PDF/image.
 
 For available PDF options, see https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pagepdfoptions
 
-Also available are the `emulate_media`, `cache`, `viewport`, `timeout` and `launch_args` options.
+Also available are the `emulate_media`, `cache`, `viewport`, `timeout`, `requestTimeout`, `convertTimeout`
+and `launch_args` options.
 
 ```ruby
 # config/initializers/grover.rb
@@ -109,12 +110,14 @@ Grover.configure do |config|
     media_features: [{ name: 'prefers-color-scheme', value: 'dark' }],
     timezone: 'Australia/Sydney',
     vision_deficiency: 'deuteranopia',
-    extraHTTPHeaders: { 'Accept-Language': 'en-US' },
+    extra_http_headers: { 'Accept-Language': 'en-US' },
     geolocation: { latitude: 59.95, longitude: 30.31667 },
     focus: '#some-element',
     hover: '#another-element',
     cache: false,
     timeout: 0, # Timeout in ms. A value of `0` means 'no timeout'
+    request_timeout: 1000, # Timeout when fetching the content (overloads the `timeout` option)
+    convert_timeout: 2000, # Timeout when converting the content (overloads the `timeout` option, only applies to PDF conversion)
     launch_args: ['--font-render-hinting=medium'],
     wait_until: 'domcontentloaded'
   }

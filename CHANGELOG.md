@@ -1,10 +1,12 @@
 # Changelog
 
 ## Unreleased
-- none
+### Breaking Change
+- [#145](https://github.com/Studiosity/grover/pull/145) Add support for `request_timeout` and `convert_timeout` options (`timeout` option applies to conversion for Puppeteer 10.4.0+) ([@abrom][])
 
 ## [1.0.6](releases/tag/v1.0.6) - 2021-10-12
-[#131](https://github.com/Studiosity/grover/pull/131) Add support for ignoring request in addition to request.path ([@braindeaf][])
+### Added
+- [#131](https://github.com/Studiosity/grover/pull/131) Add support for ignoring request in addition to request.path ([@braindeaf][])
 
 ## [1.0.5](releases/tag/v1.0.5) - 2021-08-30
 ### Fixed
