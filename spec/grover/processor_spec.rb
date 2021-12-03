@@ -720,23 +720,23 @@ describe Grover::Processor do
         end
       end
 
-      context 'when timeout option is specified' do
-        let(:options) { basic_header_footer_options.merge('timeout' => timeout) }
-
-        shared_examples 'raises navigation timeout error' do
-          if puppeteer_version_on_or_after? '2.0.0'
-            it do
-              expect { convert }.to raise_error Grover::JavaScript::TimeoutError, 'Navigation timeout of 1 ms exceeded'
-            end
-          else
-            it do
-              expect { convert }.to raise_error(
-                Grover::JavaScript::TimeoutError,
-                'Navigation Timeout Exceeded: 1ms exceeded'
-              )
-            end
+      shared_examples 'raises navigation timeout error' do
+        if puppeteer_version_on_or_after? '2.0.0'
+          it do
+            expect { convert }.to raise_error Grover::JavaScript::TimeoutError, 'Navigation timeout of 1 ms exceeded'
+          end
+        else
+          it do
+            expect { convert }.to raise_error(
+              Grover::JavaScript::TimeoutError,
+              'Navigation Timeout Exceeded: 1ms exceeded'
+            )
           end
         end
+      end
+
+      context 'when timeout option is specified' do
+        let(:options) { basic_header_footer_options.merge('timeout' => timeout) }
 
         context 'when the timeout is short' do
           let(:timeout) { 1 }
