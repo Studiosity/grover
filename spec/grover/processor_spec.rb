@@ -768,9 +768,9 @@ describe Grover::Processor do
 
             it 'will timeout when trying to convert to PDF' do
               expect { convert }.to raise_error(
-                                      Grover::JavaScript::TimeoutError,
-                                      'waiting for Page.printToPDF failed: timeout 1ms exceeded'
-                                    )
+                Grover::JavaScript::TimeoutError,
+                'waiting for Page.printToPDF failed: timeout 1ms exceeded'
+              )
             end
           end
         end
@@ -787,9 +787,9 @@ describe Grover::Processor do
 
             it 'will raise an error when trying to convert to PDF' do
               expect { convert }.to raise_error(
-                                      Grover::JavaScript::TimeoutError,
-                                      'waiting for Page.printToPDF failed: timeout 1ms exceeded'
-                                    )
+                Grover::JavaScript::TimeoutError,
+                'waiting for Page.printToPDF failed: timeout 1ms exceeded'
+              )
             end
 
             context 'when the timeout is also specified' do
@@ -797,9 +797,9 @@ describe Grover::Processor do
 
               it 'will use the convert timeout over the timeout option' do
                 expect { convert }.to raise_error(
-                                        Grover::JavaScript::TimeoutError,
-                                        'waiting for Page.printToPDF failed: timeout 1ms exceeded'
-                                      )
+                  Grover::JavaScript::TimeoutError,
+                  'waiting for Page.printToPDF failed: timeout 1ms exceeded'
+                )
               end
             end
           end
@@ -814,9 +814,9 @@ describe Grover::Processor do
 
               it 'will timeout when converting to PDF' do
                 expect { convert }.to raise_error(
-                                        Grover::JavaScript::TimeoutError,
-                                        'waiting for Page.printToPDF failed: timeout 1ms exceeded'
-                                      )
+                  Grover::JavaScript::TimeoutError,
+                  'waiting for Page.printToPDF failed: timeout 1ms exceeded'
+                )
               end
             end
           end
