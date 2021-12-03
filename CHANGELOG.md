@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased
+- none
+
+## [1.1.0](releases/tag/v1.1.0) - 2021-12-03
 ### Breaking Change
 - [#145](https://github.com/Studiosity/grover/pull/145) Add support for `request_timeout` and `convert_timeout` options (`timeout` option applies to conversion for Puppeteer 10.4.0+) ([@abrom][])
 
