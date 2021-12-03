@@ -831,16 +831,7 @@ describe Grover::Processor do
           context 'when the timeout is also specified (but something much smaller than the convert timeout)' do
             let(:timeout) { 1 }
 
-            if puppeteer_version_on_or_after? '10.4.0'
-              it 'will timeout when converting to PDF' do
-                expect { convert }.to raise_error(
-                  Grover::JavaScript::TimeoutError,
-                  'waiting for Page.printToPDF failed: timeout 1ms exceeded'
-                )
-              end
-            else
-              it { is_expected.to start_with "%PDF-1.4\n" }
-            end
+            it_behaves_like 'raises navigation timeout error'
           end
         end
       end
