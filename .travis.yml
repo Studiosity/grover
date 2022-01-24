@@ -21,11 +21,11 @@ rvm: 3.0
 
 jobs:
   include:
-    - rvm: 2.5
-      env: PUPPETEER_VERSION=12.0.1
     - rvm: 2.6
       env: PUPPETEER_VERSION=12.0.1
     - rvm: 2.7
+      env: PUPPETEER_VERSION=12.0.1
+    - rvm: ruby-head
       env: PUPPETEER_VERSION=12.0.1
 
 language: ruby
