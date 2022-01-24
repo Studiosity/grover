@@ -3,6 +3,10 @@
 ## Unreleased
 - none
 
+## [1.1.1](releases/tag/v1.1.1) - 2021-01-24
+### Added
+- [#147](https://github.com/Studiosity/grover/pull/147) Add support for Ruby 3.1 ([@walski][])
+
 ## [1.1.0](releases/tag/v1.1.0) - 2021-12-03
 ### Breaking Change
 - [#145](https://github.com/Studiosity/grover/pull/145) Add support for `request_timeout` and `convert_timeout` options (`timeout` option applies to conversion for Puppeteer 10.4.0+) ([@abrom][])
@@ -281,3 +285,4 @@
 [@mkalygin]: https://github.com/mkalygin
 [@lucasluitjes]: https://github.com/lucasluitjes
 [@julianwegkamp]: https://github.com/julianwegkamp
+[@walski]: https://github.com/walski
