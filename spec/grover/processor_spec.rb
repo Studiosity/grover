@@ -945,12 +945,18 @@ describe Grover::Processor do
       if puppeteer_version_on_or_after? '3.2.0'
         context 'when vision deficiency is set to `deuteranopia`' do
           let(:url_or_html) { '<html><body style="background-color: red"></body></html>' }
-          let(:options) { { 'visionDeficiency' => 'deuteranopia' } }
+          let(:options) { { 'visionDeficiency' => 'deuteranopia', 'path' => '/tmp/bar.png' } }
 
           it { expect(convert.unpack('C*')).to start_with "\x89PNG\r\n\x1A\n".unpack('C*') }
           it { expect(image.type).to eq 'PNG' }
           it { expect(image.dimensions).to eq [800, 600] }
-          it { expect(mean_colour_statistics(image)).to eq %w[94 71 0] }
+
+          # For some reason, Chrome 98+ (v13.1.0+ of Puppeteer) handles deuteranopia vision deficiency differently
+          if puppeteer_version_on_or_after? '13.1.0'
+            it { expect(mean_colour_statistics(image)).to eq %w[163 144 0] }
+          else
+            it { expect(mean_colour_statistics(image)).to eq %w[94 71 0] }
+          end
         end
       end
 
