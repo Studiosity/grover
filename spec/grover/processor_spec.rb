@@ -945,7 +945,7 @@ describe Grover::Processor do
       if puppeteer_version_on_or_after? '3.2.0'
         context 'when vision deficiency is set to `deuteranopia`' do
           let(:url_or_html) { '<html><body style="background-color: red"></body></html>' }
-          let(:options) { { 'visionDeficiency' => 'deuteranopia', 'path' => '/tmp/bar.png' } }
+          let(:options) { { 'visionDeficiency' => 'deuteranopia' } }
 
           it { expect(convert.unpack('C*')).to start_with "\x89PNG\r\n\x1A\n".unpack('C*') }
           it { expect(image.type).to eq 'PNG' }
