@@ -32,7 +32,7 @@ class Grover
   # @param [Hash] options Optional parameters to pass to PDF processor
   #   see https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagepdfoptions
   #
-  def initialize(url, options = {})
+  def initialize(url, **options)
     @url = url.to_s
     @options = OptionsBuilder.new(options, @url)
     @root_path = @options.delete 'root_path'
