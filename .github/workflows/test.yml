@@ -34,7 +34,7 @@ jobs:
           - ruby-version: '2.7'
             node-version: '10'
             puppeteer-version: '12.0.1'
-          - ruby-version: 'head'
+          - ruby-version: '3.1'
             node-version: '10'
             puppeteer-version: '12.0.1'
           - ruby-version: '3.0'
