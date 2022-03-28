@@ -29,14 +29,19 @@ jobs:
         ]
         include:
           - ruby-version: '2.6'
+            node-version: '10'
             puppeteer-version: '12.0.1'
           - ruby-version: '2.7'
+            node-version: '10'
             puppeteer-version: '12.0.1'
           - ruby-version: 'head'
+            node-version: '10'
             puppeteer-version: '12.0.1'
-          - node-version: '12'
+          - ruby-version: '3.0'
+            node-version: '12'
             puppeteer-version: '12.0.1'
-          - node-version: '14'
+          - ruby-version: '3.0'
+            node-version: '14'
             puppeteer-version: '12.0.1'
 
     steps:
@@ -58,6 +63,11 @@ jobs:
 
       - name: Lint code - Rubocop
         run: bundle exec rubocop
+
+      - name: Test & publish code coverage
+        uses: paambaati/codeclimate-action@v3.0.0
+        env:
+          CC_TEST_REPORTER_ID: 5cfed40102c670b5c9e509730782b751939ddbe53fc57c317b718f635bab1ce8
 
       - name: Run tests
         run: bundle exec rspec
