@@ -26,24 +26,25 @@ jobs:
             '9.1.1',
             '10.4.0',
             '11.0.0',
-            '12.0.1'
+            '12.0.1',
+            '13.5.1'
         ]
         include:
           - ruby-version: '2.6'
             node-version: '10'
-            puppeteer-version: '12.0.1'
+            puppeteer-version: '13.5.1'
           - ruby-version: '2.7'
             node-version: '10'
-            puppeteer-version: '12.0.1'
+            puppeteer-version: '13.5.1'
           - ruby-version: '3.1'
             node-version: '10'
-            puppeteer-version: '12.0.1'
+            puppeteer-version: '13.5.1'
           - ruby-version: '3.0'
             node-version: '12'
-            puppeteer-version: '12.0.1'
+            puppeteer-version: '13.5.1'
           - ruby-version: '3.0'
             node-version: '14'
-            puppeteer-version: '12.0.1'
+            puppeteer-version: '13.5.1'
 
     steps:
       - uses: actions/checkout@v2
