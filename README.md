@@ -57,7 +57,7 @@ html = MyController.new.render_to_string({
   layout: 'my_layout',
   locals: { :@instance_var => ... }
 })
-pdf = Grover.new(html, grover_options).to_pdf
+pdf = Grover.new(html, **grover_options).to_pdf
 ```
 
 ### Relative paths

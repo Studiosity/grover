@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe Grover do
-  let(:grover) { described_class.new(url_or_html, options) }
+  let(:grover) { described_class.new(url_or_html, **options) }
   let(:url_or_html) { 'http://google.com' }
   let(:options) { {} }
 
@@ -15,7 +15,7 @@ describe Grover do
     it { expect(new.instance_variable_get('@options')).to eq({}) }
 
     context 'with options passed' do
-      subject(:new) { described_class.new('http://happyfuntimes.com', options) }
+      subject(:new) { described_class.new('http://happyfuntimes.com', **options) }
 
       let(:options) { { page_size: 'A4' } }
 
@@ -125,23 +125,6 @@ describe Grover do
 
       context 'when instance options are provided' do
         let(:options) { { header_template: 'instance header', footer_template: 'instance footer' } }
-
-        it 'builds options, overriding global options, and passes them through to the processor' do
-          allow(processor).to(
-            receive(:convert).
-              with(:pdf, url_or_html, 'headerTemplate' => 'instance header', 'footerTemplate' => 'instance footer').
-              and_return('some PDF content')
-          )
-          expect(processor).to(
-            receive(:convert).
-              with(:pdf, url_or_html, 'headerTemplate' => 'instance header', 'footerTemplate' => 'instance footer')
-          )
-          expect(to_pdf).to eq 'some PDF content'
-        end
-      end
-
-      context 'when instance options have string keys' do
-        let(:options) { { 'header_template' => 'instance header', 'footer_template' => 'instance footer' } }
 
         it 'builds options, overriding global options, and passes them through to the processor' do
           allow(processor).to(
@@ -399,31 +382,6 @@ describe Grover do
 
       context 'when instance options are provided' do
         let(:options) { { header_template: 'instance header', footer_template: 'instance footer' } }
-
-        it 'builds options, overriding global options, and passes them through to the processor' do
-          allow(processor).to(
-            receive(:convert).
-              with(
-                :screenshot,
-                url_or_html,
-                'headerTemplate' => 'instance header', 'footerTemplate' => 'instance footer'
-              ).
-              and_return('some image content')
-          )
-          expect(processor).to(
-            receive(:convert).
-              with(
-                :screenshot,
-                url_or_html,
-                'headerTemplate' => 'instance header', 'footerTemplate' => 'instance footer'
-              )
-          )
-          expect(screenshot).to eq 'some image content'
-        end
-      end
-
-      context 'when instance options have string keys' do
-        let(:options) { { 'header_template' => 'instance header', 'footer_template' => 'instance footer' } }
 
         it 'builds options, overriding global options, and passes them through to the processor' do
           allow(processor).to(

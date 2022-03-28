@@ -117,7 +117,7 @@ class Grover
       end
       options[:cookies] = cookies if cookies.any?
 
-      Grover.new(body, options)
+      Grover.new(body, **options)
     end
 
     def add_cover_content(grover)
