@@ -3,7 +3,11 @@
 ## Unreleased
 - none
 
-## [1.1.1](releases/tag/v1.1.1) - 2021-01-24
+## [1.1.2](releases/tag/v1.1.2) - 2022-09-12
+### Fixed
+- [#160](https://github.com/Studiosity/grover/pull/160) Support projects that are using esm instead of cjs ([@ElMassimo][])
+
+## [1.1.1](releases/tag/v1.1.1) - 2022-01-24
 ### Added
 - [#147](https://github.com/Studiosity/grover/pull/147) Add support for Ruby 3.1 ([@walski][])
 
@@ -286,3 +290,4 @@
 [@lucasluitjes]: https://github.com/lucasluitjes
 [@julianwegkamp]: https://github.com/julianwegkamp
 [@walski]: https://github.com/walski
+[@ElMassimo]: https://github.com/ElMassimo
