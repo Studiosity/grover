@@ -249,6 +249,18 @@ Should be valid HTML markup with following classes used to inject printing value
 * `pageNumber` current page number
 * `totalPages` total pages in the document
 
+#### Setting custom PDF filename with header
+In respective controller's action use:
+
+```ruby
+respond_to do |format|
+  format.html do
+    response.headers['Content-Disposition'] = %(attachment; filename="lorem_ipsum.pdf")
+
+    render layout: 'pdf'
+  end
+end
+```
 
 ## Middleware
 Grover comes with a middleware that allows users to get a PDF, PNG or JPEG view of
