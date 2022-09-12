@@ -107,7 +107,7 @@ describe Grover::Processor do
         before do
           allow(Open3).to(
             receive(:popen3).
-              with('node', File.expand_path(File.join(__dir__, '../../lib/grover/js/processor.js')), chdir: Dir.pwd).
+              with('node', File.expand_path(File.join(__dir__, '../../lib/grover/js/processor.cjs')), chdir: Dir.pwd).
               and_return([stdin, stdout, stderr, wait_thr])
           )
 
