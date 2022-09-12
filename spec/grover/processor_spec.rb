@@ -1009,12 +1009,13 @@ describe Grover::Processor do
           'scriptTagOptions' => [{ 'content' => 'document.querySelector("h2").remove()' }]
         }
       end
+      let(:script_type) { puppeteer_version_on_or_after?('17.1.0') ? 'text/javascript' : '' }
 
       it 'returns the rendered HTML' do
         expect(Grover::Utils.squish(convert)).to eq(
           Grover::Utils.squish(
             <<-HTML
-              <html><head><script type="">document.querySelector("h2").remove()</script></head>
+              <html><head><script type="#{script_type}">document.querySelector("h2").remove()</script></head>
               <body>
                 <h1>Hey there</h1>
               </body></html>
