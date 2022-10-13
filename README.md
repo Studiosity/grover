@@ -85,7 +85,7 @@ page content and devtools.
 ## Configuration
 Grover can be configured to adjust the layout of the resulting PDF/image.
 
-For available PDF options, see https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pagepdfoptions
+For available PDF options, see https://github.com/puppeteer/puppeteer/blob/1fbc3c643f31f529597f8ae562959b15e9baa1c5/docs/api/puppeteer.pdfoptions.md
 
 Also available are the `emulate_media`, `cache`, `viewport`, `timeout`, `requestTimeout`, `convertTimeout`
 and `launch_args` options.
