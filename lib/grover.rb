@@ -30,7 +30,7 @@ class Grover
   #
   # @param [String] url URL of the page to convert
   # @param [Hash] options Optional parameters to pass to PDF processor
-  #   see https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagepdfoptions
+  #   see https://github.com/puppeteer/puppeteer/blob/main/docs/api/puppeteer.pdfoptions.md
   #
   def initialize(url, **options)
     @url = url.to_s
