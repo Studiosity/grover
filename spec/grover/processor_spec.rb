@@ -369,7 +369,11 @@ describe Grover::Processor do
           let(:options) do
             {
               'cookies' => [
-                { 'name' => 'grover-test', 'value' => 'nom nom nom', 'domain' => 'cookierenderer-production.up.railway.app' },
+                {
+                  'name' => 'grover-test',
+                  'value' => 'nom nom nom',
+                  'domain' => 'cookierenderer-production.up.railway.app'
+                },
                 { 'name' => 'other-domain', 'value' => 'should not display', 'domain' => 'example.com' },
                 { 'name' => 'escaped', 'value' => '%26%3D%3D', 'domain' => 'cookierenderer-production.up.railway.app' }
               ]
