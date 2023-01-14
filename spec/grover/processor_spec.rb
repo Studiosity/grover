@@ -364,13 +364,17 @@ describe Grover::Processor do
 
         # TODO: Replace cookie renderer app
         context 'when passing through cookies option' do
-          let(:url_or_html) { 'https://cookie-renderer.herokuapp.com/' }
+          let(:url_or_html) { 'https://cookierenderer-production.up.railway.app/' }
           let(:options) do
             {
               'cookies' => [
-                { 'name' => 'grover-test', 'value' => 'nom nom nom', 'domain' => 'cookie-renderer.herokuapp.com' },
+                {
+                  'name' => 'grover-test',
+                  'value' => 'nom nom nom',
+                  'domain' => 'cookierenderer-production.up.railway.app'
+                },
                 { 'name' => 'other-domain', 'value' => 'should not display', 'domain' => 'example.com' },
-                { 'name' => 'escaped', 'value' => '%26%3D%3D', 'domain' => 'cookie-renderer.herokuapp.com' }
+                { 'name' => 'escaped', 'value' => '%26%3D%3D', 'domain' => 'cookierenderer-production.up.railway.app' }
               ]
             }
           end
@@ -381,20 +385,20 @@ describe Grover::Processor do
         end
 
         context 'when passing through extra HTTP headers' do
-          let(:url_or_html) { 'http://cookie-renderer.herokuapp.com/?type=headers' }
+          let(:url_or_html) { 'http://cookierenderer-production.up.railway.app/?type=headers' }
           let(:options) { { 'extraHTTPHeaders' => { 'grover-test' => 'yes it is' } } }
 
           it { expect(pdf_text_content).to match(/Request contained (15|16) headers/) }
-          it { expect(pdf_text_content).to include '1. host cookie-renderer.herokuapp.com' }
-          it { expect(pdf_text_content).to include '5. grover-test yes it is' }
+          it { expect(pdf_text_content).to include '1. host cookierenderer-production.up.railway.app' }
+          it { expect(pdf_text_content).to include '4. grover-test yes it is' }
         end
 
         context 'when overloading the user agent' do
-          let(:url_or_html) { 'http://cookie-renderer.herokuapp.com/?type=headers' }
+          let(:url_or_html) { 'http://cookierenderer-production.up.railway.app/?type=headers' }
           let(:options) { { 'userAgent' => 'Grover user agent' } }
 
           it { expect(pdf_text_content).to match(/Request contained (14|15) headers/) }
-          it { expect(pdf_text_content).to include '1. host cookie-renderer.herokuapp.com' }
+          it { expect(pdf_text_content).to include '1. host cookierenderer-production.up.railway.app' }
           it { expect(pdf_text_content).to include 'user-agent Grover user agent' }
         end
       end

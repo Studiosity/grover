@@ -440,6 +440,18 @@ the HTML/JS you provide to Grover.
     heroku config:set GROVER_NO_SANDBOX=true [--remote yourappname]
     ```
 
+1. Finally, if using puppeteer 19+ (the default) add the following to a `.puppeteerrc.cjs` file in the root of your project:
+    ```
+    const {join} = require('path');
+
+    /**
+    * @type {import("puppeteer").Configuration}
+    * */
+    module.exports = {
+      cacheDirectory: join(__dirname, '.cache', 'puppeteer'),
+    };
+    ```
+
 ## Debugging
 If you're having trouble with converting the HTML content, you can enable some debugging options to help. These can be
 enabled as global options via `Grover.configure`, by passing through to the Grover initializer, or using meta tag
