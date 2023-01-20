@@ -1,8 +1,10 @@
-require: rubocop-rspec
+require:
+  - rubocop-rake
+  - rubocop-rspec
 
 AllCops:
   NewCops: enable
-  TargetRubyVersion: 2.6
+  TargetRubyVersion: 2.7
 
 Layout/DotPosition:
   EnforcedStyle: trailing

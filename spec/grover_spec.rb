@@ -44,7 +44,7 @@ describe Grover do
   describe '#to_pdf' do
     subject(:to_pdf) { grover.to_pdf }
 
-    let(:processor) { instance_double 'Grover::Processor' }
+    let(:processor) { instance_double Grover::Processor }
 
     before { allow(Grover::Processor).to receive(:new).with(Dir.pwd).and_return processor }
 
@@ -275,7 +275,7 @@ describe Grover do
   describe '#screenshot' do
     subject(:screenshot) { grover.screenshot }
 
-    let(:processor) { instance_double 'Grover::Processor' }
+    let(:processor) { instance_double Grover::Processor }
 
     before { allow(Grover::Processor).to receive(:new).with(Dir.pwd).and_return processor }
 
@@ -458,7 +458,7 @@ describe Grover do
   describe '#to_png' do
     subject(:to_png) { grover.to_png }
 
-    let(:processor) { instance_double 'Grover::Processor' }
+    let(:processor) { instance_double Grover::Processor }
 
     before { allow(Grover::Processor).to receive(:new).with(Dir.pwd).and_return processor }
 
@@ -490,7 +490,7 @@ describe Grover do
   describe '#to_jpeg' do
     subject(:to_jpeg) { grover.to_jpeg }
 
-    let(:processor) { instance_double 'Grover::Processor' }
+    let(:processor) { instance_double Grover::Processor }
 
     before { allow(Grover::Processor).to receive(:new).with(Dir.pwd).and_return processor }
 
@@ -526,7 +526,7 @@ describe Grover do
   describe '#to_html' do
     subject(:to_html) { grover.to_html }
 
-    let(:processor) { instance_double 'Grover::Processor' }
+    let(:processor) { instance_double Grover::Processor }
     let(:expected_html) { '<html><body>Some HTML</body></html>' }
 
     before { allow(Grover::Processor).to receive(:new).with(Dir.pwd).and_return processor }
@@ -613,36 +613,36 @@ describe Grover do
   describe '#show_front_cover?' do
     subject(:show_front_cover?) { grover.show_front_cover? }
 
-    it { is_expected.to eq false }
+    it { is_expected.to be false }
 
     context 'when option specified' do
       let(:options) { { front_cover_path: '/baz' } }
 
-      it { is_expected.to eq true }
+      it { is_expected.to be true }
     end
 
     context 'when the option isnt a path' do
       let(:options) { { front_cover_path: 'http://example.com/baz' } }
 
-      it { is_expected.to eq false }
+      it { is_expected.to be false }
     end
   end
 
   describe '#show_back_cover?' do
     subject(:show_back_cover?) { grover.show_back_cover? }
 
-    it { is_expected.to eq false }
+    it { is_expected.to be false }
 
     context 'when option specified' do
       let(:options) { { back_cover_path: '/baz' } }
 
-      it { is_expected.to eq true }
+      it { is_expected.to be true }
     end
 
     context 'when the option isnt a path' do
       let(:options) { { back_cover_path: 'http://example.com/baz' } }
 
-      it { is_expected.to eq false }
+      it { is_expected.to be false }
     end
   end
 
