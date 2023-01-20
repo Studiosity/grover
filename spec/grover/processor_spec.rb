@@ -84,7 +84,7 @@ describe Grover::Processor do
         context 'when puppeteer package is not in package.json' do
           before do
             FileUtils.copy 'package.json', 'package.json.tmp'
-            IO.write('package.json', File.open('package.json') { |f| f.read.gsub(/"puppeteer"/, '"puppeteer-tmp"') })
+            File.write('package.json', File.open('package.json') { |f| f.read.gsub(/"puppeteer"/, '"puppeteer-tmp"') })
           end
 
           after { FileUtils.move 'package.json.tmp', 'package.json' }
@@ -99,10 +99,10 @@ describe Grover::Processor do
       end
 
       context 'when stubbing the call to the Node processor' do
-        let(:stdin) { instance_double 'IO' }
-        let(:stdout) { instance_double 'IO' }
-        let(:stderr) { instance_double 'IO' }
-        let(:wait_thr) { instance_double 'Process::Waiter' }
+        let(:stdin) { instance_double IO }
+        let(:stdout) { instance_double IO }
+        let(:stderr) { instance_double IO }
+        let(:wait_thr) { instance_double Process::Waiter }
 
         before do
           allow(Open3).to(
@@ -540,7 +540,7 @@ describe Grover::Processor do
           basic_header_footer_options.merge(
             'executeScript' => 'startProcessing()',
             'waitForFunction' => 'doneProcessing === true',
-            'waitForFunctionOptions' => { "polling": 50, "timeout": wait_function_timeout }
+            'waitForFunctionOptions' => { 'polling' => 50, 'timeout' => wait_function_timeout }
           )
         end
 
@@ -548,11 +548,14 @@ describe Grover::Processor do
 
         context 'when waiting for function takes too long' do
           let(:wait_function_timeout) { 100 }
+          let(:timeout_error_regex) do
+            puppeteer_version_on_or_after?('18.0.0') ? /Waiting failed: 100ms exceeded/ : /waiting for function failed/
+          end
 
           it 'raises a JavaScript error if waitForFunction fails' do
             expect do
               pdf_text_content
-            end.to raise_error Grover::JavaScript::TimeoutError, /waiting for function failed/
+            end.to raise_error Grover::JavaScript::TimeoutError, timeout_error_regex
           end
         end
       end
@@ -669,7 +672,7 @@ describe Grover::Processor do
                   <p id="loading">Loading</p>
                   <p id="content" style="display: none">Loaded</p>
                 </body>
-  
+
                 <script>
                   setTimeout(function() {
                     document.getElementById('loading').remove();
@@ -879,7 +882,7 @@ describe Grover::Processor do
               <head>
                 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css"
                       integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We"
-                      crossorigin="anonymous">                
+                      crossorigin="anonymous">
               </head>
               <body class="bg-dark"></body>
             </html>

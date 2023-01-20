@@ -5,7 +5,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 require 'grover/version'
 
-Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
+Gem::Specification.new do |spec|
   spec.name        = 'grover'
   spec.version     = Grover::VERSION
   spec.authors     = ['Andrew Bromwich']
@@ -16,7 +16,7 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   SUMMARY
   spec.homepage    = 'https://github.com/Studiosity/grover'
   spec.license     = 'MIT'
-  spec.required_ruby_version = ['>= 2.6.0', '< 3.2.0']
+  spec.required_ruby_version = ['>= 2.7.0', '< 3.2.0']
 
   # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
   # delete this section to allow pushing this gem to any host.
@@ -27,19 +27,19 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
 
   spec.files         = `git ls-files lib`.split("\n") + ['LICENSE']
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
-  spec.test_files    = spec.files.grep(%r{^spec/})
   spec.require_paths = ['lib']
 
   spec.add_dependency 'combine_pdf', '~> 1.0'
   spec.add_dependency 'nokogiri', '~> 1.0'
 
-  spec.add_development_dependency 'mini_magick', '~> 4.9'
-  spec.add_development_dependency 'pdf-reader', '~> 2.2'
+  spec.add_development_dependency 'mini_magick', '~> 4.12'
+  spec.add_development_dependency 'pdf-reader', '~> 2.11'
   spec.add_development_dependency 'rack-test', '~> 1.1'
-  spec.add_development_dependency 'rake', '~> 12.3'
-  spec.add_development_dependency 'rspec', '~> 3.8'
-  spec.add_development_dependency 'rubocop', '~> 0.72'
-  spec.add_development_dependency 'rubocop-rspec', '~> 1.33'
+  spec.add_development_dependency 'rake', '~> 13.0'
+  spec.add_development_dependency 'rspec', '~> 3.12'
+  spec.add_development_dependency 'rubocop', '~> 1.43'
+  spec.add_development_dependency 'rubocop-rake', '~> 0.6'
+  spec.add_development_dependency 'rubocop-rspec', '~> 2.18'
   # Limit simplecov to 0.17.x due to https://github.com/codeclimate/test-reporter/issues/413
   spec.add_development_dependency 'simplecov', '~> 0.17', '< 0.18'
 end

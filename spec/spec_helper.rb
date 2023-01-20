@@ -20,5 +20,6 @@ end
 MiniMagick.validate_on_create = false
 
 def puppeteer_version_on_or_after?(version)
-  ENV['PUPPETEER_VERSION'].to_s == '' || Gem::Version.new(ENV['PUPPETEER_VERSION']) >= Gem::Version.new(version)
+  puppeteer_version = ENV.fetch('PUPPETEER_VERSION', '')
+  puppeteer_version.empty? || Gem::Version.new(puppeteer_version) >= Gem::Version.new(version)
 end

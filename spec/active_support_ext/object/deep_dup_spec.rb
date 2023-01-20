@@ -8,8 +8,8 @@ describe 'DeepDup' do
       object = Object.new
       dup = object.deep_dup
       dup.instance_variable_set(:@a, 1)
-      expect(object.instance_variable_defined?(:@a)).to eq false
-      expect(dup.instance_variable_defined?(:@a)).to eq true
+      expect(object.instance_variable_defined?(:@a)).to be false
+      expect(dup.instance_variable_defined?(:@a)).to be true
     end
   end
 
