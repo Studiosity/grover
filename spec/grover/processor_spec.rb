@@ -540,7 +540,7 @@ describe Grover::Processor do
           basic_header_footer_options.merge(
             'executeScript' => 'startProcessing()',
             'waitForFunction' => 'doneProcessing === true',
-            'waitForFunctionOptions' => { polling: 50, timeout: wait_function_timeout }
+            'waitForFunctionOptions' => { 'polling' => 50, 'timeout' => wait_function_timeout }
           )
         end
 
@@ -882,7 +882,7 @@ describe Grover::Processor do
               <head>
                 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css"
                       integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We"
-                      crossorigin="anonymous">#{'                '}
+                      crossorigin="anonymous">
               </head>
               <body class="bg-dark"></body>
             </html>
