@@ -547,7 +547,7 @@ describe Grover::Processor do
         it { expect(pdf_text_content).to eq "#{date} Hello, world! http://www.example.net/foo/bar 1/1" }
 
         context 'when waiting for function takes too long' do
-          let(:wait_function_timeout) { 100 }
+          let(:wait_function_timeout) { 110 }
 
           it 'raises a JavaScript error if waitForFunction fails' do
             expect do
