@@ -546,13 +546,25 @@ describe Grover::Processor do
 
         it { expect(pdf_text_content).to eq "#{date} Hello, world! http://www.example.net/foo/bar 1/1" }
 
-        context 'when waiting for function takes too long' do
-          let(:wait_function_timeout) { 110 }
+        if puppeteer_version_on_or_after? '18.0.0'
+          context 'when waiting for function takes too long' do
+            let(:wait_function_timeout) { 100 }
 
-          it 'raises a JavaScript error if waitForFunction fails' do
-            expect do
-              pdf_text_content
-            end.to raise_error Grover::JavaScript::TimeoutError, /waiting for function failed/
+            it 'raises a JavaScript error if waitForFunction fails' do
+              expect do
+                pdf_text_content
+              end.to raise_error Grover::JavaScript::TimeoutError, /Waiting failed: 100ms exceeded/
+            end
+          end
+        else
+          context 'when waiting for function takes too long' do
+            let(:wait_function_timeout) { 100 }
+
+            it 'raises a JavaScript error if waitForFunction fails' do
+              expect do
+                pdf_text_content
+              end.to raise_error Grover::JavaScript::TimeoutError, /waiting for function failed/
+            end
           end
         end
       end
