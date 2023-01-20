@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         ruby-version: ['3.1']
-        node-version: ['10']
+        node-version: ['14']
         puppeteer-version: [
           '14.4.1',
           '15.5.0',
@@ -24,15 +24,9 @@ jobs:
         ]
         include:
           - ruby-version: '2.7'
-            node-version: '10'
+            node-version: '14'
             puppeteer-version: '19.5.2'
           - ruby-version: '3.0'
-            node-version: '10'
-            puppeteer-version: '19.5.2'
-          - ruby-version: '3.1'
-            node-version: '12'
-            puppeteer-version: '19.5.2'
-          - ruby-version: '3.1'
             node-version: '14'
             puppeteer-version: '19.5.2'
           - ruby-version: '3.1'
