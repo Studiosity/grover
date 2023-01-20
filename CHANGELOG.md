@@ -3,6 +3,10 @@
 ## Unreleased
 - none
 
+## [1.1.3](releases/tag/v1.1.3) - 2023-01-21
+### Added
+- [#177](https://github.com/Studiosity/grover/pull/177) Add support for Ruby 3.2 ([@Yobilat][], [@abrom][])
+
 ## [1.1.2](releases/tag/v1.1.2) - 2022-09-12
 ### Fixed
 - [#160](https://github.com/Studiosity/grover/pull/160) Support projects that are using esm instead of cjs ([@ElMassimo][])
@@ -291,3 +295,4 @@
 [@julianwegkamp]: https://github.com/julianwegkamp
 [@walski]: https://github.com/walski
 [@ElMassimo]: https://github.com/ElMassimo
+[@Yobilat]: https://github.com/Yobilat
