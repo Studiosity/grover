@@ -3,6 +3,10 @@
 ## Unreleased
 - none
 
+## [1.1.4](releases/tag/v1.1.4) - 2023-02-05
+### Fixed
+- [#179](https://github.com/Studiosity/grover/pull/179) Clean up temporary user data directory ([@abrom][])
+
 ## [1.1.3](releases/tag/v1.1.3) - 2023-01-21
 ### Added
 - [#177](https://github.com/Studiosity/grover/pull/177) Add support for Ruby 3.2 ([@Yobilat][], [@abrom][])
