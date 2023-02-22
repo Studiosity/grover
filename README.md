@@ -164,8 +164,8 @@ if the initial content request or any subsequent asset request returns a bad res
 
 The Chrome/Chromium executable path can be overridden with the `executable_path` option.
 
-Javascript can be executed on the page (after render and before conversion to PDF/image)
-with the `execute_script` option.
+Supplementary JavaScript can be executed on the page (after render and before conversion to PDF/image)
+by passing it to the `execute_script` option.
 
 #### Basic authentication
 For requesting a page with basic authentication, `username` and `password` options can be provided. Note that this
