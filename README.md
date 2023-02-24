@@ -167,6 +167,10 @@ The Chrome/Chromium executable path can be overridden with the `executable_path`
 Supplementary JavaScript can be executed on the page (after render and before conversion to PDF/image)
 by passing it to the `execute_script` option.
 
+```javascript
+Grover.new(<some url>, { execute_script: 'document.getElementsByTagName("footer")[0].innerText = "Hey"' }).to_pdf
+```
+
 #### Basic authentication
 For requesting a page with basic authentication, `username` and `password` options can be provided. Note that this
 only really makes sense if you're calling Grover directly (and not via middleware).
