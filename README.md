@@ -490,6 +490,12 @@ $ rubocop
 both succeed
 
 
+To run tests tagged with `remote_browser`, you need to start a browser in a container:
+`docker run -p 3000:3000 browserless/chrome:latest`
+and run:
+`rspec --tag remote_browser`
+
+
 ## Special mention
 Thanks are given to the great work done in the [PDFKit project](https://github.com/pdfkit/pdfkit).
 The middleware and HTML preprocessing components were used heavily in the implementation of Grover.

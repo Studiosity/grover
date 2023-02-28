@@ -875,6 +875,16 @@ describe Grover::Processor do
         it { expect(mean_colour_statistics(image)).to eq %w[0 0 255] }
       end
 
+      context 'when using remote browser option with HTML', remote_browser: true do
+        let(:options) { { browserWsEndpoint: 'ws://localhost:3000' } }
+        let(:url_or_html) { '<html><body style="background-color: blue"></body></html>' }
+
+        it { expect(convert.unpack('C*')).to start_with "\x89PNG\r\n\x1A\n".unpack('C*') }
+        it { expect(image.type).to eq 'PNG' }
+        it { expect(image.dimensions).to eq [800, 600] }
+        it { expect(mean_colour_statistics(image)).to eq %w[0 0 255] }
+      end
+
       context 'when HTML requests external assets' do
         let(:url_or_html) do
           <<~HTML

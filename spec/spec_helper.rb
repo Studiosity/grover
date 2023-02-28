@@ -13,6 +13,7 @@ require 'mini_magick'
 
 RSpec.configure do |config|
   config.order = 'random'
+  config.filter_run_excluding remote_browser: true
 
   include Rack::Test::Methods
 end
