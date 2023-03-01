@@ -179,6 +179,21 @@ only really makes sense if you're calling Grover directly (and not via middlewar
 Grover.new('<some URI with basic authentication', username: 'the username', password: 'super secret').to_pdf
 ```
 
+#### Remote Chromium
+
+By default, Grover launches a local Chromium instance. You can connect to a remote/external
+Chromium with the `browser_ws_endpoint` options.
+
+For example, to connect to a chrome instance started with docker using `docker run -p 3000:3000 browserless/chrome:latest`:
+
+```ruby
+options = {"browser_ws_endpoint": "ws://localhost:3000/"}
+grover = Grover.new("https://mysite.com/path/to/thing", options)
+File.open("grover.png", "wb") { |f| f << grover.to_png }
+```
+
+You can also pass launch flags like this: `ws://localhost:3000/?--disable-speech-api`
+
 #### Adding cookies
 To set request cookies when requesting a URL, pass an array of hashes as such
 _N.B._ Only the `name` and `value` properties are required.
