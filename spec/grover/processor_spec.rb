@@ -404,6 +404,32 @@ describe Grover::Processor do
         end
       end
 
+      context 'when passing through launch params to remote browser', remote_browser: true do
+        let(:options) { { 'browserWsEndpoint' => browser_ws_endpoint } }
+        let(:browser_ws_endpoint) { 'ws://localhost:3000/' }
+        let(:url_or_html) do
+          <<-HTML
+            <html>
+              <body>
+                Speech recognition is <span id="test" />
+                <script type="text/javascript">
+                  var speechSupported = "webkitSpeechRecognition" in window;
+                  document.getElementById("test").innerHTML = speechSupported ? "supported" : "not supported"
+                </script>
+              </body>
+            </html>
+          HTML
+        end
+
+        it { expect(pdf_text_content).to eq 'Speech recognition is supported' }
+
+        context 'when WS endpoint param specifies disabling the speech API' do
+          let(:browser_ws_endpoint) { 'ws://localhost:3000/?--disable-speech-api' }
+
+          it { expect(pdf_text_content).to eq 'Speech recognition is not supported' }
+        end
+      end
+
       context 'when HTML includes screen only content' do
         let(:url_or_html) do
           <<-HTML
