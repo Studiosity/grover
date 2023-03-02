@@ -70,7 +70,7 @@ jobs:
           PUPPETEER_VERSION: ${{ matrix.puppeteer-version }}
 
       - name: Run tests with remote browser
-        run: bundle exec rspec --tag remote-browser
+        run: bundle exec rspec --tag remote_browser
         env:
           PUPPETEER_VERSION: ${{ matrix.puppeteer-version }}
 
