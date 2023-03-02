@@ -9,6 +9,11 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      remote-chrome:
+        image: browserless/chrome:1.57-puppeteer-19.2.2
+        ports:
+          - 3000:3000
     strategy:
       fail-fast: false
       matrix:
@@ -61,6 +66,11 @@ jobs:
 
       - name: Run tests
         run: bundle exec rspec
+        env:
+          PUPPETEER_VERSION: ${{ matrix.puppeteer-version }}
+
+      - name: Run tests with remote browser
+        run: bundle exec rspec --tag remote-browser
         env:
           PUPPETEER_VERSION: ${{ matrix.puppeteer-version }}
 

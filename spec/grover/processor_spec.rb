@@ -404,6 +404,32 @@ describe Grover::Processor do
         end
       end
 
+      context 'when passing through launch params to remote browser', remote_browser: true do
+        let(:options) { { 'browserWsEndpoint' => browser_ws_endpoint } }
+        let(:browser_ws_endpoint) { 'ws://localhost:3000/' }
+        let(:url_or_html) do
+          <<-HTML
+            <html>
+              <body>
+                Speech recognition is <span id="test" />
+                <script type="text/javascript">
+                  var speechSupported = "webkitSpeechRecognition" in window;
+                  document.getElementById("test").innerHTML = speechSupported ? "supported" : "not supported"
+                </script>
+              </body>
+            </html>
+          HTML
+        end
+
+        it { expect(pdf_text_content).to eq 'Speech recognition is supported' }
+
+        context 'when WS endpoint param specifies disabling the speech API' do
+          let(:browser_ws_endpoint) { 'ws://localhost:3000/?--disable-speech-api' }
+
+          it { expect(pdf_text_content).to eq 'Speech recognition is not supported' }
+        end
+      end
+
       context 'when HTML includes screen only content' do
         let(:url_or_html) do
           <<-HTML
@@ -867,6 +893,16 @@ describe Grover::Processor do
       end
 
       context 'when passing through HTML' do
+        let(:url_or_html) { '<html><body style="background-color: blue"></body></html>' }
+
+        it { expect(convert.unpack('C*')).to start_with "\x89PNG\r\n\x1A\n".unpack('C*') }
+        it { expect(image.type).to eq 'PNG' }
+        it { expect(image.dimensions).to eq [800, 600] }
+        it { expect(mean_colour_statistics(image)).to eq %w[0 0 255] }
+      end
+
+      context 'when using remote browser option with HTML', remote_browser: true do
+        let(:options) { { browserWsEndpoint: 'ws://localhost:3000' } }
         let(:url_or_html) { '<html><body style="background-color: blue"></body></html>' }
 
         it { expect(convert.unpack('C*')).to start_with "\x89PNG\r\n\x1A\n".unpack('C*') }
