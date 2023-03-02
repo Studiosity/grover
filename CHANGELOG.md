@@ -3,6 +3,10 @@
 ## Unreleased
 - none
 
+## [1.1.5](releases/tag/v1.1.5) - 2023-03-02
+### Added
+- [#178](https://github.com/Studiosity/grover/pull/178) Add remote browser support ([@Zinggi][])
+
 ## [1.1.4](releases/tag/v1.1.4) - 2023-02-05
 ### Fixed
 - [#179](https://github.com/Studiosity/grover/pull/179) Clean up temporary user data directory ([@abrom][])
@@ -300,3 +304,4 @@
 [@walski]: https://github.com/walski
 [@ElMassimo]: https://github.com/ElMassimo
 [@Yobilat]: https://github.com/Yobilat
+[@Zinggi]: https://github.com/Zinggi
