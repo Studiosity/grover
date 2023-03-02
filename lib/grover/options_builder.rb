@@ -8,7 +8,7 @@ class Grover
   # Build options from Grover.configuration, meta_options, and passed-in options
   #
   class OptionsBuilder < Hash
-    def initialize(options, url) # rubocop:disable Lint/MissingSuper
+    def initialize(options, url)
       @url = url
       combined = grover_configuration
       Utils.deep_merge! combined, Utils.deep_stringify_keys(options)
