@@ -84,7 +84,9 @@ describe Grover::Processor do
         context 'when puppeteer package is not in package.json' do
           before do
             FileUtils.copy 'package.json', 'package.json.tmp'
-            File.write('package.json', File.open('package.json') { |f| f.read.gsub(/"puppeteer": "/, '"puppeteer-tmp": "') })
+            File.write('package.json', File.open('package.json') do |f|
+                                         f.read.gsub(/"puppeteer": "/, '"puppeteer-tmp": "')
+                                       end)
           end
 
           after { FileUtils.move 'package.json.tmp', 'package.json' }
@@ -110,18 +112,20 @@ describe Grover::Processor do
 
         context 'when puppeteer package is not installed' do
           # Temporarily move the node puppeteer* folder
-          before {
+          before do
             FileUtils.move 'node_modules/puppeteer', 'node_modules/puppeteer_temp'
             FileUtils.move 'node_modules/puppeteer-core', 'node_modules/puppeteer-core_temp'
             FileUtils.copy 'package.json', 'package.json.tmp'
-            File.write('package.json', File.open('package.json') { |f| f.read.gsub(/"puppeteer": "/, '"puppeteer-core": "') })
-          }
+            File.write('package.json', File.open('package.json') do |f|
+                                         f.read.gsub(/"puppeteer": "/, '"puppeteer-core": "')
+                                       end)
+          end
 
-          after {
+          after do
             FileUtils.move 'node_modules/puppeteer_temp', 'node_modules/puppeteer'
             FileUtils.move 'node_modules/puppeteer-core_temp', 'node_modules/puppeteer-core'
             FileUtils.move 'package.json.tmp', 'package.json'
-          }
+          end
 
           it 'raises a DependencyError' do
             expect { convert }.to raise_error Grover::DependencyError, Grover::Utils.squish(<<~ERROR)
@@ -132,18 +136,21 @@ describe Grover::Processor do
         end
 
         context 'when puppeteer-core package is not in package.json' do
-          before {
+          before do
             FileUtils.move 'node_modules/puppeteer', 'node_modules/puppeteer_temp'
             FileUtils.move 'node_modules/puppeteer-core', 'node_modules/puppeteer-core_temp'
             FileUtils.copy 'package.json', 'package.json.tmp'
-            File.write('package.json', File.open('package.json') { |f| f.read.gsub(/"puppeteer": "/, '"puppeteer-tmp": "').gsub(/"puppeteer-core": "/, '"puppeteer-core-tmp": "') })
-          }
+            File.write('package.json', File.open('package.json') do |f|
+                                         f.read.gsub(/"puppeteer": "/, '"puppeteer-tmp": "').
+                                          gsub(/"puppeteer-core": "/, '"puppeteer-core-tmp": "')
+                                       end)
+          end
 
-          after {
+          after do
             FileUtils.move 'node_modules/puppeteer_temp', 'node_modules/puppeteer'
             FileUtils.move 'node_modules/puppeteer-core_temp', 'node_modules/puppeteer-core'
             FileUtils.move 'package.json.tmp', 'package.json'
-          }
+          end
 
           it 'raises a DependencyError' do
             expect { convert }.to raise_error Grover::DependencyError, Grover::Utils.squish(<<~ERROR)
@@ -152,7 +159,6 @@ describe Grover::Processor do
             ERROR
           end
         end
-
       end
 
       context 'when stubbing the call to the Node processor' do
