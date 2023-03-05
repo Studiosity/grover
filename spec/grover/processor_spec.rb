@@ -12,7 +12,7 @@ describe Grover::Processor do
     let(:options) { {} }
     let(:date) do
       # New version of Chromium (v93) that comes with v10.2.0 of puppeteer uses a different date format
-      date_format = puppeteer_version_on_or_after?('10.2.0') ? '%-m/%-d/%y, %-l:%M %p' : '%-m/%-d/%Y'
+      date_format = puppeteer_version_on_or_after?('10.2.0') ? '%-m/%-d/%y, %-l:%M%p' : '%-m/%-d/%Y'
       Time.now.strftime date_format
     end
 
@@ -84,7 +84,7 @@ describe Grover::Processor do
         context 'when puppeteer package is not in package.json' do
           before do
             FileUtils.copy 'package.json', 'package.json.tmp'
-            File.write('package.json', File.open('package.json') { |f| f.read.gsub(/"puppeteer"/, '"puppeteer-tmp"') })
+            File.write('package.json', File.open('package.json') { |f| f.read.gsub(/"puppeteer": "/, '"puppeteer-tmp": "') })
           end
 
           after { FileUtils.move 'package.json.tmp', 'package.json' }
@@ -96,6 +96,63 @@ describe Grover::Processor do
             ERROR
           end
         end
+      end
+
+      context 'when puppeteer-core package is not installed for remote browser', remote_browser: true do
+        let(:options) { { 'browserWsEndpoint' => browser_ws_endpoint } }
+        let(:browser_ws_endpoint) { 'ws://localhost:3000/' }
+
+        context 'when puppeteer package is installed' do
+          it 'raises no errors' do
+            expect { convert }.not_to raise_error
+          end
+        end
+
+        context 'when puppeteer package is not installed' do
+          # Temporarily move the node puppeteer* folder
+          before {
+            FileUtils.move 'node_modules/puppeteer', 'node_modules/puppeteer_temp'
+            FileUtils.move 'node_modules/puppeteer-core', 'node_modules/puppeteer-core_temp'
+            FileUtils.copy 'package.json', 'package.json.tmp'
+            File.write('package.json', File.open('package.json') { |f| f.read.gsub(/"puppeteer": "/, '"puppeteer-core": "') })
+          }
+
+          after {
+            FileUtils.move 'node_modules/puppeteer_temp', 'node_modules/puppeteer'
+            FileUtils.move 'node_modules/puppeteer-core_temp', 'node_modules/puppeteer-core'
+            FileUtils.move 'package.json.tmp', 'package.json'
+          }
+
+          it 'raises a DependencyError' do
+            expect { convert }.to raise_error Grover::DependencyError, Grover::Utils.squish(<<~ERROR)
+              Cannot find module 'puppeteer-core'.
+              The module was found in '#{Dir.pwd}/package.json' however, please run 'npm install' from '#{Dir.pwd}'
+            ERROR
+          end
+        end
+
+        context 'when puppeteer-core package is not in package.json' do
+          before {
+            FileUtils.move 'node_modules/puppeteer', 'node_modules/puppeteer_temp'
+            FileUtils.move 'node_modules/puppeteer-core', 'node_modules/puppeteer-core_temp'
+            FileUtils.copy 'package.json', 'package.json.tmp'
+            File.write('package.json', File.open('package.json') { |f| f.read.gsub(/"puppeteer": "/, '"puppeteer-tmp": "').gsub(/"puppeteer-core": "/, '"puppeteer-core-tmp": "') })
+          }
+
+          after {
+            FileUtils.move 'node_modules/puppeteer_temp', 'node_modules/puppeteer'
+            FileUtils.move 'node_modules/puppeteer-core_temp', 'node_modules/puppeteer-core'
+            FileUtils.move 'package.json.tmp', 'package.json'
+          }
+
+          it 'raises a DependencyError' do
+            expect { convert }.to raise_error Grover::DependencyError, Grover::Utils.squish(<<~ERROR)
+              Cannot find module 'puppeteer-core'.
+              You need to add it to '#{Dir.pwd}/package.json' and run 'npm install'
+            ERROR
+          end
+        end
+
       end
 
       context 'when stubbing the call to the Node processor' do

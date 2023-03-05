@@ -46,12 +46,11 @@ class Grover
       return if result[0] == 'ok'
 
       cleanup_process
-      parse_package_error result[1]
     end
 
     def parse_package_error(error_message) # rubocop:disable Metrics/MethodLength
       package_name = error_message[/^Error: Cannot find module '(.*)'$/, 1]
-      raise Grover::Error, error_message unless package_name
+      return unless package_name
 
       begin
         %w[dependencies devDependencies].each do |key|
@@ -86,6 +85,8 @@ class Grover
 
       if status == 'ok'
         message
+      elsif error_class.eql?('DependencyError')
+        parse_package_error message
       elsif error_class.nil?
         raise Grover::JavaScript::UnknownError, message
       else
