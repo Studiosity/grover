@@ -124,12 +124,12 @@ Grover.configure do |config|
 end
 ```
 
-For available PNG/JPEG options, see https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pagescreenshotoptions
+For available PNG/JPEG options, see https://github.com/puppeteer/puppeteer/blob/main/docs/api/puppeteer.page.screenshot.md#remarks
 
 Note that by default the `full_page` option is set to false and you will get a 800x600 image. You can either specify
 the image size using the `clip` options, or capture the entire page with `full_page` set to `true`.
 
-For `viewport` options, see https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pagesetviewportviewport
+For `viewport` options, see https://github.com/puppeteer/puppeteer/blob/main/docs/api/puppeteer.page.setviewport.md#remarks
 
 For `launch_args` options, see http://peter.sh/experiments/chromium-command-line-switches/
 Launch parameter args can also be provided using a meta tag:
@@ -151,11 +151,11 @@ The `hover` option takes a CSS selector and will hover on the first matching ele
 ```
 
 For `wait_until` option, default for URLs is `networkidle2` and for HTML content `networkidle0`.
-For available options see https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pagegotourl-options
+For available options see https://github.com/puppeteer/puppeteer/blob/main/docs/api/puppeteer.page.goto.md#remarks
 
-The `wait_for_selector` option can also be used to wait until an element appears on the page. Additional waiting parameters can be set with the `wait_for_selector_options` options hash. For available options, see: https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pagewaitforselectorselector-options.
+The `wait_for_selector` option can also be used to wait until an element appears on the page. Additional waiting parameters can be set with the `wait_for_selector_options` options hash. For available options, see: https://github.com/puppeteer/puppeteer/blob/main/docs/api/puppeteer.page.waitforselector.md#remarks.
 
-The `wait_for_function` option can be used to wait until a specific function returns a truthy value. Additional parameters can be set with the `wait_for_function_options` options hash. For available options, see: https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pagewaitforfunctionpagefunction-options-args
+The `wait_for_function` option can be used to wait until a specific function returns a truthy value. Additional parameters can be set with the `wait_for_function_options` options hash. For available options, see: https://github.com/puppeteer/puppeteer/blob/main/docs/api/puppeteer.page.waitforfunction.md#remarks
 
 The `wait_for_timeout` option can also be used to wait the specified number of milliseconds have elapsed.
 
@@ -197,7 +197,7 @@ You can also pass launch flags like this: `ws://localhost:3000/?--disable-speech
 #### Adding cookies
 To set request cookies when requesting a URL, pass an array of hashes as such
 _N.B._ Only the `name` and `value` properties are required.
-See [page.setCookies](https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pagesetcookiecookies) documentation for more details.
+See [page.setCookie](https://github.com/puppeteer/puppeteer/blob/main/docs/api/puppeteer.page.setcookie.md#pagesetcookie-method) documentation for more details (old documentation with more detailed description is available [here](https://github.com/puppeteer/puppeteer/blob/v15.0.0/docs/api.md#pagesetcookiecookies)).
 
 ```ruby
 myCookies = [
@@ -226,7 +226,7 @@ Grover.new('<some URI with cookies', cookies: header_cookies).to_pdf
 
 #### Adding style tags
 To add style tags, pass an array of style tag options as such
-See [page.addStyleTag](https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pageaddstyletagoptions) documentation for more details.
+See [page.addStyleTag](https://github.com/puppeteer/puppeteer/blob/main/docs/api/puppeteer.frameaddstyletagoptions.md) documentation for more details (old documentation with more detailed description is available [here](https://github.com/puppeteer/puppeteer/blob/v15.0.0/docs/api.md#pageaddstyletagoptions)).
 
 ```ruby
 style_tag_options = [
@@ -239,7 +239,7 @@ Grover.new('<html><body><h1>Heading</h1></body></html>', style_tag_options: styl
 
 #### Adding script tags
 To add script tags, pass an array of script tag options as such
-See [page.addScriptTag](https://github.com/puppeteer/puppeteer/blob/main/docs/api.md#pageaddscripttagoptions) documentation for more details.
+See documentation for more details [page.addScriptTag]([page.addScriptTag](https://github.com/puppeteer/puppeteer/blob/v15.0.0/main/docs/api.md#pageaddscripttagoptions)) (old documentation is available [here](https://github.com/puppeteer/puppeteer/blob/v15.0.0/main/docs/api.md#pageaddscripttagoptions)).
 
 ```ruby
 script_tag_options = [
