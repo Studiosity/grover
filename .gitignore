@@ -3,3 +3,6 @@ Gemfile.lock
 package-lock.json
 /node_modules
 /coverage
+/.ruby-version
+/.nvmrc
+/.byebug_history

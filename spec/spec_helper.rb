@@ -10,10 +10,12 @@ require 'rack/test'
 require 'stringio'
 require 'pdf-reader'
 require 'mini_magick'
+require 'byebug'
 
 RSpec.configure do |config|
   config.order = 'random'
   config.filter_run_excluding remote_browser: true
+  config.filter_run_when_matching :focus
 
   include Rack::Test::Methods
 end
