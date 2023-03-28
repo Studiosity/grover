@@ -1,5 +1,4 @@
 require "ferrum"
-require "base64"
 
 class Grover
   class FerrumProcessor
@@ -10,7 +9,7 @@ class Grover
       sleep 0.5 # give network requests time to start
       browser.network.wait_for_idle
 
-      Base64.decode64(page.pdf)
+      page.pdf(encoding: :binary)
     ensure
       browser.quit
     end
