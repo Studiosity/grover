@@ -6,11 +6,9 @@ class Grover
   class FerrumProcessor
     def convert(method, html, options)
       browser = Ferrum::Browser.new
-      Tempfile.open(%w[page .html]) do |file|
-        file.write(html)
-        browser.go_to("file://#{file.path}")
-      end
-      Base64.decode64(browser.pdf)
+      page = browser.create_page
+      page.content = html
+      Base64.decode64(page.pdf)
     ensure
       browser.quit
     end
