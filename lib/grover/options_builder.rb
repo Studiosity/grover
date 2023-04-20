@@ -9,6 +9,7 @@ class Grover
   #
   class OptionsBuilder < Hash
     def initialize(options, url)
+      super()
       @url = url
       combined = grover_configuration
       Utils.deep_merge! combined, Utils.deep_stringify_keys(options)
