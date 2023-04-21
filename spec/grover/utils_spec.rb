@@ -160,107 +160,107 @@ describe Grover::Utils do
   end
 
   describe '.deep_merge!' do
-    subject(:deep_merge!) { described_class.deep_merge! hash1, hash2 }
+    subject(:deep_merge!) { described_class.deep_merge! first_hash, second_hash }
 
     context 'when both hashes are empty' do
-      let(:hash1) { {} }
-      let(:hash2) { {} }
+      let(:first_hash) { {} }
+      let(:second_hash) { {} }
 
       it { is_expected.to eq({}) }
 
       it 'leaves the first hash empty' do
         deep_merge!
-        expect(hash1).to eq({})
+        expect(first_hash).to eq({})
       end
 
       it 'leaves the second hash empty' do
         deep_merge!
-        expect(hash2).to eq({})
+        expect(second_hash).to eq({})
       end
     end
 
     context 'when hash1 has some keys' do
-      let(:hash1) { { foo: 'bar' } }
-      let(:hash2) { {} }
+      let(:first_hash) { { foo: 'bar' } }
+      let(:second_hash) { {} }
 
       it { is_expected.to eq(foo: 'bar') }
 
       it 'leaves the first hash as it was' do
         deep_merge!
-        expect(hash1).to eq(foo: 'bar')
+        expect(first_hash).to eq(foo: 'bar')
       end
 
       it 'leaves the second hash empty' do
         deep_merge!
-        expect(hash2).to eq({})
+        expect(second_hash).to eq({})
       end
     end
 
     context 'when hash2 has some keys' do
-      let(:hash1) { {} }
-      let(:hash2) { { foo: 'bar' } }
+      let(:first_hash) { {} }
+      let(:second_hash) { { foo: 'bar' } }
 
       it { is_expected.to eq(foo: 'bar') }
 
       it 'updates hash1 to include the contents from hash2' do
         deep_merge!
-        expect(hash1).to eq(foo: 'bar')
+        expect(first_hash).to eq(foo: 'bar')
       end
 
       it 'leaves the second hash as it was' do
         deep_merge!
-        expect(hash2).to eq(foo: 'bar')
+        expect(second_hash).to eq(foo: 'bar')
       end
     end
 
     context 'when both hashes have keys (different)' do
-      let(:hash1) { { bar: 'baz' } }
-      let(:hash2) { { foo: 'bar' } }
+      let(:first_hash) { { bar: 'baz' } }
+      let(:second_hash) { { foo: 'bar' } }
 
       it { is_expected.to eq(foo: 'bar', bar: 'baz') }
 
       it 'merges the contents of hash1 and hash2' do
         deep_merge!
-        expect(hash1).to eq(foo: 'bar', bar: 'baz')
+        expect(first_hash).to eq(foo: 'bar', bar: 'baz')
       end
 
       it 'leaves the second hash as it was' do
         deep_merge!
-        expect(hash2).to eq(foo: 'bar')
+        expect(second_hash).to eq(foo: 'bar')
       end
     end
 
     context 'when both hashes have keys (same)' do
-      let(:hash1) { { foo: 'baz', baz: 'foo' } }
-      let(:hash2) { { foo: 'bar' } }
+      let(:first_hash) { { foo: 'baz', baz: 'foo' } }
+      let(:second_hash) { { foo: 'bar' } }
 
       it { is_expected.to eq(foo: 'bar', baz: 'foo') }
 
       it 'overloads existing key values in hash1' do
         deep_merge!
-        expect(hash1).to eq(foo: 'bar', baz: 'foo')
+        expect(first_hash).to eq(foo: 'bar', baz: 'foo')
       end
 
       it 'leaves the second hash as it was' do
         deep_merge!
-        expect(hash2).to eq(foo: 'bar')
+        expect(second_hash).to eq(foo: 'bar')
       end
     end
 
     context 'when both hashes have keys (same/deep)' do
-      let(:hash1) { { foo: { bar: 'baz' }, fizz: 'buzz' } }
-      let(:hash2) { { foo: { baz: 'bar', bar: 'foo' } } }
+      let(:first_hash) { { foo: { bar: 'baz' }, fizz: 'buzz' } }
+      let(:second_hash) { { foo: { baz: 'bar', bar: 'foo' } } }
 
       it { is_expected.to eq(foo: { bar: 'foo', baz: 'bar' }, fizz: 'buzz') }
 
       it 'overloads existing deep key values in hash1' do
         deep_merge!
-        expect(hash1).to eq(foo: { bar: 'foo', baz: 'bar' }, fizz: 'buzz')
+        expect(first_hash).to eq(foo: { bar: 'foo', baz: 'bar' }, fizz: 'buzz')
       end
 
       it 'leaves the second hash as it was' do
         deep_merge!
-        expect(hash2).to eq(foo: { baz: 'bar', bar: 'foo' })
+        expect(second_hash).to eq(foo: { baz: 'bar', bar: 'foo' })
       end
     end
   end
