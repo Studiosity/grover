@@ -64,7 +64,7 @@ pdf = Grover.new(html, **grover_options).to_pdf
 If calling Grover directly (not through middleware) you will need to either specify a `display_url` or modify your
 HTML by converting any relative paths to absolute paths before passing to Grover.
 
-This can be achieved using the HTML pre-processor helper:
+This can be achieved using the HTML pre-processor helper (pay attention to the slash at the end of the url):
 
 ```ruby
 absolute_html = Grover::HTMLPreprocessor.process relative_html, 'http://my.server/', 'http'
@@ -226,7 +226,7 @@ Grover.new('<some URI with cookies', cookies: header_cookies).to_pdf
 
 #### Adding style tags
 To add style tags, pass an array of style tag options as such
-See [page.addStyleTag](https://github.com/puppeteer/puppeteer/blob/main/docs/api/puppeteer.frameaddstyletagoptions.md) documentation for more details (old documentation with more detailed description is available [here](https://github.com/puppeteer/puppeteer/blob/v15.0.0/docs/api.md#pageaddstyletagoptions)).
+See [page.addStyleTag](https://github.com/puppeteer/puppeteer/blob/main/docs/api/puppeteer.page.addstyletag.md) documentation for more details (old documentation with more detailed description is available [here](https://github.com/puppeteer/puppeteer/blob/v15.0.0/docs/api.md#pageaddstyletagoptions)).
 
 ```ruby
 style_tag_options = [
@@ -239,7 +239,7 @@ Grover.new('<html><body><h1>Heading</h1></body></html>', style_tag_options: styl
 
 #### Adding script tags
 To add script tags, pass an array of script tag options as such
-See documentation for more details [page.addScriptTag]([page.addScriptTag](https://github.com/puppeteer/puppeteer/blob/v15.0.0/main/docs/api.md#pageaddscripttagoptions)) (old documentation is available [here](https://github.com/puppeteer/puppeteer/blob/v15.0.0/main/docs/api.md#pageaddscripttagoptions)).
+See documentation for more details [page.addScriptTag](https://github.com/puppeteer/puppeteer/blob/main/docs/api/puppeteer.page.addscripttag.md) (old documentation is available [here](https://github.com/puppeteer/puppeteer/blob/v15.0.0/docs/api.md#pageaddscripttagoptions)).
 
 ```ruby
 script_tag_options = [
