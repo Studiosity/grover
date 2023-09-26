@@ -84,7 +84,7 @@ describe Grover::Processor do
         context 'when puppeteer package is not in package.json' do
           before do
             FileUtils.copy 'package.json', 'package.json.tmp'
-            File.write('package.json', File.open('package.json') { |f| f.read.gsub(/"puppeteer"/, '"puppeteer-tmp"') })
+            File.write('package.json', File.open('package.json') { |f| f.read.gsub('"puppeteer"', '"puppeteer-tmp"') })
           end
 
           after { FileUtils.move 'package.json.tmp', 'package.json' }
