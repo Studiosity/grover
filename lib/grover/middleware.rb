@@ -70,7 +70,7 @@ class Grover
 
     def ignore_request?
       ignore_request = Grover.configuration.ignore_request
-      return unless ignore_request.is_a?(Proc)
+      return false unless ignore_request.is_a?(Proc)
 
       ignore_request.call @request
     end
