@@ -84,7 +84,7 @@ describe Grover::Processor do
         context 'when puppeteer package is not in package.json' do
           before do
             FileUtils.copy 'package.json', 'package.json.tmp'
-            File.write('package.json', File.open('package.json') { |f| f.read.gsub(/"puppeteer"/, '"puppeteer-tmp"') })
+            File.write('package.json', File.open('package.json') { |f| f.read.gsub('"puppeteer"', '"puppeteer-tmp"') })
           end
 
           after { FileUtils.move 'package.json.tmp', 'package.json' }
@@ -404,7 +404,7 @@ describe Grover::Processor do
         end
       end
 
-      context 'when passing through launch params to remote browser', remote_browser: true do
+      context 'when passing through launch params to remote browser', :remote_browser do
         let(:options) { { 'browserWsEndpoint' => browser_ws_endpoint } }
         let(:browser_ws_endpoint) { 'ws://localhost:3000/' }
         let(:url_or_html) do
@@ -901,7 +901,7 @@ describe Grover::Processor do
         it { expect(mean_colour_statistics(image)).to eq %w[0 0 255] }
       end
 
-      context 'when using remote browser option with HTML', remote_browser: true do
+      context 'when using remote browser option with HTML', :remote_browser do
         let(:options) { { browserWsEndpoint: 'ws://localhost:3000' } }
         let(:url_or_html) { '<html><body style="background-color: blue"></body></html>' }
 

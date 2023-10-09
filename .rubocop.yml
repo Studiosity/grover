@@ -6,6 +6,9 @@ AllCops:
   NewCops: enable
   TargetRubyVersion: 2.7
 
+Gemspec/DevelopmentDependencies:
+  EnforcedStyle: gemspec
+
 Layout/DotPosition:
   EnforcedStyle: trailing
 
