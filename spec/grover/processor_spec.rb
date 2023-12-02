@@ -58,6 +58,35 @@ describe Grover::Processor do
         end
       end
 
+      context 'when passing through a valid file URL' do
+        let(:url_or_html) { "file:///#{fixture_path('test.html')}" }
+        let(:options) { { allowFileUrl: true } }
+
+        it { is_expected.to start_with "%PDF-1.4\n" }
+        it { expect(pdf_reader.page_count).to eq 1 }
+        it { expect(pdf_text_content).to include 'Hello World!' }
+      end
+
+      context 'when passing through an invalid file URL' do
+        let(:url_or_html) { 'file:///fake/invalid.html' }
+        let(:options) { { allowFileUrl: true } }
+
+        it 'raises a JavaScript error that the file could not be found' do
+          expect do
+            convert
+          end.to raise_error Grover::JavaScript::Error, %r{net::ERR_FILE_NOT_FOUND at file:///fake/invalid.html}
+        end
+      end
+
+      context 'when passing a file URL and allow_file_url is disabled' do
+        let(:url_or_html) { "file:///#{fixture_path('test.html')}" }
+
+        it { is_expected.to start_with "%PDF-1.4\n" }
+        it { expect(pdf_reader.page_count).to eq 1 }
+        it { expect(pdf_text_content).not_to include 'Hello World!' }
+        it { expect(pdf_text_content).to include "file:///#{fixture_path('test.html')}" }
+      end
+
       context 'when passing through an empty string' do
         let(:url_or_html) { '' }
 

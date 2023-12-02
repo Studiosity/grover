@@ -45,7 +45,7 @@ class Grover
     end
 
     def url_source?
-      @url.match(/\Ahttp/i)
+      @url.match(/\A(http|file)/i)
     end
   end
 end
