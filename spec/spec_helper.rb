@@ -29,6 +29,10 @@ end
 
 MiniMagick.validate_on_create = false
 
+def fixture_path(file)
+  File.join(File.expand_path(__dir__), 'fixtures', file)
+end
+
 def puppeteer_version_on_or_after?(version)
   puppeteer_version = ENV.fetch('PUPPETEER_VERSION', '')
   puppeteer_version.empty? || Gem::Version.new(puppeteer_version) >= Gem::Version.new(version)
