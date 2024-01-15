@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sinatra'
 require 'rack/auth/basic'
 
@@ -16,7 +18,7 @@ helpers do
 end
 
 get '/' do
-  "I'm Feeling Lucky"
+  "I'm Feeling Grovery"
 end
 
 get '/cookie_renderer' do

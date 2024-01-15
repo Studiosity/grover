@@ -44,7 +44,7 @@ describe Grover::Processor do
 
         it { is_expected.to start_with "%PDF-1.4\n" }
         it { expect(pdf_reader.page_count).to eq 1 }
-        it { expect(pdf_text_content).to include "I'm Feeling Lucky" }
+        it { expect(pdf_text_content).to include "I'm Feeling Grovery" }
       end
 
       context 'when passing through an invalid URL' do
@@ -640,7 +640,7 @@ describe Grover::Processor do
         end
 
         context 'when assets have redirects PDFs are generated successfully' do
-          it { expect(pdf_text_content).to match "#{date}" }
+          it { expect(pdf_text_content).to match "#{date} I'm Feeling Grovery" }
         end
 
         context 'with images' do
@@ -808,7 +808,7 @@ describe Grover::Processor do
             let(:timeout) { 1 }
 
             if puppeteer_version_on_or_after? '10.4.0'
-              it 'will timeout when trying to convert to PDF' do
+              it 'times out when trying to convert to PDF' do
                 expect { convert }.to raise_error(
                   Grover::JavaScript::TimeoutError,
                   'waiting for Page.printToPDF failed: timeout 1ms exceeded'
@@ -829,7 +829,7 @@ describe Grover::Processor do
           let(:convert_timeout) { 1 }
 
           if puppeteer_version_on_or_after? '10.4.0'
-            it 'will raise an error when trying to convert to PDF' do
+            it 'raises an error when trying to convert to PDF' do
               expect { convert }.to raise_error(
                 Grover::JavaScript::TimeoutError,
                 'waiting for Page.printToPDF failed: timeout 1ms exceeded'
@@ -843,7 +843,7 @@ describe Grover::Processor do
             let(:timeout) { 10_000 }
 
             if puppeteer_version_on_or_after? '10.4.0'
-              it 'will use the convert timeout over the timeout option' do
+              it 'uses the convert timeout over the timeout option' do
                 expect { convert }.to raise_error(
                   Grover::JavaScript::TimeoutError,
                   'waiting for Page.printToPDF failed: timeout 1ms exceeded'

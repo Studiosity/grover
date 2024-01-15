@@ -1,23 +1,30 @@
+# frozen_string_literal: true
+
 require 'childprocess'
 require 'net/http'
 require 'logger'
 
+#
+# Simple control interface for the TestApp Sinatra server which hosts the various HTTP interfaces required to
+# test Grover
+#
 class TestServer
   class << self
     attr_reader :server
 
     def start
-      @server ||= new
+      @server ||= new # rubocop:disable Naming/MemoizedInstanceVariableName
     end
 
     def stop
       @server.stop
+      @server = nil
     end
   end
 
   attr_reader :process, :read_io, :server_url, :logger
 
-  SERVER_URL = 'http://localhost:4567'.freeze
+  SERVER_URL = 'http://localhost:4567'
 
   def initialize
     @logger = Logger.new($stdout)
@@ -45,11 +52,9 @@ class TestServer
 
   def logging_thread
     @logging_thread ||= Thread.new do
-      begin
-        loop { print @read_io.readpartial(8192) }
-      rescue EOFError
-        logger.warn 'Server process has terminated'
-      end
+      loop { print @read_io.readpartial(8192) }
+    rescue EOFError
+      logger.warn 'Server process has terminated'
     end
   end
 
