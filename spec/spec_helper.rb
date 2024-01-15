@@ -10,10 +10,19 @@ require 'rack/test'
 require 'stringio'
 require 'pdf-reader'
 require 'mini_magick'
+require_relative 'support/test_server'
 
 RSpec.configure do |config|
   config.order = 'random'
   config.filter_run_excluding remote_browser: true
+
+  config.before(:suite) do
+    TestServer.start
+  end
+
+  config.after(:suite) do
+    TestServer.stop
+  end
 
   include Rack::Test::Methods
 end

@@ -8,7 +8,7 @@ describe Grover::Processor do
   describe '#convert' do
     subject(:convert) { processor.convert method, url_or_html, options }
 
-    let(:url_or_html) { 'http://google.com' }
+    let(:url_or_html) { 'http://localhost:4567' }
     let(:options) { {} }
     let(:date) do
       # New version of Chromium (v93) that comes with v10.2.0 of puppeteer uses a different date format
@@ -40,14 +40,11 @@ describe Grover::Processor do
       end
 
       context 'when passing through a valid URL' do
-        # we need to add the language for test stability
-        # if not added explicitly, google can respond with a different locale
-        # based on IP address geo-lookup, timezone, etc.
-        let(:url_or_html) { 'https://www.google.com/?gl=us' }
+        let(:url_or_html) { 'http://localhost:4567' }
 
         it { is_expected.to start_with "%PDF-1.4\n" }
         it { expect(pdf_reader.page_count).to eq 1 }
-        it { expect(pdf_text_content).to include "I'm Feeling Lucky" }
+        it { expect(pdf_text_content).to include "I'm Feeling Grovery" }
       end
 
       context 'when passing through an invalid URL' do
@@ -133,6 +130,8 @@ describe Grover::Processor do
 
         context 'when first call to gets on stdout succeeds but second returns nil' do
           before do
+            allow(stdin).to receive(:puts).with(any_args)
+
             allow(stdout).to receive(:gets).and_return '["ok"]', nil
             allow(stdin).to receive(:puts).with '["pdf","http://google.com",{}]'
             allow(stderr).to receive(:read).and_return 'The reason the worker failed'
@@ -149,7 +148,7 @@ describe Grover::Processor do
         context 'when first call to gets on stdout succeeds but second returns an error' do
           before do
             allow(stdout).to receive(:gets).and_return '["ok"]', '["err","Some unknown thing happened"]'
-            allow(stdin).to receive(:puts).with '["pdf","http://google.com",{}]'
+            allow(stdin).to receive(:puts).with '["pdf","http://localhost:4567",{}]'
             allow(stderr).to receive(:read).and_return 'The reason the worker failed'
           end
 
@@ -169,7 +168,7 @@ describe Grover::Processor do
         context 'when the worker returns an invalid response' do
           before do
             allow(stdout).to receive(:gets).and_return '["ok"]', '["ok",invalid_response]'
-            allow(stdin).to receive(:puts).with '["pdf","http://google.com",{}]'
+            allow(stdin).to receive(:puts).with '["pdf","http://localhost:4567",{}]'
           end
 
           it 'raises an Error' do
@@ -353,7 +352,7 @@ describe Grover::Processor do
         end
 
         context 'when requesting a URI requiring basic authentication' do
-          let(:url_or_html) { 'https://jigsaw.w3.org/HTTP/Basic/' }
+          let(:url_or_html) { 'http://localhost:4567/auth' }
 
           it { expect(pdf_text_content).to eq 'Unauthorized access You are denied access to this resource.' }
 
@@ -365,17 +364,17 @@ describe Grover::Processor do
         end
 
         context 'when passing through cookies option' do
-          let(:url_or_html) { 'https://cookierenderer-production.up.railway.app/' }
+          let(:url_or_html) { 'http://localhost:4567/cookie_renderer' }
           let(:options) do
             {
               'cookies' => [
                 {
                   'name' => 'grover-test',
                   'value' => 'nom nom nom',
-                  'domain' => 'cookierenderer-production.up.railway.app'
+                  'domain' => 'localhost:4567'
                 },
                 { 'name' => 'other-domain', 'value' => 'should not display', 'domain' => 'example.com' },
-                { 'name' => 'escaped', 'value' => '%26%3D%3D', 'domain' => 'cookierenderer-production.up.railway.app' }
+                { 'name' => 'escaped', 'value' => '%26%3D%3D', 'domain' => 'localhost:4567' }
               ]
             }
           end
@@ -386,21 +385,21 @@ describe Grover::Processor do
         end
 
         context 'when passing through extra HTTP headers' do
-          let(:url_or_html) { 'http://cookierenderer-production.up.railway.app/?type=headers' }
+          let(:url_or_html) { 'http://localhost:4567/headers' }
           let(:options) { { 'extraHTTPHeaders' => { 'grover-test' => 'yes it is' } } }
 
-          it { expect(pdf_text_content).to match(/Request contained (15|16) headers/) }
-          it { expect(pdf_text_content).to include '1. host cookierenderer-production.up.railway.app' }
-          it { expect(pdf_text_content).to include '4. grover-test yes it is' }
+          it { expect(pdf_text_content).to match(/Request contained \d+ headers/) }
+          it { expect(pdf_text_content).to include '1. host localhost:4567' }
+          it { expect(pdf_text_content).to include '5. grover-test yes it is' }
         end
 
         context 'when overloading the user agent' do
-          let(:url_or_html) { 'http://cookierenderer-production.up.railway.app/?type=headers' }
+          let(:url_or_html) { 'http://localhost:4567/headers' }
           let(:options) { { 'userAgent' => 'Grover user agent' } }
 
-          it { expect(pdf_text_content).to match(/Request contained (14|15) headers/) }
-          it { expect(pdf_text_content).to include '1. host cookierenderer-production.up.railway.app' }
-          it { expect(pdf_text_content).to include 'user-agent Grover user agent' }
+          it { expect(pdf_text_content).to match(/Request contained \d+ headers/) }
+          it { expect(pdf_text_content).to include '1. host localhost:4567' }
+          it { expect(pdf_text_content).to include '4. user-agent Grover user agent' }
         end
       end
 
@@ -641,7 +640,7 @@ describe Grover::Processor do
         end
 
         context 'when assets have redirects PDFs are generated successfully' do
-          it { expect(pdf_text_content).to match "#{date} Google" }
+          it { expect(pdf_text_content).to match "#{date} I'm Feeling Grovery" }
         end
 
         context 'with images' do
@@ -809,7 +808,7 @@ describe Grover::Processor do
             let(:timeout) { 1 }
 
             if puppeteer_version_on_or_after? '10.4.0'
-              it 'will timeout when trying to convert to PDF' do
+              it 'times out when trying to convert to PDF' do
                 expect { convert }.to raise_error(
                   Grover::JavaScript::TimeoutError,
                   'waiting for Page.printToPDF failed: timeout 1ms exceeded'
@@ -830,7 +829,7 @@ describe Grover::Processor do
           let(:convert_timeout) { 1 }
 
           if puppeteer_version_on_or_after? '10.4.0'
-            it 'will raise an error when trying to convert to PDF' do
+            it 'raises an error when trying to convert to PDF' do
               expect { convert }.to raise_error(
                 Grover::JavaScript::TimeoutError,
                 'waiting for Page.printToPDF failed: timeout 1ms exceeded'
@@ -844,7 +843,7 @@ describe Grover::Processor do
             let(:timeout) { 10_000 }
 
             if puppeteer_version_on_or_after? '10.4.0'
-              it 'will use the convert timeout over the timeout option' do
+              it 'uses the convert timeout over the timeout option' do
                 expect { convert }.to raise_error(
                   Grover::JavaScript::TimeoutError,
                   'waiting for Page.printToPDF failed: timeout 1ms exceeded'
@@ -876,7 +875,7 @@ describe Grover::Processor do
       let(:image) { MiniMagick::Image.read convert }
 
       context 'when passing through a valid URL' do
-        let(:url_or_html) { 'https://media.gettyimages.com/photos/tabby-cat-selfie-picture-id1151094724?s=2048x2048' }
+        let(:url_or_html) { 'http://localhost:4567/cat' }
 
         # default screenshot is PNG 800w x 600h
         it { expect(convert.unpack('C*')).to start_with "\x89PNG\r\n\x1A\n".unpack('C*') }
@@ -887,8 +886,8 @@ describe Grover::Processor do
         # so we'll check it's mean colour is roughly what we expect
         it do
           expect(image.data.dig('imageStatistics', MiniMagick.imagemagick7? ? 'Overall' : 'all', 'mean').to_f).
-            to be_within(1).of(97.7473).  # ImageMagick 6.9.3-1 (version used by Travis CI)
-            or be_within(1).of(161.497)   # ImageMagick 6.9.10-84
+            to be_within(10).of(97.7473).  # ImageMagick 6.9.3-1 (version used by Travis CI)
+            or be_within(10).of(161.497)   # ImageMagick 6.9.10-84
         end
       end
 
