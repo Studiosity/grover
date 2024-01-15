@@ -389,8 +389,8 @@ describe Grover::Processor do
           let(:options) { { 'extraHTTPHeaders' => { 'grover-test' => 'yes it is' } } }
 
           it { expect(pdf_text_content).to match(/Request contained \d+ headers/) }
-          it { expect(pdf_text_content).to include 'host localhost:4567' }
-          it { expect(pdf_text_content).to include 'grover-test yes it is' }
+          it { expect(pdf_text_content).to include '1. host localhost:4567' }
+          it { expect(pdf_text_content).to include '5. grover-test yes it is' }
         end
 
         context 'when overloading the user agent' do
@@ -399,7 +399,7 @@ describe Grover::Processor do
 
           it { expect(pdf_text_content).to match(/Request contained \d+ headers/) }
           it { expect(pdf_text_content).to include '1. host localhost:4567' }
-          it { expect(pdf_text_content).to include 'user-agent Grover user agent' }
+          it { expect(pdf_text_content).to include '4. user-agent Grover user agent' }
         end
       end
 

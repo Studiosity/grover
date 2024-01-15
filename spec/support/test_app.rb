@@ -35,16 +35,18 @@ get '/auth' do
 end
 
 get '/headers' do
-  headers_info =
+  headers =
     request.
     env.
-    select { |k, _v| k.start_with?('HTTP_') }.
-    map.with_index(1) do |(k, v), i|
+    select { |k, _v| k.start_with?('HTTP_') }
+  headers_info =
+    headers.
+      map.with_index(1) do |(k, v), i|
       "#{i}. #{k.sub(/^HTTP_/, '').downcase.tr('_', '-')} #{v}"
     end.
     join(', ')
 
-  "Request contained #{headers_info.count(', ') + 1} headers: #{headers_info}"
+  "Request contained #{headers.size} headers: #{headers_info}"
 end
 
 get '/cat' do
