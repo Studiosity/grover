@@ -41,9 +41,7 @@ get '/headers' do
     select { |k, _v| k.start_with?('HTTP_') }
   headers_info =
     headers.
-      map.with_index(1) do |(k, v), i|
-      "#{i}. #{k.sub(/^HTTP_/, '').downcase.tr('_', '-')} #{v}"
-    end.
+    map.with_index(1) { |(k, v), i| "#{i}. #{k.sub(/^HTTP_/, '').downcase.tr('_', '-')} #{v}" }.
     join(', ')
 
   "Request contained #{headers.size} headers: #{headers_info}"
