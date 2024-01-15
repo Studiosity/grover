@@ -3,6 +3,10 @@
 ## Unreleased
 - none
 
+## [1.1.6](releases/tag/v1.1.6) - 2024-01-16
+### Added
+- [#216](https://github.com/Studiosity/grover/pull/216) Add ruby 3.3 support and update test suite to use a local server ([@afromankenobi][])
+
 ## [1.1.5](releases/tag/v1.1.5) - 2023-03-02
 ### Added
 - [#178](https://github.com/Studiosity/grover/pull/178) Add remote browser support ([@Zinggi][])
@@ -305,3 +309,4 @@
 [@ElMassimo]: https://github.com/ElMassimo
 [@Yobilat]: https://github.com/Yobilat
 [@Zinggi]: https://github.com/Zinggi
+[@afromankenobi]: https://github.com/afromankenobi
