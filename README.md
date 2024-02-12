@@ -194,6 +194,12 @@ File.open("grover.png", "wb") { |f| f << grover.to_png }
 
 You can also pass launch flags like this: `ws://localhost:3000/?--disable-speech-api`
 
+If you are only using remote chromium, you better use `puppeteer-core` instead of `puppeteer` to avoid downloading chrome.
+Grover will use `puppeteer` or fallback to `puppeteer-core` if it is available.
+```sh
+npm install puppeteer-core
+```
+
 #### Adding cookies
 To set request cookies when requesting a URL, pass an array of hashes as such
 _N.B._ Only the `name` and `value` properties are required.
