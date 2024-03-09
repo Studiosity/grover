@@ -194,7 +194,7 @@ File.open("grover.png", "wb") { |f| f << grover.to_png }
 
 You can also pass launch flags like this: `ws://localhost:3000/?--disable-speech-api`
 
-If you are only using remote chromium, you better use `puppeteer-core` instead of `puppeteer` to avoid downloading chrome.
+If you are only using remote chromium, you can install the `puppeteer-core` node package instead of `puppeteer` to avoid downloading chrome.
 Grover will use `puppeteer` or fallback to `puppeteer-core` if it is available.
 ```sh
 npm install puppeteer-core
