@@ -417,7 +417,7 @@ describe Grover::Processor do
 
           it { expect(pdf_text_content).to match(/Request contained \d+ headers/) }
           it { expect(pdf_text_content).to include '1. host localhost:4567' }
-          it { expect(pdf_text_content).to match /\d{1,2}\. grover-test yes it is/ }
+          it { expect(pdf_text_content).to match(/\d{1,2}\. grover-test yes it is/) }
         end
 
         context 'when overloading the user agent' do
@@ -867,19 +867,14 @@ describe Grover::Processor do
         context 'when the convert timeout is short' do
           let(:convert_timeout) { 1 }
 
-          if puppeteer_version_on_or_after? '21'
+          if puppeteer_version_on_or_after? '10.4.0'
             it 'raises an error when trying to convert to PDF' do
-              expect { convert }.to raise_error(
-                Grover::JavaScript::TimeoutError,
-                'Timed out after waiting 1ms'
-              )
-            end
-          elsif puppeteer_version_on_or_after? '10.4.0'
-            it 'raises an error when trying to convert to PDF' do
-              expect { convert }.to raise_error(
-                Grover::JavaScript::TimeoutError,
-                'waiting for Page.printToPDF failed: timeout 1ms exceeded'
-              )
+              error_message = if puppeteer_version_on_or_after?('21')
+                                'Timed out after waiting 1ms'
+                              else
+                                'waiting for Page.printToPDF failed: timeout 1ms exceeded'
+                              end
+              expect { convert }.to raise_error Grover::JavaScript::TimeoutError, error_message
             end
           else
             it { is_expected.to start_with "%PDF-1.4\n" }
@@ -888,19 +883,14 @@ describe Grover::Processor do
           context 'when the timeout is also specified' do
             let(:timeout) { 10_000 }
 
-            if puppeteer_version_on_or_after? '21'
+            if puppeteer_version_on_or_after? '10.4.0'
               it 'uses the convert timeout over the timeout option' do
-                expect { convert }.to raise_error(
-                  Grover::JavaScript::TimeoutError,
-                  'Timed out after waiting 1ms'
-                )
-              end
-            elsif puppeteer_version_on_or_after? '10.4.0'
-              it 'uses the convert timeout over the timeout option' do
-                expect { convert }.to raise_error(
-                  Grover::JavaScript::TimeoutError,
-                  'waiting for Page.printToPDF failed: timeout 1ms exceeded'
-                )
+                error_message = if puppeteer_version_on_or_after?('21')
+                                  'Timed out after waiting 1ms'
+                                else
+                                  'waiting for Page.printToPDF failed: timeout 1ms exceeded'
+                                end
+                expect { convert }.to raise_error Grover::JavaScript::TimeoutError, error_message
               end
             else
               it { is_expected.to start_with "%PDF-1.4\n" }
