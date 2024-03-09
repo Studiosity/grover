@@ -246,7 +246,7 @@ describe Grover::Processor do
             HTML
           end
 
-          it { expect(pdf_text_content).to eq "Hey there http://example.com Footer content" }
+          it { expect(pdf_text_content).to eq 'Hey there http://example.com Footer content' }
         end
 
         context 'when the options disable display of header/footer' do
