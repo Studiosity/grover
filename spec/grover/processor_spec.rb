@@ -215,8 +215,11 @@ describe Grover::Processor do
 
         context 'when options includes A4 page format' do
           let(:options) { { format: 'A4' } }
+          let(:media_box) do
+            puppeteer_version_on_or_after?('21') ? [0, 0, 594.95996, 841.91998] : [0, 0, 595.91998, 842.88]
+          end
 
-          it { expect(pdf_reader.pages.first.attributes).to include(MediaBox: [0, 0, 594.95996, 841.91998]) }
+          it { expect(pdf_reader.pages.first.attributes).to include(MediaBox: media_box) }
         end
 
         context 'when options includes Letter page format' do
@@ -243,7 +246,7 @@ describe Grover::Processor do
             HTML
           end
 
-          it { expect(pdf_text_content).to eq "Hey there #{protocol}://example.com Footer content" }
+          it { expect(pdf_text_content).to eq "Hey there http://example.com Footer content" }
         end
 
         context 'when the options disable display of header/footer' do
@@ -641,7 +644,8 @@ describe Grover::Processor do
           it do
             expect do
               convert
-            end.to raise_error Grover::JavaScript::RequestFailedError, 'net::ERR_NAME_NOT_RESOLVED at http://foo.bar/baz.img'
+            end.to raise_error Grover::JavaScript::RequestFailedError,
+                               "net::ERR_NAME_NOT_RESOLVED at #{protocol}://foo.bar/baz.img"
           end
         end
 
@@ -649,6 +653,7 @@ describe Grover::Processor do
           let(:url_or_html) do
             <<-HTML
               <html>
+                <head><link rel="icon" href="data:;base64,iVBORw0KGgo="></head>
                 <body>
                   <img src="https://google.com/404.jpg" />
                 </body>
@@ -667,6 +672,7 @@ describe Grover::Processor do
           let(:url_or_html) do
             <<-HTML
               <html>
+                <head><link rel="icon" href="data:;base64,iVBORw0KGgo="></head>
                 <body>
                   Hey there
                   <img src="https://httpstat.us/304" />
@@ -848,10 +854,13 @@ describe Grover::Processor do
 
             if puppeteer_version_on_or_after? '10.4.0'
               it 'times out when trying to convert to PDF' do
-                expect { convert }.to raise_error(
-                  Grover::JavaScript::TimeoutError,
-                  'waiting for Page.printToPDF failed: timeout 1ms exceeded'
-                )
+                error_message = if puppeteer_version_on_or_after?('21')
+                                  'Timed out after waiting 1ms'
+                                else
+                                  'waiting for Page.printToPDF failed: timeout 1ms exceeded'
+                                end
+
+                expect { convert }.to raise_error Grover::JavaScript::TimeoutError, error_message
               end
             else
               it { is_expected.to start_with "%PDF-1.4\n" }
