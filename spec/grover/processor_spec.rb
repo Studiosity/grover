@@ -453,6 +453,18 @@ describe Grover::Processor do
         end
       end
 
+      unless linux_system? # It looks like the way a connection failure is handled is different on Linux systems
+        context 'when passing through WS launch params without a remote browser' do
+          let(:options) { { 'browserWsEndpoint' => 'ws://localhost:3000/' } }
+          let(:url_or_html) { '<html><body>WS endpoint doesnt exist</body></html>' }
+
+          it 'raises a WsConnectFailedError' do
+            expect { convert }.to raise_error Grover::JavaScript::WsConnectFailedError,
+                                              'Failed to connect to browser WS endpoint: ws://localhost:3000/'
+          end
+        end
+      end
+
       context 'when HTML includes screen only content' do
         let(:url_or_html) do
           <<-HTML
