@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       remote-chrome:
-        image: browserless/chrome:1.57-puppeteer-19.2.2
+        image: browserless/chrome:latest
         ports:
           - 3000:3000
     strategy:
