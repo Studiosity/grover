@@ -69,12 +69,16 @@ describe Grover::Processor do
         # Temporarily move the node puppeteer folder
         before do
           FileUtils.move 'node_modules/puppeteer', 'node_modules/puppeteer_temp'
-          FileUtils.move 'node_modules/puppeteer-core', 'node_modules/puppeteer-core_temp'
+          if puppeteer_version_on_or_after? '18.0.0'
+            FileUtils.move 'node_modules/puppeteer-core', 'node_modules/puppeteer-core_temp'
+          end
         end
 
         after do
           FileUtils.move 'node_modules/puppeteer_temp', 'node_modules/puppeteer'
-          FileUtils.move 'node_modules/puppeteer-core_temp', 'node_modules/puppeteer-core'
+          if puppeteer_version_on_or_after? '18.0.0'
+            FileUtils.move 'node_modules/puppeteer-core_temp', 'node_modules/puppeteer-core'
+          end
         end
 
         it 'raises a DependencyError' do
