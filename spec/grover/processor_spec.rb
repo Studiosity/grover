@@ -15,6 +15,7 @@ describe Grover::Processor do
       date_format = puppeteer_version_on_or_after?('10.2.0') ? '%-m/%-d/%y, %-l:%M %p' : '%-m/%-d/%Y'
       Time.now.strftime date_format
     end
+    let(:protocol) { puppeteer_version_on_or_after?('21') ? 'https' : 'http' }
 
     context 'when converting to PDF' do
       let(:method) { :pdf }
@@ -27,7 +28,7 @@ describe Grover::Processor do
       let(:basic_header_footer_options) do
         {
           'displayHeaderFooter' => true,
-          'displayUrl' => 'http://www.example.net/foo/bar',
+          'displayUrl' => "#{protocol}://www.example.net/foo/bar",
           'margin' => {
             'top' => '1in',
             'bottom' => '1in'
@@ -242,7 +243,7 @@ describe Grover::Processor do
             HTML
           end
 
-          it { expect(pdf_text_content).to eq 'Hey there http://example.com Footer content' }
+          it { expect(pdf_text_content).to eq "Hey there #{protocol}://example.com Footer content" }
         end
 
         context 'when the options disable display of header/footer' do
@@ -267,7 +268,7 @@ describe Grover::Processor do
         context 'when options include header and footer enabled' do
           let(:options) { basic_header_footer_options.merge('headerTemplate' => "#{large_text}#{default_header}") }
 
-          it { expect(pdf_text_content).to eq "#{date} Paaage Hey there http://www.example.net/foo/bar 1/1" }
+          it { expect(pdf_text_content).to eq "#{date} Paaage Hey there #{protocol}://www.example.net/foo/bar 1/1" }
         end
 
         context 'when options override header template' do
@@ -275,7 +276,7 @@ describe Grover::Processor do
             basic_header_footer_options.merge('headerTemplate' => "#{large_text}<div class='text'>Excellente</div>")
           end
 
-          it { expect(pdf_text_content).to eq 'Excellente Hey there http://www.example.net/foo/bar 1/1' }
+          it { expect(pdf_text_content).to eq "Excellente Hey there #{protocol}://www.example.net/foo/bar 1/1" }
         end
 
         context 'when header template includes the display url marker' do
@@ -287,7 +288,7 @@ describe Grover::Processor do
 
           it do
             expect(pdf_text_content).to(
-              eq('abchttp://www.example.net/foo/bardef Hey there http://www.example.net/foo/bar 1/1')
+              eq("abc#{protocol}://www.example.net/foo/bardef Hey there #{protocol}://www.example.net/foo/bar 1/1")
             )
           end
         end
@@ -296,7 +297,9 @@ describe Grover::Processor do
           let(:options) { basic_header_footer_options.merge('footerTemplate' => footer_template) }
           let(:footer_template) { "#{large_text}<div class='text'>great <span class='url'></span> page</div>" }
 
-          it { expect(pdf_text_content).to eq "#{date} Paaage Hey there great http://www.example.net/foo/bar page" }
+          it do
+            expect(pdf_text_content).to eq "#{date} Paaage Hey there great #{protocol}://www.example.net/foo/bar page"
+          end
 
           context 'when template contains quotes' do
             let(:footer_template) { %(<div class='text'>Footer with "quotes" in it</div>) }
@@ -309,7 +312,7 @@ describe Grover::Processor do
           let(:options) { basic_header_footer_options.tap { |hash| hash.delete('displayUrl') } }
 
           it 'uses the default `example.com` for the footer URL' do
-            expect(pdf_text_content).to eq "#{date} Paaage Hey there http://example.com/ 1/1"
+            expect(pdf_text_content).to eq "#{date} Paaage Hey there #{protocol}://example.com/ 1/1"
           end
         end
 
@@ -414,7 +417,7 @@ describe Grover::Processor do
 
           it { expect(pdf_text_content).to match(/Request contained \d+ headers/) }
           it { expect(pdf_text_content).to include '1. host localhost:4567' }
-          it { expect(pdf_text_content).to include '5. grover-test yes it is' }
+          it { expect(pdf_text_content).to match /\d{1,2}\. grover-test yes it is/ }
         end
 
         context 'when overloading the user agent' do
@@ -529,7 +532,7 @@ describe Grover::Processor do
         let(:options) { basic_header_footer_options.merge('executeScript' => script) }
         let(:script) { 'document.getElementsByTagName("body")[0].innerText = "Some evaluated content"' }
 
-        it { expect(pdf_text_content).to eq "#{date} Some evaluated content http://www.example.net/foo/bar 1/1" }
+        it { expect(pdf_text_content).to eq "#{date} Some evaluated content #{protocol}://www.example.net/foo/bar 1/1" }
       end
 
       context 'when waitForSelector option is specified' do
@@ -548,7 +551,7 @@ describe Grover::Processor do
         end
         let(:options) { basic_header_footer_options.merge('waitForSelector' => 'h1') }
 
-        it { expect(pdf_text_content).to eq "#{date} Hey there http://www.example.net/foo/bar 1/1" }
+        it { expect(pdf_text_content).to eq "#{date} Hey there #{protocol}://www.example.net/foo/bar 1/1" }
       end
 
       context 'when waitForFunction option is specified' do
@@ -574,7 +577,7 @@ describe Grover::Processor do
           )
         end
 
-        it { expect(pdf_text_content).to eq "#{date} Hey there http://www.example.net/foo/bar 1/1" }
+        it { expect(pdf_text_content).to eq "#{date} Hey there #{protocol}://www.example.net/foo/bar 1/1" }
       end
 
       context 'when waitForFunction option is specified with options' do
@@ -605,7 +608,7 @@ describe Grover::Processor do
           )
         end
 
-        it { expect(pdf_text_content).to eq "#{date} Hello, world! http://www.example.net/foo/bar 1/1" }
+        it { expect(pdf_text_content).to eq "#{date} Hello, world! #{protocol}://www.example.net/foo/bar 1/1" }
 
         context 'when waiting for function takes too long' do
           let(:wait_function_timeout) { 100 }
@@ -720,7 +723,7 @@ describe Grover::Processor do
           )
         end
 
-        it { expect(pdf_text_content).to eq "#{date} http://www.example.net/foo/bar 1/1" }
+        it { expect(pdf_text_content).to eq "#{date} #{protocol}://www.example.net/foo/bar 1/1" }
       end
 
       # Only test `waitForTimeout` if the Puppeteer supports it
@@ -864,7 +867,14 @@ describe Grover::Processor do
         context 'when the convert timeout is short' do
           let(:convert_timeout) { 1 }
 
-          if puppeteer_version_on_or_after? '10.4.0'
+          if puppeteer_version_on_or_after? '21'
+            it 'raises an error when trying to convert to PDF' do
+              expect { convert }.to raise_error(
+                Grover::JavaScript::TimeoutError,
+                'Timed out after waiting 1ms'
+              )
+            end
+          elsif puppeteer_version_on_or_after? '10.4.0'
             it 'raises an error when trying to convert to PDF' do
               expect { convert }.to raise_error(
                 Grover::JavaScript::TimeoutError,
@@ -878,7 +888,14 @@ describe Grover::Processor do
           context 'when the timeout is also specified' do
             let(:timeout) { 10_000 }
 
-            if puppeteer_version_on_or_after? '10.4.0'
+            if puppeteer_version_on_or_after? '21'
+              it 'uses the convert timeout over the timeout option' do
+                expect { convert }.to raise_error(
+                  Grover::JavaScript::TimeoutError,
+                  'Timed out after waiting 1ms'
+                )
+              end
+            elsif puppeteer_version_on_or_after? '10.4.0'
               it 'uses the convert timeout over the timeout option' do
                 expect { convert }.to raise_error(
                   Grover::JavaScript::TimeoutError,
