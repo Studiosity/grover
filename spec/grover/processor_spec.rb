@@ -748,7 +748,7 @@ describe Grover::Processor do
             <<-HTML
               <html>
                 <head><link rel='icon' href='data:;base64,iVBORw0KGgo='></head>
-                
+              #{'  '}
                 <body>
                   <p id="loading">Loading</p>
                   <p id="content" style="display: none">Loaded</p>
