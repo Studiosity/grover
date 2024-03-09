@@ -105,16 +105,18 @@ describe Grover::Processor do
         end
       end
 
-      context 'when puppeteer-core package only is installed', :remote_browser do
-        before { FileUtils.move 'node_modules/puppeteer', 'node_modules/puppeteer_temp' }
-        after { FileUtils.move 'node_modules/puppeteer_temp', 'node_modules/puppeteer' }
+      if puppeteer_version_on_or_after? '18.0.0'
+        context 'when only the puppeteer-core package is installed', :remote_browser do
+          before { FileUtils.move 'node_modules/puppeteer', 'node_modules/puppeteer_temp' }
+          after { FileUtils.move 'node_modules/puppeteer_temp', 'node_modules/puppeteer' }
 
-        let(:options) { { 'browserWsEndpoint' => browser_ws_endpoint } }
-        let(:browser_ws_endpoint) { 'ws://localhost:3000/' }
-        let(:url_or_html) { '<html><body style="background-color: blue">puppeteer-core works!</body></html>' }
+          let(:options) { { 'browserWsEndpoint' => browser_ws_endpoint } }
+          let(:browser_ws_endpoint) { 'ws://localhost:3000/' }
+          let(:url_or_html) { '<html><body style="background-color: blue">puppeteer-core works!</body></html>' }
 
-        it { expect { convert }.not_to raise_error }
-        it { expect(pdf_text_content).to eq 'puppeteer-core works!' }
+          it { expect { convert }.not_to raise_error }
+          it { expect(pdf_text_content).to eq 'puppeteer-core works!' }
+        end
       end
 
       context 'when stubbing the call to the Node processor' do
