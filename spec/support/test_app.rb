@@ -18,7 +18,7 @@ helpers do
 end
 
 get '/' do
-  "I'm Feeling Grovery"
+  "<html><head><link rel='icon' href='data:;base64,iVBORw0KGgo='></head><body>I'm Feeling Grovery</body></html>"
 end
 
 get '/cookie_renderer' do

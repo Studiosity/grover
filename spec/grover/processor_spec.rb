@@ -384,7 +384,14 @@ describe Grover::Processor do
         context 'when requesting a URI requiring basic authentication' do
           let(:url_or_html) { 'http://localhost:4567/auth' }
 
-          it { expect(pdf_text_content).to eq 'Unauthorized access You are denied access to this resource.' }
+          if puppeteer_version_on_or_after? '22'
+            it do
+              expect { convert }.to raise_error Grover::JavaScript::Error,
+                                                'net::ERR_INVALID_AUTH_CREDENTIALS at http://localhost:4567/auth'
+            end
+          else
+            it { expect(pdf_text_content).to eq 'Unauthorized access You are denied access to this resource.' }
+          end
 
           context 'when passing through `username` and `password` options' do
             let(:options) { { username: 'guest', password: 'guest' } }
@@ -634,6 +641,7 @@ describe Grover::Processor do
           let(:url_or_html) do
             <<-HTML
               <html>
+                <head><link rel="icon" href="data:;base64,iVBORw0KGgo="></head>
                 <body>
                   <img src="http://foo.bar/baz.img" />
                 </body>
@@ -692,6 +700,7 @@ describe Grover::Processor do
           let(:url_or_html) do
             <<-HTML
               <html>
+                <head><link rel='icon' href='data:;base64,iVBORw0KGgo='></head>
                 <body>
                   <img src="https://placekitten.com/200/200" />
                 </body>
@@ -733,11 +742,13 @@ describe Grover::Processor do
       end
 
       # Only test `waitForTimeout` if the Puppeteer supports it
-      if puppeteer_version_on_or_after? '5.3.0'
+      if puppeteer_version_on_or_after?('5.3.0') && puppeteer_version_on_or_before?('21.11.0')
         context 'when waitForTimeout option is specified' do
           let(:url_or_html) do
             <<-HTML
               <html>
+                <head><link rel='icon' href='data:;base64,iVBORw0KGgo='></head>
+                
                 <body>
                   <p id="loading">Loading</p>
                   <p id="content" style="display: none">Loaded</p>
