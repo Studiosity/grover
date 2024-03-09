@@ -313,6 +313,7 @@ describe Grover::Processor do
 
         context 'when displayUrl option is not provided' do
           let(:options) { basic_header_footer_options.tap { |hash| hash.delete('displayUrl') } }
+          let(:protocol) { puppeteer_version_on_or_after?('22') ? 'https' : 'http' }
 
           it 'uses the default `example.com` for the footer URL' do
             expect(pdf_text_content).to eq "#{date} Paaage Hey there #{protocol}://example.com/ 1/1"
