@@ -65,11 +65,21 @@ describe Grover::Processor do
         it { expect(pdf_text_content).to eq '' }
       end
 
-      context 'when puppeteer package is not installed' do
+      context 'when puppeteer / puppeteer-core package is not installed' do
         # Temporarily move the node puppeteer folder
-        before { FileUtils.move 'node_modules/puppeteer', 'node_modules/puppeteer_temp' }
+        before do
+          FileUtils.move 'node_modules/puppeteer', 'node_modules/puppeteer_temp'
+          if puppeteer_version_on_or_after? '18.0.0'
+            FileUtils.move 'node_modules/puppeteer-core', 'node_modules/puppeteer-core_temp'
+          end
+        end
 
-        after { FileUtils.move 'node_modules/puppeteer_temp', 'node_modules/puppeteer' }
+        after do
+          FileUtils.move 'node_modules/puppeteer_temp', 'node_modules/puppeteer'
+          if puppeteer_version_on_or_after? '18.0.0'
+            FileUtils.move 'node_modules/puppeteer-core_temp', 'node_modules/puppeteer-core'
+          end
+        end
 
         it 'raises a DependencyError' do
           expect { convert }.to raise_error Grover::DependencyError, Grover::Utils.squish(<<~ERROR)
@@ -92,6 +102,20 @@ describe Grover::Processor do
               You need to add it to '#{Dir.pwd}/package.json' and run 'npm install'
             ERROR
           end
+        end
+      end
+
+      if puppeteer_version_on_or_after? '18.0.0'
+        context 'when only the puppeteer-core package is installed', :remote_browser do
+          before { FileUtils.move 'node_modules/puppeteer', 'node_modules/puppeteer_temp' }
+          after { FileUtils.move 'node_modules/puppeteer_temp', 'node_modules/puppeteer' }
+
+          let(:options) { { 'browserWsEndpoint' => browser_ws_endpoint } }
+          let(:browser_ws_endpoint) { 'ws://localhost:3000/' }
+          let(:url_or_html) { '<html><body style="background-color: blue">puppeteer-core works!</body></html>' }
+
+          it { expect { convert }.not_to raise_error }
+          it { expect(pdf_text_content).to eq 'puppeteer-core works!' }
         end
       end
 
