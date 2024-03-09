@@ -34,6 +34,11 @@ def puppeteer_version_on_or_after?(version)
   puppeteer_version.empty? || Gem::Version.new(puppeteer_version) >= Gem::Version.new(version)
 end
 
+def puppeteer_version_on_or_before?(version)
+  puppeteer_version = ENV.fetch('PUPPETEER_VERSION', '')
+  puppeteer_version.empty? || Gem::Version.new(puppeteer_version) <= Gem::Version.new(version)
+end
+
 def linux_system?
   uname = `uname -s`
   uname.start_with? 'Linux'
