@@ -171,6 +171,8 @@ by passing it to the `execute_script` option.
 Grover.new(<some url>, { execute_script: 'document.getElementsByTagName("footer")[0].innerText = "Hey"' }).to_pdf
 ```
 
+The `allow_file_url` option can be used to render an html document from the file system. This should be used with *EXTREME CAUTION*. If used improperly it could potentially be manipulated to reveal sensitive files on the system. Do not enable if rendering content from outside entities (user uploads, external URLs, etc).
+
 #### Basic authentication
 For requesting a page with basic authentication, `username` and `password` options can be provided. Note that this
 only really makes sense if you're calling Grover directly (and not via middleware).

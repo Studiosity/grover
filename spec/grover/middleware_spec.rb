@@ -509,11 +509,14 @@ describe Grover::Middleware do
       it 'passes through the request URL (sans extension) to Grover' do
         allow(Grover).to(
           receive(:new).
-            with('Grover McGroveryface', display_url: 'http://www.example.org/test').
+            with('Grover McGroveryface', display_url: 'http://www.example.org/test', middleware: true).
             and_return(grover)
         )
         allow(grover).to receive(:to_pdf).with(no_args).and_return 'A converted PDF'
-        expect(Grover).to receive(:new).with('Grover McGroveryface', display_url: 'http://www.example.org/test')
+        expect(Grover).to(
+          receive(:new).
+            with('Grover McGroveryface', display_url: 'http://www.example.org/test', middleware: true)
+        )
         expect(grover).to receive(:to_pdf).with(no_args)
         get 'http://www.example.org/test.pdf'
         expect(last_response.body).to eq 'A converted PDF'
@@ -524,12 +527,14 @@ describe Grover::Middleware do
           allow(Grover).to receive(:new).with(
             'Grover McGroveryface',
             display_url: 'http://www.example.org/test',
+            middleware: true,
             cookies: [{ domain: 'www.example.org', name: k, value: v }]
           ).and_return(grover)
           allow(grover).to receive(:to_pdf).with(no_args).and_return 'A converted PDF'
           expect(Grover).to receive(:new).with(
             'Grover McGroveryface',
             display_url: 'http://www.example.org/test',
+            middleware: true,
             cookies: [{ domain: 'www.example.org', name: k, value: v }]
           )
           expect(grover).to receive(:to_pdf).with(no_args)
@@ -564,11 +569,14 @@ describe Grover::Middleware do
         it 'passes through the request URL (sans extension) to Grover' do
           allow(Grover).to(
             receive(:new).
-              with('Grover McGroveryface', display_url: 'http://www.example.org/test').
+              with('Grover McGroveryface', display_url: 'http://www.example.org/test', middleware: true).
               and_return(grover)
           )
           allow(grover).to receive(:to_png).with(no_args).and_return 'A converted PNG'
-          expect(Grover).to receive(:new).with('Grover McGroveryface', display_url: 'http://www.example.org/test')
+          expect(Grover).to(
+            receive(:new).
+              with('Grover McGroveryface', display_url: 'http://www.example.org/test', middleware: true)
+          )
           expect(grover).to receive(:to_png).with(no_args)
           get 'http://www.example.org/test.png'
           expect(last_response.body).to eq 'A converted PNG'
@@ -591,11 +599,14 @@ describe Grover::Middleware do
         it 'passes through the request URL (sans extension) to Grover' do
           allow(Grover).to(
             receive(:new).
-              with('Grover McGroveryface', display_url: 'http://www.example.org/test').
+              with('Grover McGroveryface', display_url: 'http://www.example.org/test', middleware: true).
               and_return(grover)
           )
           allow(grover).to receive(:to_jpeg).with(no_args).and_return 'A converted JPEG'
-          expect(Grover).to receive(:new).with('Grover McGroveryface', display_url: 'http://www.example.org/test')
+          expect(Grover).to(
+            receive(:new).
+              with('Grover McGroveryface', display_url: 'http://www.example.org/test', middleware: true)
+          )
           expect(grover).to receive(:to_jpeg).with(no_args)
           get 'http://www.example.org/test.jpeg'
           expect(last_response.body).to eq 'A converted JPEG'

@@ -33,9 +33,9 @@ class Grover
   #   see https://github.com/puppeteer/puppeteer/blob/main/docs/api/puppeteer.pdfoptions.md
   #   and https://github.com/puppeteer/puppeteer/blob/main/docs/api/puppeteer.screenshotoptions.md
   #
-  def initialize(url, **options)
+  def initialize(url, middleware: false, **options)
     @url = url.to_s
-    @options = OptionsBuilder.new(options, @url)
+    @options = OptionsBuilder.new(options, @url, middleware: middleware)
     @root_path = @options.delete 'root_path'
     @front_cover_path = @options.delete 'front_cover_path'
     @back_cover_path = @options.delete 'back_cover_path'
