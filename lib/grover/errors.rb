@@ -15,4 +15,5 @@ class Grover
       const_set name, Class.new(Error)
     end
   end
+  UnsafeConfigurationError = Class.new(Error)
 end

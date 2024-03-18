@@ -8,7 +8,7 @@ class Grover
   # Build options from Grover.configuration, meta_options, and passed-in options
   #
   class OptionsBuilder < Hash
-    def initialize(options, url)
+    def initialize(options, url, middleware:)
       super()
       @url = url
       combined = grover_configuration
@@ -16,6 +16,12 @@ class Grover
       Utils.deep_merge! combined, meta_options unless url_source?
 
       update OptionsFixer.new(combined).run
+
+      # The combination of middleware and allowing file URLs is exceptionally
+      # unsafe as it can lead to data exfiltration from the host system.
+      return unless middleware && (self['allow_file_url'] || self['allowFileUrl'])
+
+      raise UnsafeConfigurationError, 'using `allow_file_url` option with middleware is exceptionally unsafe'
     end
 
     private
