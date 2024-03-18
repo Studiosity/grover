@@ -4,11 +4,12 @@ require 'spec_helper'
 require 'grover/options_builder'
 
 describe Grover::OptionsBuilder do
-  subject(:built_options) { described_class.new(options, url_or_html) }
+  subject(:built_options) { described_class.new(options, url_or_html, middleware: middleware) }
 
   let(:url_or_html) { 'https://google.com' }
   let(:options) { {} }
   let(:global_config) { { cache: false, quality: 95 } }
+  let(:middleware) { false }
 
   before { allow(Grover.configuration).to receive(:options).and_return(global_config) }
 
@@ -156,5 +157,31 @@ describe Grover::OptionsBuilder do
     end
 
     it { is_expected.to include('viewport' => { 'height' => 100, 'width' => 200, 'device_scale_factor' => 2.5 }) }
+  end
+
+  context 'when the middleware flag is enabled' do
+    let(:middleware) { true }
+
+    it 'returns combined passed-in/global options' do
+      expect(built_options).to eq('cache' => false, 'quality' => 95)
+    end
+
+    context 'when providing `allow_file_url` option inline' do
+      let(:options) { { allow_file_url: true } }
+
+      it 'raises `Grover::UnsafeConfigurationError`' do
+        expect { built_options }.to raise_error Grover::UnsafeConfigurationError,
+                                                'using `allow_file_url` option with middleware is exceptionally unsafe'
+      end
+    end
+
+    context 'when providing `allow_file_url` option through global options' do
+      let(:global_config) { { allow_file_url: true } }
+
+      it 'raises `Grover::UnsafeConfigurationError`' do
+        expect { built_options }.to raise_error Grover::UnsafeConfigurationError,
+                                                'using `allow_file_url` option with middleware is exceptionally unsafe'
+      end
+    end
   end
 end

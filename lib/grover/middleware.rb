@@ -111,7 +111,7 @@ class Grover
       body = body.join if body.is_a?(Array)
       body = HTMLPreprocessor.process body, root_url, protocol
 
-      options = { display_url: request_url }
+      options = { display_url: request_url, middleware: true }
       cookies = Rack::Utils.parse_cookies(env).map do |name, value|
         { name: name, value: Rack::Utils.escape(value), domain: env['HTTP_HOST'] }
       end
