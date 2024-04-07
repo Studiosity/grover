@@ -184,15 +184,15 @@ Grover.new('<some URI with basic authentication', username: 'the username', pass
 By default, Grover launches a local Chromium instance. You can connect to a remote/external
 Chromium with the `browser_ws_endpoint` options.
 
-For example, to connect to a chrome instance started with docker using `docker run -p 3000:3000 browserless/chrome:latest`:
+For example, to connect to a chrome instance started with docker using `docker run -p 3000:3000 ghcr.io/browserless/chrome:latest`:
 
 ```ruby
-options = {"browser_ws_endpoint": "ws://localhost:3000/"}
+options = {"browser_ws_endpoint": "ws://localhost:3000/chrome"}
 grover = Grover.new("https://mysite.com/path/to/thing", options)
 File.open("grover.png", "wb") { |f| f << grover.to_png }
 ```
 
-You can also pass launch flags like this: `ws://localhost:3000/?--disable-speech-api`
+You can also pass launch flags like this: `ws://localhost:3000/chrome?--disable-speech-api`
 
 If you are only using remote chromium, you can install the `puppeteer-core` node package instead of `puppeteer` to avoid downloading chrome.
 Grover will use `puppeteer` or fallback to `puppeteer-core` if it is available.
