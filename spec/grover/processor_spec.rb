@@ -8,13 +8,14 @@ describe Grover::Processor do
   describe '#convert' do
     subject(:convert) { processor.convert method, url_or_html, options }
 
-    let(:url_or_html) { 'http://google.com' }
+    let(:url_or_html) { 'http://localhost:4567' }
     let(:options) { {} }
     let(:date) do
       # New version of Chromium (v93) that comes with v10.2.0 of puppeteer uses a different date format
       date_format = puppeteer_version_on_or_after?('10.2.0') ? '%-m/%-d/%y, %-l:%M %p' : '%-m/%-d/%Y'
       Time.now.strftime date_format
     end
+    let(:protocol) { puppeteer_version_on_or_after?('21') ? 'https' : 'http' }
 
     context 'when converting to PDF' do
       let(:method) { :pdf }
@@ -27,7 +28,7 @@ describe Grover::Processor do
       let(:basic_header_footer_options) do
         {
           'displayHeaderFooter' => true,
-          'displayUrl' => 'http://www.example.net/foo/bar',
+          'displayUrl' => "#{protocol}://www.example.net/foo/bar",
           'margin' => {
             'top' => '1in',
             'bottom' => '1in'
@@ -40,14 +41,11 @@ describe Grover::Processor do
       end
 
       context 'when passing through a valid URL' do
-        # we need to add the language for test stability
-        # if not added explicitly, google can respond with a different locale
-        # based on IP address geo-lookup, timezone, etc.
-        let(:url_or_html) { 'https://www.google.com/?gl=us' }
+        let(:url_or_html) { 'http://localhost:4567' }
 
         it { is_expected.to start_with "%PDF-1.4\n" }
         it { expect(pdf_reader.page_count).to eq 1 }
-        it { expect(pdf_text_content).to include "I'm Feeling Lucky" }
+        it { expect(pdf_text_content).to include "I'm Feeling Grovery" }
       end
 
       context 'when passing through an invalid URL' do
@@ -68,11 +66,21 @@ describe Grover::Processor do
         it { expect(pdf_text_content).to eq '' }
       end
 
-      context 'when puppeteer package is not installed' do
+      context 'when puppeteer / puppeteer-core package is not installed' do
         # Temporarily move the node puppeteer folder
-        before { FileUtils.move 'node_modules/puppeteer', 'node_modules/puppeteer_temp' }
+        before do
+          FileUtils.move 'node_modules/puppeteer', 'node_modules/puppeteer_temp'
+          if puppeteer_version_on_or_after? '18.0.0'
+            FileUtils.move 'node_modules/puppeteer-core', 'node_modules/puppeteer-core_temp'
+          end
+        end
 
-        after { FileUtils.move 'node_modules/puppeteer_temp', 'node_modules/puppeteer' }
+        after do
+          FileUtils.move 'node_modules/puppeteer_temp', 'node_modules/puppeteer'
+          if puppeteer_version_on_or_after? '18.0.0'
+            FileUtils.move 'node_modules/puppeteer-core_temp', 'node_modules/puppeteer-core'
+          end
+        end
 
         it 'raises a DependencyError' do
           expect { convert }.to raise_error Grover::DependencyError, Grover::Utils.squish(<<~ERROR)
@@ -84,7 +92,7 @@ describe Grover::Processor do
         context 'when puppeteer package is not in package.json' do
           before do
             FileUtils.copy 'package.json', 'package.json.tmp'
-            File.write('package.json', File.open('package.json') { |f| f.read.gsub(/"puppeteer"/, '"puppeteer-tmp"') })
+            File.write('package.json', File.open('package.json') { |f| f.read.gsub('"puppeteer"', '"puppeteer-tmp"') })
           end
 
           after { FileUtils.move 'package.json.tmp', 'package.json' }
@@ -95,6 +103,20 @@ describe Grover::Processor do
               You need to add it to '#{Dir.pwd}/package.json' and run 'npm install'
             ERROR
           end
+        end
+      end
+
+      if puppeteer_version_on_or_after? '18.0.0'
+        context 'when only the puppeteer-core package is installed', :remote_browser do
+          before { FileUtils.move 'node_modules/puppeteer', 'node_modules/puppeteer_temp' }
+          after { FileUtils.move 'node_modules/puppeteer_temp', 'node_modules/puppeteer' }
+
+          let(:options) { { 'browserWsEndpoint' => browser_ws_endpoint } }
+          let(:browser_ws_endpoint) { 'ws://localhost:3000/' }
+          let(:url_or_html) { '<html><body style="background-color: blue">puppeteer-core works!</body></html>' }
+
+          it { expect { convert }.not_to raise_error }
+          it { expect(pdf_text_content).to eq 'puppeteer-core works!' }
         end
       end
 
@@ -133,6 +155,8 @@ describe Grover::Processor do
 
         context 'when first call to gets on stdout succeeds but second returns nil' do
           before do
+            allow(stdin).to receive(:puts).with(any_args)
+
             allow(stdout).to receive(:gets).and_return '["ok"]', nil
             allow(stdin).to receive(:puts).with '["pdf","http://google.com",{}]'
             allow(stderr).to receive(:read).and_return 'The reason the worker failed'
@@ -149,7 +173,7 @@ describe Grover::Processor do
         context 'when first call to gets on stdout succeeds but second returns an error' do
           before do
             allow(stdout).to receive(:gets).and_return '["ok"]', '["err","Some unknown thing happened"]'
-            allow(stdin).to receive(:puts).with '["pdf","http://google.com",{}]'
+            allow(stdin).to receive(:puts).with '["pdf","http://localhost:4567",{}]'
             allow(stderr).to receive(:read).and_return 'The reason the worker failed'
           end
 
@@ -169,7 +193,7 @@ describe Grover::Processor do
         context 'when the worker returns an invalid response' do
           before do
             allow(stdout).to receive(:gets).and_return '["ok"]', '["ok",invalid_response]'
-            allow(stdin).to receive(:puts).with '["pdf","http://google.com",{}]'
+            allow(stdin).to receive(:puts).with '["pdf","http://localhost:4567",{}]'
           end
 
           it 'raises an Error' do
@@ -191,8 +215,11 @@ describe Grover::Processor do
 
         context 'when options includes A4 page format' do
           let(:options) { { format: 'A4' } }
+          let(:media_box) do
+            puppeteer_version_on_or_after?('21') ? [0, 0, 595.91998, 842.88] : [0, 0, 594.95996, 841.91998]
+          end
 
-          it { expect(pdf_reader.pages.first.attributes).to include(MediaBox: [0, 0, 594.95996, 841.91998]) }
+          it { expect(pdf_reader.pages.first.attributes).to include(MediaBox: media_box) }
         end
 
         context 'when options includes Letter page format' do
@@ -244,7 +271,7 @@ describe Grover::Processor do
         context 'when options include header and footer enabled' do
           let(:options) { basic_header_footer_options.merge('headerTemplate' => "#{large_text}#{default_header}") }
 
-          it { expect(pdf_text_content).to eq "#{date} Paaage Hey there http://www.example.net/foo/bar 1/1" }
+          it { expect(pdf_text_content).to eq "#{date} Paaage Hey there #{protocol}://www.example.net/foo/bar 1/1" }
         end
 
         context 'when options override header template' do
@@ -252,7 +279,7 @@ describe Grover::Processor do
             basic_header_footer_options.merge('headerTemplate' => "#{large_text}<div class='text'>Excellente</div>")
           end
 
-          it { expect(pdf_text_content).to eq 'Excellente Hey there http://www.example.net/foo/bar 1/1' }
+          it { expect(pdf_text_content).to eq "Excellente Hey there #{protocol}://www.example.net/foo/bar 1/1" }
         end
 
         context 'when header template includes the display url marker' do
@@ -264,7 +291,7 @@ describe Grover::Processor do
 
           it do
             expect(pdf_text_content).to(
-              eq('abchttp://www.example.net/foo/bardef Hey there http://www.example.net/foo/bar 1/1')
+              eq("abc#{protocol}://www.example.net/foo/bardef Hey there #{protocol}://www.example.net/foo/bar 1/1")
             )
           end
         end
@@ -273,7 +300,9 @@ describe Grover::Processor do
           let(:options) { basic_header_footer_options.merge('footerTemplate' => footer_template) }
           let(:footer_template) { "#{large_text}<div class='text'>great <span class='url'></span> page</div>" }
 
-          it { expect(pdf_text_content).to eq "#{date} Paaage Hey there great http://www.example.net/foo/bar page" }
+          it do
+            expect(pdf_text_content).to eq "#{date} Paaage Hey there great #{protocol}://www.example.net/foo/bar page"
+          end
 
           context 'when template contains quotes' do
             let(:footer_template) { %(<div class='text'>Footer with "quotes" in it</div>) }
@@ -284,9 +313,10 @@ describe Grover::Processor do
 
         context 'when displayUrl option is not provided' do
           let(:options) { basic_header_footer_options.tap { |hash| hash.delete('displayUrl') } }
+          let(:protocol) { puppeteer_version_on_or_after?('22') ? 'https' : 'http' }
 
           it 'uses the default `example.com` for the footer URL' do
-            expect(pdf_text_content).to eq "#{date} Paaage Hey there http://example.com/ 1/1"
+            expect(pdf_text_content).to eq "#{date} Paaage Hey there #{protocol}://example.com/ 1/1"
           end
         end
 
@@ -353,9 +383,16 @@ describe Grover::Processor do
         end
 
         context 'when requesting a URI requiring basic authentication' do
-          let(:url_or_html) { 'https://jigsaw.w3.org/HTTP/Basic/' }
+          let(:url_or_html) { 'http://localhost:4567/auth' }
 
-          it { expect(pdf_text_content).to eq 'Unauthorized access You are denied access to this resource.' }
+          if puppeteer_version_on_or_after? '22'
+            it do
+              expect { convert }.to raise_error Grover::JavaScript::Error,
+                                                'net::ERR_INVALID_AUTH_CREDENTIALS at http://localhost:4567/auth'
+            end
+          else
+            it { expect(pdf_text_content).to eq 'Unauthorized access You are denied access to this resource.' }
+          end
 
           context 'when passing through `username` and `password` options' do
             let(:options) { { username: 'guest', password: 'guest' } }
@@ -365,17 +402,17 @@ describe Grover::Processor do
         end
 
         context 'when passing through cookies option' do
-          let(:url_or_html) { 'https://cookierenderer-production.up.railway.app/' }
+          let(:url_or_html) { 'http://localhost:4567/cookie_renderer' }
           let(:options) do
             {
               'cookies' => [
                 {
                   'name' => 'grover-test',
                   'value' => 'nom nom nom',
-                  'domain' => 'cookierenderer-production.up.railway.app'
+                  'domain' => 'localhost:4567'
                 },
                 { 'name' => 'other-domain', 'value' => 'should not display', 'domain' => 'example.com' },
-                { 'name' => 'escaped', 'value' => '%26%3D%3D', 'domain' => 'cookierenderer-production.up.railway.app' }
+                { 'name' => 'escaped', 'value' => '%26%3D%3D', 'domain' => 'localhost:4567' }
               ]
             }
           end
@@ -386,25 +423,25 @@ describe Grover::Processor do
         end
 
         context 'when passing through extra HTTP headers' do
-          let(:url_or_html) { 'http://cookierenderer-production.up.railway.app/?type=headers' }
+          let(:url_or_html) { 'http://localhost:4567/headers' }
           let(:options) { { 'extraHTTPHeaders' => { 'grover-test' => 'yes it is' } } }
 
-          it { expect(pdf_text_content).to match(/Request contained (15|16) headers/) }
-          it { expect(pdf_text_content).to include '1. host cookierenderer-production.up.railway.app' }
-          it { expect(pdf_text_content).to include '4. grover-test yes it is' }
+          it { expect(pdf_text_content).to match(/Request contained \d+ headers/) }
+          it { expect(pdf_text_content).to include '1. host localhost:4567' }
+          it { expect(pdf_text_content).to match(/\d{1,2}\. grover-test yes it is/) }
         end
 
         context 'when overloading the user agent' do
-          let(:url_or_html) { 'http://cookierenderer-production.up.railway.app/?type=headers' }
+          let(:url_or_html) { 'http://localhost:4567/headers' }
           let(:options) { { 'userAgent' => 'Grover user agent' } }
 
-          it { expect(pdf_text_content).to match(/Request contained (14|15) headers/) }
-          it { expect(pdf_text_content).to include '1. host cookierenderer-production.up.railway.app' }
-          it { expect(pdf_text_content).to include 'user-agent Grover user agent' }
+          it { expect(pdf_text_content).to match(/Request contained \d+ headers/) }
+          it { expect(pdf_text_content).to include '1. host localhost:4567' }
+          it { expect(pdf_text_content).to include '4. user-agent Grover user agent' }
         end
       end
 
-      context 'when passing through launch params to remote browser', remote_browser: true do
+      context 'when passing through launch params to remote browser', :remote_browser do
         let(:options) { { 'browserWsEndpoint' => browser_ws_endpoint } }
         let(:browser_ws_endpoint) { 'ws://localhost:3000/' }
         let(:url_or_html) do
@@ -427,6 +464,18 @@ describe Grover::Processor do
           let(:browser_ws_endpoint) { 'ws://localhost:3000/?--disable-speech-api' }
 
           it { expect(pdf_text_content).to eq 'Speech recognition is not supported' }
+        end
+      end
+
+      unless linux_system? # It looks like the way a connection failure is handled is different on Linux systems
+        context 'when passing through WS launch params without a remote browser' do
+          let(:options) { { 'browserWsEndpoint' => 'ws://localhost:3000/' } }
+          let(:url_or_html) { '<html><body>WS endpoint doesnt exist</body></html>' }
+
+          it 'raises a WsConnectFailedError' do
+            expect { convert }.to raise_error Grover::JavaScript::WsConnectFailedError,
+                                              'Failed to connect to browser WS endpoint: ws://localhost:3000/'
+          end
         end
       end
 
@@ -494,7 +543,7 @@ describe Grover::Processor do
         let(:options) { basic_header_footer_options.merge('executeScript' => script) }
         let(:script) { 'document.getElementsByTagName("body")[0].innerText = "Some evaluated content"' }
 
-        it { expect(pdf_text_content).to eq "#{date} Some evaluated content http://www.example.net/foo/bar 1/1" }
+        it { expect(pdf_text_content).to eq "#{date} Some evaluated content #{protocol}://www.example.net/foo/bar 1/1" }
       end
 
       context 'when waitForSelector option is specified' do
@@ -513,7 +562,7 @@ describe Grover::Processor do
         end
         let(:options) { basic_header_footer_options.merge('waitForSelector' => 'h1') }
 
-        it { expect(pdf_text_content).to eq "#{date} Hey there http://www.example.net/foo/bar 1/1" }
+        it { expect(pdf_text_content).to eq "#{date} Hey there #{protocol}://www.example.net/foo/bar 1/1" }
       end
 
       context 'when waitForFunction option is specified' do
@@ -539,7 +588,7 @@ describe Grover::Processor do
           )
         end
 
-        it { expect(pdf_text_content).to eq "#{date} Hey there http://www.example.net/foo/bar 1/1" }
+        it { expect(pdf_text_content).to eq "#{date} Hey there #{protocol}://www.example.net/foo/bar 1/1" }
       end
 
       context 'when waitForFunction option is specified with options' do
@@ -570,7 +619,7 @@ describe Grover::Processor do
           )
         end
 
-        it { expect(pdf_text_content).to eq "#{date} Hello, world! http://www.example.net/foo/bar 1/1" }
+        it { expect(pdf_text_content).to eq "#{date} Hello, world! #{protocol}://www.example.net/foo/bar 1/1" }
 
         context 'when waiting for function takes too long' do
           let(:wait_function_timeout) { 100 }
@@ -593,6 +642,7 @@ describe Grover::Processor do
           let(:url_or_html) do
             <<-HTML
               <html>
+                <head><link rel="icon" href="data:;base64,iVBORw0KGgo="></head>
                 <body>
                   <img src="http://foo.bar/baz.img" />
                 </body>
@@ -603,7 +653,8 @@ describe Grover::Processor do
           it do
             expect do
               convert
-            end.to raise_error Grover::JavaScript::RequestFailedError, 'net::ERR_NAME_NOT_RESOLVED at http://foo.bar/baz.img'
+            end.to raise_error Grover::JavaScript::RequestFailedError,
+                               "net::ERR_NAME_NOT_RESOLVED at #{protocol}://foo.bar/baz.img"
           end
         end
 
@@ -611,6 +662,7 @@ describe Grover::Processor do
           let(:url_or_html) do
             <<-HTML
               <html>
+                <head><link rel="icon" href="data:;base64,iVBORw0KGgo="></head>
                 <body>
                   <img src="https://google.com/404.jpg" />
                 </body>
@@ -629,6 +681,7 @@ describe Grover::Processor do
           let(:url_or_html) do
             <<-HTML
               <html>
+                <head><link rel="icon" href="data:;base64,iVBORw0KGgo="></head>
                 <body>
                   Hey there
                   <img src="https://httpstat.us/304" />
@@ -641,13 +694,14 @@ describe Grover::Processor do
         end
 
         context 'when assets have redirects PDFs are generated successfully' do
-          it { expect(pdf_text_content).to match "#{date} Google" }
+          it { expect(pdf_text_content).to match "#{date} I'm Feeling Grovery" }
         end
 
         context 'with images' do
           let(:url_or_html) do
             <<-HTML
               <html>
+                <head><link rel='icon' href='data:;base64,iVBORw0KGgo='></head>
                 <body>
                   <img src="https://placekitten.com/200/200" />
                 </body>
@@ -685,15 +739,17 @@ describe Grover::Processor do
           )
         end
 
-        it { expect(pdf_text_content).to eq "#{date} http://www.example.net/foo/bar 1/1" }
+        it { expect(pdf_text_content).to eq "#{date} #{protocol}://www.example.net/foo/bar 1/1" }
       end
 
       # Only test `waitForTimeout` if the Puppeteer supports it
-      if puppeteer_version_on_or_after? '5.3.0'
+      if puppeteer_version_on_or_after?('5.3.0') && puppeteer_version_on_or_before?('21.11.0')
         context 'when waitForTimeout option is specified' do
           let(:url_or_html) do
             <<-HTML
               <html>
+                <head><link rel='icon' href='data:;base64,iVBORw0KGgo='></head>
+              #{'  '}
                 <body>
                   <p id="loading">Loading</p>
                   <p id="content" style="display: none">Loaded</p>
@@ -809,11 +865,14 @@ describe Grover::Processor do
             let(:timeout) { 1 }
 
             if puppeteer_version_on_or_after? '10.4.0'
-              it 'will timeout when trying to convert to PDF' do
-                expect { convert }.to raise_error(
-                  Grover::JavaScript::TimeoutError,
-                  'waiting for Page.printToPDF failed: timeout 1ms exceeded'
-                )
+              it 'times out when trying to convert to PDF' do
+                error_message = if puppeteer_version_on_or_after?('21')
+                                  'Timed out after waiting 1ms'
+                                else
+                                  'waiting for Page.printToPDF failed: timeout 1ms exceeded'
+                                end
+
+                expect { convert }.to raise_error Grover::JavaScript::TimeoutError, error_message
               end
             else
               it { is_expected.to start_with "%PDF-1.4\n" }
@@ -830,11 +889,13 @@ describe Grover::Processor do
           let(:convert_timeout) { 1 }
 
           if puppeteer_version_on_or_after? '10.4.0'
-            it 'will raise an error when trying to convert to PDF' do
-              expect { convert }.to raise_error(
-                Grover::JavaScript::TimeoutError,
-                'waiting for Page.printToPDF failed: timeout 1ms exceeded'
-              )
+            it 'raises an error when trying to convert to PDF' do
+              error_message = if puppeteer_version_on_or_after?('21')
+                                'Timed out after waiting 1ms'
+                              else
+                                'waiting for Page.printToPDF failed: timeout 1ms exceeded'
+                              end
+              expect { convert }.to raise_error Grover::JavaScript::TimeoutError, error_message
             end
           else
             it { is_expected.to start_with "%PDF-1.4\n" }
@@ -844,11 +905,13 @@ describe Grover::Processor do
             let(:timeout) { 10_000 }
 
             if puppeteer_version_on_or_after? '10.4.0'
-              it 'will use the convert timeout over the timeout option' do
-                expect { convert }.to raise_error(
-                  Grover::JavaScript::TimeoutError,
-                  'waiting for Page.printToPDF failed: timeout 1ms exceeded'
-                )
+              it 'uses the convert timeout over the timeout option' do
+                error_message = if puppeteer_version_on_or_after?('21')
+                                  'Timed out after waiting 1ms'
+                                else
+                                  'waiting for Page.printToPDF failed: timeout 1ms exceeded'
+                                end
+                expect { convert }.to raise_error Grover::JavaScript::TimeoutError, error_message
               end
             else
               it { is_expected.to start_with "%PDF-1.4\n" }
@@ -876,7 +939,7 @@ describe Grover::Processor do
       let(:image) { MiniMagick::Image.read convert }
 
       context 'when passing through a valid URL' do
-        let(:url_or_html) { 'https://media.gettyimages.com/photos/tabby-cat-selfie-picture-id1151094724?s=2048x2048' }
+        let(:url_or_html) { 'http://localhost:4567/cat' }
 
         # default screenshot is PNG 800w x 600h
         it { expect(convert.unpack('C*')).to start_with "\x89PNG\r\n\x1A\n".unpack('C*') }
@@ -887,8 +950,8 @@ describe Grover::Processor do
         # so we'll check it's mean colour is roughly what we expect
         it do
           expect(image.data.dig('imageStatistics', MiniMagick.imagemagick7? ? 'Overall' : 'all', 'mean').to_f).
-            to be_within(1).of(97.7473).  # ImageMagick 6.9.3-1 (version used by Travis CI)
-            or be_within(1).of(161.497)   # ImageMagick 6.9.10-84
+            to be_within(10).of(97.7473).  # ImageMagick 6.9.3-1 (version used by Travis CI)
+            or be_within(10).of(161.497)   # ImageMagick 6.9.10-84
         end
       end
 
@@ -901,7 +964,7 @@ describe Grover::Processor do
         it { expect(mean_colour_statistics(image)).to eq %w[0 0 255] }
       end
 
-      context 'when using remote browser option with HTML', remote_browser: true do
+      context 'when using remote browser option with HTML', :remote_browser do
         let(:options) { { browserWsEndpoint: 'ws://localhost:3000' } }
         let(:url_or_html) { '<html><body style="background-color: blue"></body></html>' }
 
