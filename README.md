@@ -287,6 +287,16 @@ respond_to do |format|
 end
 ```
 
+#### Setting custom environment variable for node
+The `node_env_vars` configuration option enables you to set custom environment variables for the spawned node process. For example you might need to disable jemalloc in some environments (https://github.com/Studiosity/grover/issues/80).
+
+```ruby
+# config/initializers/grover.rb
+Grover.configure do |config|
+  config.node_env_vars = { "LD_PRELOAD" => "" }
+end
+```
+
 ## Middleware
 Grover comes with a middleware that allows users to get a PDF, PNG or JPEG view of
 any page on your site by appending .pdf, .png or .jpeg/.jpg to the URL.
