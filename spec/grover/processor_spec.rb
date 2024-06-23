@@ -384,12 +384,18 @@ describe Grover::Processor do
 
         context 'when options include executablePath' do
           let(:options) { { 'executablePath' => '/totes/invalid/path' } }
+          let(:error_message) do
+            if puppeteer_version_on_or_after? '22.6.3'
+              'Browser was not found at the configured executablePath (/totes/invalid/path)'
+            else
+              %r{Failed to launch (chrome|the browser process)! spawn /totes/invalid/path}
+            end
+          end
 
           it do
             expect do
               convert
-            end.to raise_error Grover::JavaScript::Error,
-                               %r{Failed to launch (chrome|the browser process)! spawn /totes/invalid/path}
+            end.to raise_error Grover::JavaScript::Error, error_message
           end
         end
 
@@ -448,7 +454,7 @@ describe Grover::Processor do
 
           it { expect(pdf_text_content).to match(/Request contained \d+ headers/) }
           it { expect(pdf_text_content).to include '1. host localhost:4567' }
-          it { expect(pdf_text_content).to include '4. user-agent Grover user agent' }
+          it { expect(pdf_text_content).to match(/[45]\. user-agent Grover user agent/) }
         end
       end
 
@@ -680,11 +686,18 @@ describe Grover::Processor do
               </html>
             HTML
           end
+          let(:error_message) do
+            if puppeteer_version_on_or_after? '22.6.0'
+              'net::ERR_BLOCKED_BY_ORB at https://google.com/404.jpg'
+            else
+              '404 https://google.com/404.jpg'
+            end
+          end
 
           it do
             expect do
               convert
-            end.to raise_error Grover::JavaScript::RequestFailedError, '404 https://google.com/404.jpg'
+            end.to raise_error Grover::JavaScript::RequestFailedError, error_message
           end
         end
 
@@ -960,9 +973,10 @@ describe Grover::Processor do
         # don't really want to rely on pixel testing the website screenshot
         # so we'll check it's mean colour is roughly what we expect
         it do
+          pixel_mean = puppeteer_version_on_or_after?('22.9.0') ? 140.925 : 161.497
+
           expect(image.data.dig('imageStatistics', MiniMagick.imagemagick7? ? 'Overall' : 'all', 'mean').to_f).
-            to be_within(10).of(97.7473).  # ImageMagick 6.9.3-1 (version used by Travis CI)
-            or be_within(10).of(161.497)   # ImageMagick 6.9.10-84
+            to be_within(10).of(pixel_mean)
         end
       end
 
