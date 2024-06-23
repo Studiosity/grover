@@ -714,7 +714,7 @@ describe Grover::Processor do
               <html>
                 <head><link rel='icon' href='data:;base64,iVBORw0KGgo='></head>
                 <body>
-                  <img src="https://placekitten.com/200/200" />
+                  <img src="http://localhost:4567/cat.png" />
                 </body>
               </html>
             HTML
