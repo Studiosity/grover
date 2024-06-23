@@ -107,7 +107,7 @@ describe Grover::Processor do
       end
 
       context 'when passing environment variables to the Node process through configuration' do
-        before { allow(Grover.configuration).to receive(:node_env_vars).and_return 'FOO' => 'bar'}
+        before { allow(Grover.configuration).to receive(:node_env_vars).and_return 'FOO' => 'bar' }
 
         it 'passes the environment variables to the Node process' do
           expect(Open3).to receive(:popen3).with({ 'FOO' => 'bar' }, any_args).and_call_original
