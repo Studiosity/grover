@@ -40,7 +40,7 @@ describe Grover::Middleware do
         it 'returns PDF content type' do
           get 'http://www.example.org/test.pdf'
           expect(last_response.headers['Content-Type']).to eq 'application/pdf'
-          response_size = Grover.new('Grover McGroveryface').to_pdf.bytesize
+          response_size = Grover.new('Grover McGroveryface', display_url: 'http://www.example.org/test').to_pdf.bytesize
           expect(last_response.body.bytesize).to eq response_size
           expect(last_response.headers['Content-Length']).to eq response_size.to_s
         end
@@ -48,7 +48,7 @@ describe Grover::Middleware do
         it 'matches PDF case insensitive' do
           get 'http://www.example.org/test.PDF'
           expect(last_response.headers['Content-Type']).to eq 'application/pdf'
-          response_size = Grover.new('Grover McGroveryface').to_pdf.bytesize
+          response_size = Grover.new('Grover McGroveryface', display_url: 'http://www.example.org/test').to_pdf.bytesize
           expect(last_response.body.bytesize).to eq response_size
           expect(last_response.headers['Content-Length']).to eq response_size.to_s
         end
@@ -352,7 +352,9 @@ describe Grover::Middleware do
         it 'returns response as PDF' do
           get 'http://www.example.org/test.pdf'
           expect(last_response.headers['Content-Type']).to eq 'application/pdf'
-          expect(last_response.body.bytesize).to eq Grover.new('Rackalicious').to_pdf.bytesize
+          expect(last_response.body.bytesize).to(
+            eq(Grover.new('Rackalicious', display_url: 'http://www.example.org/test').to_pdf.bytesize)
+          )
         end
 
         context 'when app configuration has PDF middleware disabled' do
@@ -416,7 +418,9 @@ describe Grover::Middleware do
         it 'returns response as PDF' do
           get 'http://www.example.org/test.pdf'
           expect(last_response.headers['Content-Type']).to eq 'application/pdf'
-          expect(last_response.body.bytesize).to eq Grover.new('Part 1Part 2').to_pdf.bytesize
+          expect(last_response.body.bytesize).to(
+            eq(Grover.new('Part 1Part 2', display_url: 'http://www.example.org/test').to_pdf.bytesize)
+          )
         end
       end
     end
@@ -433,7 +437,9 @@ describe Grover::Middleware do
             with('Grover McGroveryface', 'http://www.example.org/', 'http')
         )
         get 'http://www.example.org/test.pdf'
-        expect(last_response.body.bytesize).to eq Grover.new('Processed McProcessyface').to_pdf.bytesize
+        expect(last_response.body.bytesize).to(
+          eq(Grover.new('Processed McProcessyface', display_url: 'http://www.example.org/test').to_pdf.bytesize)
+        )
       end
 
       context 'with root_url specified as an argument' do
@@ -455,7 +461,9 @@ describe Grover::Middleware do
               with('Grover McGroveryface', 'http://example.com/', 'http')
           )
           get 'http://www.example.org/test.pdf'
-          expect(last_response.body.bytesize).to eq Grover.new('Processed McProcessyface').to_pdf.bytesize
+          expect(last_response.body.bytesize).to(
+            eq(Grover.new('Processed McProcessyface', display_url: 'http://www.example.org/test').to_pdf.bytesize)
+          )
         end
       end
 
@@ -472,7 +480,11 @@ describe Grover::Middleware do
 
           it 'uses the specified root_url' do
             get 'http://www.example.org/test.pdf'
-            expect(last_response.body.bytesize).to eq Grover.new('src="http://example.com/asdf"').to_pdf.bytesize
+            expect(last_response.body.bytesize).to(
+              eq(
+                Grover.new('src="http://example.com/asdf"', display_url: 'http://www.example.org/test').to_pdf.bytesize
+              )
+            )
           end
 
           context 'when the root_url is also set in configuration' do
@@ -480,7 +492,13 @@ describe Grover::Middleware do
 
             it 'uses the specified root_url in the middleware initializer' do
               get 'http://www.example.org/test.pdf'
-              expect(last_response.body.bytesize).to eq Grover.new('src="http://example.com/asdf"').to_pdf.bytesize
+              expect(last_response.body.bytesize).to(
+                eq(
+                  Grover.
+                    new('src="http://example.com/asdf"', display_url: 'http://www.example.org/test').
+                    to_pdf.bytesize
+                )
+              )
             end
           end
         end
@@ -490,14 +508,24 @@ describe Grover::Middleware do
 
           it 'uses the specified root_url' do
             get 'http://www.example.org/test.pdf'
-            expect(last_response.body.bytesize).to eq Grover.new('src="http://example.com/asdf"').to_pdf.bytesize
+            expect(last_response.body.bytesize).to(
+              eq(
+                Grover.new('src="http://example.com/asdf"', display_url: 'http://www.example.org/test').to_pdf.bytesize
+              )
+            )
           end
         end
 
         context 'without root_url specified' do
           it 'uses the detected root_url (request url)' do
             get 'http://www.example.org/test.pdf'
-            expect(last_response.body.bytesize).to eq Grover.new('src="http://www.example.org/asdf"').to_pdf.bytesize
+            expect(last_response.body.bytesize).to(
+              eq(
+                Grover.
+                  new('src="http://www.example.org/asdf"', display_url: 'http://www.example.org/test').
+                  to_pdf.bytesize
+              )
+            )
           end
         end
       end
