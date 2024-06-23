@@ -3,6 +3,10 @@
 ## Unreleased
 - none
 
+## [1.1.8](releases/tag/v1.1.8) - 2024-06-23
+### Added
+- [#240](https://github.com/Studiosity/grover/pull/240) Enable passing environment variables to the node process ([@jukra][])
+
 ## [1.1.7](releases/tag/v1.1.7) - 2024-03-09
 ### Added
 - [#225](https://github.com/Studiosity/grover/pull/225) Add support for fallback to loading `puppeteer-core` dependency ([@sbounmy][], [@dexterouschen][])
@@ -320,3 +324,4 @@
 [@afromankenobi]: https://github.com/afromankenobi
 [@sbounmy]: https://github.com/sbounmy
 [@dexterouschen]: https://github.com/dexterouschen
+[@jukra]: https://github.com/jukra
