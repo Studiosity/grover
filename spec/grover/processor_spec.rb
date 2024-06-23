@@ -106,6 +106,16 @@ describe Grover::Processor do
         end
       end
 
+      context 'when passing environment variables to the Node process through configuration' do
+        before { allow(Grover.configuration).to receive(:node_env_vars).and_return 'FOO' => 'bar' }
+
+        it 'passes the environment variables to the Node process' do
+          expect(Open3).to receive(:popen3).with({ 'FOO' => 'bar' }, any_args).and_call_original
+
+          convert
+        end
+      end
+
       if puppeteer_version_on_or_after? '18.0.0'
         context 'when only the puppeteer-core package is installed', :remote_browser do
           before { FileUtils.move 'node_modules/puppeteer', 'node_modules/puppeteer_temp' }
@@ -129,7 +139,8 @@ describe Grover::Processor do
         before do
           allow(Open3).to(
             receive(:popen3).
-              with('node', File.expand_path(File.join(__dir__, '../../lib/grover/js/processor.cjs')), chdir: Dir.pwd).
+              with({}, 'node', File.expand_path(File.join(__dir__,
+                                                          '../../lib/grover/js/processor.cjs')), chdir: Dir.pwd).
               and_return([stdin, stdout, stderr, wait_thr])
           )
 
@@ -703,7 +714,7 @@ describe Grover::Processor do
               <html>
                 <head><link rel='icon' href='data:;base64,iVBORw0KGgo='></head>
                 <body>
-                  <img src="https://placekitten.com/200/200" />
+                  <img src="http://localhost:4567/cat.png" />
                 </body>
               </html>
             HTML
