@@ -32,6 +32,7 @@ class Grover
 
     def spawn_process
       @stdin, @stdout, @stderr, @wait_thr = Open3.popen3(
+        Grover.configuration.node_env_vars,
         'node',
         File.expand_path(File.join(__dir__, 'js/processor.cjs')),
         chdir: app_root
