@@ -871,7 +871,7 @@ describe Grover::Processor do
             <<-HTML
               <html>
                 <body></body>
-  
+
                 <script>
                   setTimeout(function() {
                     document.body.innerHTML = '<h1>Hey there</h1>';

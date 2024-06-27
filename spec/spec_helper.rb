@@ -39,9 +39,9 @@ end
 
 def puppeteer_version
   @puppeteer_version ||= begin
-                           version = `node -p "require('puppeteer/package.json').version"`.strip
-                           version if version.match?(/\A\d+\.\d+\.\d+\z/)
-                         end
+    version = `node -p "require('puppeteer/package.json').version"`.strip
+    version if version.match?(/\A\d+\.\d+\.\d+\z/)
+  end
 end
 
 def linux_system?
