@@ -52,6 +52,21 @@ describe Grover::Middleware do
           expect(last_response.body.bytesize).to eq response_size
           expect(last_response.headers['Content-Length']).to eq response_size.to_s
         end
+
+        context 'when `allow_file_uris` configuration option is set' do
+          before { allow(Grover.configuration).to receive(:allow_file_uris).and_return true }
+
+          it 'raises an `UnsafeConfigurationError`' do
+            expect do
+              get 'http://www.example.org/test.PDF'
+            end.to(
+              raise_error(
+                Grover::UnsafeConfigurationError,
+                'using `allow_file_uris` configuration with middleware is exceptionally unsafe'
+              )
+            )
+          end
+        end
       end
 
       context 'when requesting a PNG' do
@@ -71,6 +86,21 @@ describe Grover::Middleware do
           response_size = Grover.new('Grover McGroveryface').to_png.bytesize
           expect(last_response.body.bytesize).to eq response_size
           expect(last_response.headers['Content-Length']).to eq response_size.to_s
+        end
+
+        context 'when `allow_file_uris` configuration option is set' do
+          before { allow(Grover.configuration).to receive(:allow_file_uris).and_return true }
+
+          it 'raises an `UnsafeConfigurationError`' do
+            expect do
+              get 'http://www.example.org/test.PNG'
+            end.to(
+              raise_error(
+                Grover::UnsafeConfigurationError,
+                'using `allow_file_uris` configuration with middleware is exceptionally unsafe'
+              )
+            )
+          end
         end
       end
 
@@ -100,6 +130,21 @@ describe Grover::Middleware do
           expect(last_response.body.bytesize).to eq response_size
           expect(last_response.headers['Content-Length']).to eq response_size.to_s
         end
+
+        context 'when `allow_file_uris` configuration option is set' do
+          before { allow(Grover.configuration).to receive(:allow_file_uris).and_return true }
+
+          it 'raises an `UnsafeConfigurationError`' do
+            expect do
+              get 'http://www.example.org/test.JPG'
+            end.to(
+              raise_error(
+                Grover::UnsafeConfigurationError,
+                'using `allow_file_uris` configuration with middleware is exceptionally unsafe'
+              )
+            )
+          end
+        end
       end
 
       context 'when request doesnt have an extension' do
@@ -108,6 +153,17 @@ describe Grover::Middleware do
           expect(last_response.headers['Content-Type']).to eq 'text/html'
           expect(last_response.body).to eq 'Grover McGroveryface'
           expect(last_response.headers['Content-Length']).to eq '20'
+        end
+
+        context 'when `allow_file_uris` configuration option is set' do
+          before { allow(Grover.configuration).to receive(:allow_file_uris).and_return true }
+
+          it 'returns the downstream content and content type' do
+            get 'http://www.example.org/test'
+            expect(last_response.headers['Content-Type']).to eq 'text/html'
+            expect(last_response.body).to eq 'Grover McGroveryface'
+            expect(last_response.headers['Content-Length']).to eq '20'
+          end
         end
       end
 

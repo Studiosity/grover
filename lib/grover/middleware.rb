@@ -25,12 +25,13 @@ class Grover
     end
 
     def _call(env)
-      check_file_uri_configuration
-
       @request = Rack::Request.new(env)
       identify_request_type
 
-      configure_env_for_grover_request(env) if grover_request?
+      if grover_request?
+        check_file_uri_configuration
+        configure_env_for_grover_request(env)
+      end
       status, headers, response = @app.call(env)
       response = update_response response, headers if grover_request? && html_content?(headers)
 
