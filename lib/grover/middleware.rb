@@ -25,6 +25,8 @@ class Grover
     end
 
     def _call(env)
+      check_file_uri_configuration
+
       @request = Rack::Request.new(env)
       identify_request_type
 
@@ -44,6 +46,14 @@ class Grover
     JPEG_REGEX = /\.jpe?g$/i.freeze
 
     attr_reader :pdf_request, :png_request, :jpeg_request
+
+    def check_file_uri_configuration
+      return unless Grover.configuration.allow_file_uris
+
+      # The combination of middleware and allowing file URLs is exceptionally
+      # unsafe as it can lead to data exfiltration from the host system.
+      raise UnsafeConfigurationError, 'using `allow_file_uris` configuration with middleware is exceptionally unsafe'
+    end
 
     def identify_request_type
       @pdf_request = Grover.configuration.use_pdf_middleware && path_matches?(PDF_REGEX)
@@ -111,7 +121,7 @@ class Grover
       body = body.join if body.is_a?(Array)
       body = HTMLPreprocessor.process body, root_url, protocol
 
-      options = { display_url: request_url, middleware: true }
+      options = { display_url: request_url }
       cookies = Rack::Utils.parse_cookies(env).map do |name, value|
         { name: name, value: Rack::Utils.escape(value), domain: env['HTTP_HOST'] }
       end
