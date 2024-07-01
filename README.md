@@ -352,7 +352,7 @@ Grover.configure do |config|
 end
 ```
 
-#### ignore_path
+### ignore_path
 The `ignore_path` configuration option can be used to tell Grover's middleware whether it should handle/modify
 the response. There are three ways to set up the `ignore_path`:
  * a `String` which matches the start of the request path.
@@ -378,7 +378,7 @@ Grover.configure do |config|
 end
 ```
 
-#### ignore_request
+### ignore_request
 The `ignore_request` configuration option can be used to tell Grover's middleware whether it should handle/modify
 the response. It should be set with a `Proc` which accepts the request (Rack::Request) as a parameter.
 
@@ -396,6 +396,30 @@ Grover.configure do |config|
   end
   # matches `HTTP Header X-BLOCK`
 end
+```
+
+### allow_file_uris
+The `allow_file_uris` option can be used to render an html document from the file system. 
+This should be used with *EXTREME CAUTION*. If used improperly it could potentially be manipulated to reveal
+sensitive files on the system. Do not enable if rendering content from outside entities
+(user uploads, external URLs, etc).
+
+It defaults to `false` preventing local system files from being read.
+
+```ruby
+# config/initializers/grover.rb
+Grover.configure do |config|
+  config.allow_file_uris = true
+end
+```
+
+And used as such:
+```ruby
+# Grover.new accepts a file URI and optional parameters for Puppeteer
+grover = Grover.new('file:///some/local/file.html', format: 'A4')
+
+# Get an inline PDF of the local file
+pdf = grover.to_pdf
 ```
 
 ## Cover pages
