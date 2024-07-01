@@ -24,7 +24,7 @@ class Grover
       dup._call(env)
     end
 
-    def _call(env)
+    def _call(env) # rubocop:disable Metrics/MethodLength
       @request = Rack::Request.new(env)
       identify_request_type
 
