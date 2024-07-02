@@ -3,6 +3,10 @@
 ## Unreleased
 - none
 
+## [1.1.9](releases/tag/v1.1.9) - 2024-07-02
+### Added
+- [#209](https://github.com/Studiosity/grover/pull/209) Allow loading html from file uri ([@jkowens][])
+
 ## [1.1.8](releases/tag/v1.1.8) - 2024-06-23
 ### Added
 - [#240](https://github.com/Studiosity/grover/pull/240) Enable passing environment variables to the node process ([@jukra][])
@@ -325,3 +329,4 @@
 [@sbounmy]: https://github.com/sbounmy
 [@dexterouschen]: https://github.com/dexterouschen
 [@jukra]: https://github.com/jukra
+[@jkowens]: https://github.com/jkowens
