@@ -69,13 +69,9 @@ jobs:
 
       - name: Run tests
         run: bundle exec rspec
-        env:
-          PUPPETEER_VERSION: ${{ matrix.puppeteer-version }}
 
       - name: Run tests with remote browser
         run: bundle exec rspec --tag remote_browser
-        env:
-          PUPPETEER_VERSION: ${{ matrix.puppeteer-version }}
 
       - name: Test & publish code coverage
         uses: paambaati/codeclimate-action@v3.2.0
