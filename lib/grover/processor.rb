@@ -21,7 +21,7 @@ class Grover
       return unless result
       return result if result.is_a?(String)
 
-      result['data'].pack('C*')
+      result.values.pack('C*')
     ensure
       cleanup_process if stdin
     end
