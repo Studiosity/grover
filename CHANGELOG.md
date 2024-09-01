@@ -3,6 +3,10 @@
 ## Unreleased
 - none
 
+## [1.1.10](releases/tag/v1.1.10) - 2024-09-01
+### Fixed
+- [#258](https://github.com/Studiosity/grover/pull/258) Support for Puppeteer v23.x ([@abrom][])
+
 ## [1.1.9](releases/tag/v1.1.9) - 2024-07-02
 ### Added
 - [#209](https://github.com/Studiosity/grover/pull/209) Allow loading html from file uri ([@jkowens][])
