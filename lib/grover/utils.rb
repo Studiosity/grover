@@ -8,7 +8,8 @@ class Grover
     ACRONYMS = {
       'css' => 'CSS',
       'csp' => 'CSP',
-      'http' => 'HTTP'
+      'http' => 'HTTP',
+      'js' => 'JS'
     }.freeze
     private_constant :ACRONYMS
 

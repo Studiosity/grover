@@ -34,7 +34,8 @@ class Grover
     def fix_boolean_options!
       fix_options!(
         'display_header_footer', 'full_page', 'landscape', 'omit_background', 'prefer_css_page_size',
-        'print_background', 'viewport.has_touch', 'viewport.is_landscape', 'viewport.is_mobile', 'bypass_csp'
+        'print_background', 'viewport.has_touch', 'viewport.is_landscape', 'viewport.is_mobile', 'bypass_csp',
+        'raise_on_request_failure', 'raise_on_js_error'
       ) { |value| !FALSE_VALUES.include?(value) }
     end
 

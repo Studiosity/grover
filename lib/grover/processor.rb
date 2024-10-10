@@ -83,14 +83,14 @@ class Grover
       input = stdout.gets
       raise Errno::EPIPE, "Can't read from worker" if input.nil?
 
-      status, message, error_class = JSON.parse(input)
+      status, message, error_class, errors = JSON.parse(input)
 
       if status == 'ok'
         message
       elsif error_class.nil?
         raise Grover::JavaScript::UnknownError, message
       else
-        raise Grover::JavaScript.const_get(error_class, false), message
+        raise Grover::JavaScript.const_get(error_class, false).new(*[message, errors].compact)
       end
     rescue JSON::ParserError
       raise Grover::Error, 'Malformed worker response'

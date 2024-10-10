@@ -162,6 +162,9 @@ The `wait_for_timeout` option can also be used to wait the specified number of m
 The `raise_on_request_failure` option, when enabled, will raise a `Grover::JavaScript::RequestFailedError`
 if the initial content request or any subsequent asset request returns a bad response or times out.
 
+The `raise_on_js_error` option, when enabled, will raise a `Grover::JavaScript::PageRenderError` if any uncaught
+Javascript errors occur when trying to render the page.
+
 The Chrome/Chromium executable path can be overridden with the `executable_path` option.
 
 Supplementary JavaScript can be executed on the page (after render and before conversion to PDF/image)
