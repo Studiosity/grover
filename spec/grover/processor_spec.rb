@@ -802,20 +802,39 @@ describe Grover::Processor do
             HTML
           end
 
-          it do
-            expect { convert }.to raise_error do |error|
-              expect(error).to be_a Grover::JavaScript::PageRenderError
-              expect(error.message).to eq "Unexpected identifier 'went'\nReally wrong"
-              expect(error.error_details).to eq [
-                {
-                  type: 'SyntaxError',
-                  message: "Unexpected identifier 'went'"
-                },
-                {
-                  type: 'Error',
-                  message: 'Really wrong'
-                }
-              ]
+          if puppeteer_version_on_or_after? '20.0.0'
+            it do
+              expect { convert }.to raise_error do |error|
+                expect(error).to be_a Grover::JavaScript::PageRenderError
+                expect(error.message).to eq "Unexpected identifier 'went'\nReally wrong"
+                expect(error.error_details).to eq [
+                  {
+                    type: 'SyntaxError',
+                    message: "Unexpected identifier 'went'"
+                  },
+                  {
+                    type: 'Error',
+                    message: 'Really wrong'
+                  }
+                ]
+              end
+            end
+          else
+            it do
+              expect { convert }.to raise_error do |error|
+                expect(error).to be_a Grover::JavaScript::PageRenderError
+                expect(error.message).to eq "SyntaxError: Unexpected identifier 'went'\nReally wrong"
+                expect(error.error_details).to eq [
+                  {
+                    type: 'Error',
+                    message: "SyntaxError: Unexpected identifier 'went'"
+                  },
+                  {
+                    type: 'Error',
+                    message: 'Really wrong'
+                  }
+                ]
+              end
             end
           end
 
