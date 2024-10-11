@@ -3,6 +3,10 @@
 ## Unreleased
 - none
 
+## [1.1.11](releases/tag/v1.1.11) - 2024-10-11
+### Added
+- [#264](https://github.com/Studiosity/grover/pull/264) Add `raise_on_js_error` option ([@abrom][])
+
 ## [1.1.10](releases/tag/v1.1.10) - 2024-09-01
 ### Fixed
 - [#258](https://github.com/Studiosity/grover/pull/258) Support for Puppeteer v23.x ([@abrom][])
