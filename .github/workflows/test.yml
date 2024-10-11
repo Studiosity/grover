@@ -64,6 +64,9 @@ jobs:
       - name: Install Puppeteer
         run: npm install puppeteer@${{ matrix.puppeteer-version }}
 
+      - name: Install Imagemagick
+        uses: mfinelli/setup-imagemagick@v5
+
       - name: Lint code - Rubocop
         run: bundle exec rubocop
 
@@ -71,11 +74,13 @@ jobs:
         run: bundle exec rspec
         env:
           PUPPETEER_VERSION: ${{ matrix.puppeteer-version }}
+          GROVER_NO_SANDBOX: true
 
       - name: Run tests with remote browser
         run: bundle exec rspec --tag remote_browser
         env:
           PUPPETEER_VERSION: ${{ matrix.puppeteer-version }}
+          GROVER_NO_SANDBOX: true
 
       - name: Test & publish code coverage
         uses: paambaati/codeclimate-action@v3.2.0
