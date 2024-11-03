@@ -171,7 +171,7 @@ Supplementary JavaScript can be executed on the page (after render and before co
 by passing it to the `execute_script` option.
 
 ```javascript
-Grover.new(<some url>, { execute_script: 'document.getElementsByTagName("footer")[0].innerText = "Hey"' }).to_pdf
+Grover.new(<some url>, execute_script: 'document.getElementsByTagName("footer")[0].innerText = "Hey"').to_pdf
 ```
 
 #### Basic authentication
@@ -190,8 +190,7 @@ Chromium with the `browser_ws_endpoint` options.
 For example, to connect to a chrome instance started with docker using `docker run -p 3000:3000 ghcr.io/browserless/chrome:latest`:
 
 ```ruby
-options = {"browser_ws_endpoint": "ws://localhost:3000/chrome"}
-grover = Grover.new("https://mysite.com/path/to/thing", options)
+grover = Grover.new("https://mysite.com/path/to/thing", browser_ws_endpoint: "ws://localhost:3000/chrome")
 File.open("grover.png", "wb") { |f| f << grover.to_png }
 ```
 
