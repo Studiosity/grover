@@ -300,6 +300,16 @@ Grover.configure do |config|
 end
 ```
 
+#### Yarn pnp strategy
+
+If you ar using yarn pnp strategy, you can override how to run js runtime for grover:
+
+```ruby
+Grover.configure do |config|
+  config.js_runtime_bin = ['yarn', 'node']
+end
+```
+
 ## Middleware
 Grover comes with a middleware that allows users to get a PDF, PNG or JPEG view of
 any page on your site by appending .pdf, .png or .jpeg/.jpg to the URL.
@@ -325,7 +335,7 @@ To enable them, there are configuration options for each image type as well as a
 
 If either of the image handling middleware options are enabled, the [ignore_path](#ignore_path) and/or
 [ignore_request](#ignore_request) should also be configured, otherwise assets are likely to be handled
-which would likely result in 404 responses.  
+which would likely result in 404 responses.
 
 ```ruby
 # config/initializers/grover.rb
@@ -402,7 +412,7 @@ end
 ```
 
 ### allow_file_uris
-The `allow_file_uris` option can be used to render an html document from the file system. 
+The `allow_file_uris` option can be used to render an html document from the file system.
 This should be used with *EXTREME CAUTION*. If used improperly it could potentially be manipulated to reveal
 sensitive files on the system. Do not enable if rendering content from outside entities
 (user uploads, external URLs, etc).
@@ -434,6 +444,8 @@ To get around this, Grover's middleware allows you to specify relative paths for
 For direct execution, you can make multiple calls and combine the resulting PDFs together.
 
 ### Using middleware
+
+To use this functionality you need add [combine_pdf](https://rubygems.org/gems/combine_pdf) gem in your app.
 
 You can specify relative paths to the cover page contents using the `front_cover_path` and `back_cover_path`
 options either via the global configuration, or via meta tags. These paths (with query parameters) are then
@@ -560,7 +572,7 @@ The middleware and HTML preprocessing components were used heavily in the implem
 
 Thanks are also given to the excellent [Schmooze project](https://github.com/Shopify/schmooze).
 The Ruby to NodeJS interface in Grover is heavily based off that work. Grover previously used that gem,
-however migrated away due to differing requirements over persistence/cleanup of the NodeJS worker process.  
+however migrated away due to differing requirements over persistence/cleanup of the NodeJS worker process.
 
 ## License
 
