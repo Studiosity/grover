@@ -19,7 +19,7 @@ class Grover
       @use_pdf_middleware = true
       @use_png_middleware = false
       @use_jpeg_middleware = false
-      @js_runtime_bin = 'node'
+      @js_runtime_bin = ['node']
       @node_env_vars = {}
       @allow_file_uris = false
     end
