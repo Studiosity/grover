@@ -141,7 +141,7 @@ class Grover
       begin
         require 'combine_pdf'
       rescue ::LoadError
-        raise Grover::Error, "You need install combine_pdf gem"
+        raise Grover::Error, 'Please add/install the "combine_pdf" gem to use the front/back cover page feature'
       end
     end
 
