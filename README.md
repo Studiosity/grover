@@ -445,11 +445,11 @@ For direct execution, you can make multiple calls and combine the resulting PDFs
 
 ### Using middleware
 
-Note, to use this functionality you need to add the [combine_pdf](https://rubygems.org/gems/combine_pdf) gem to your app.
-
 You can specify relative paths to the cover page contents using the `front_cover_path` and `back_cover_path`
 options either via the global configuration, or via meta tags. These paths (with query parameters) are then
 requested from the downstream app.
+
+Note, to use this functionality you need to add the [combine_pdf](https://rubygems.org/gems/combine_pdf) gem to your app.
 
 The cover pages are converted to PDF in isolation, and then combined together with the original PDF response,
 before being returned back up through the Rack stack.
