@@ -302,7 +302,7 @@ end
 
 #### Yarn pnp strategy
 
-If you ar using yarn pnp strategy, you can override how to run js runtime for grover:
+If you are using the Yarn PnP strategy, you can override the run JS runtime for grover:
 
 ```ruby
 Grover.configure do |config|
