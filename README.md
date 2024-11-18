@@ -300,7 +300,7 @@ Grover.configure do |config|
 end
 ```
 
-#### Yarn pnp strategy
+#### Yarn PnP strategy
 
 If you are using the Yarn PnP strategy, you can override the run JS runtime for grover:
 
