@@ -256,7 +256,13 @@ describe Grover::Processor do
         context 'when options includes A4 page format' do
           let(:options) { { format: 'A4' } }
           let(:media_box) do
-            puppeteer_version_on_or_after?('21') ? [0, 0, 595.91998, 842.88] : [0, 0, 594.95996, 841.91998]
+            if puppeteer_version_on_or_after?('23.3.1')
+              [0, 0, 595.91998, 841.91998]
+            elsif puppeteer_version_on_or_after?('21')
+              [0, 0, 595.91998, 842.88]
+            else
+              [0, 0, 594.95996, 841.91998]
+            end
           end
 
           it { expect(pdf_reader.pages.first.attributes).to include(MediaBox: media_box) }

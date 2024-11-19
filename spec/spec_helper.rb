@@ -34,13 +34,16 @@ def fixture_path(file)
 end
 
 def puppeteer_version_on_or_after?(version)
-  puppeteer_version = ENV.fetch('PUPPETEER_VERSION', '')
   puppeteer_version.empty? || Gem::Version.new(puppeteer_version) >= Gem::Version.new(version)
 end
 
 def puppeteer_version_on_or_before?(version)
-  puppeteer_version = ENV.fetch('PUPPETEER_VERSION', '')
   puppeteer_version.empty? || Gem::Version.new(puppeteer_version) <= Gem::Version.new(version)
+end
+
+def puppeteer_version
+  @puppeteer_version ||=
+    ENV.fetch('PUPPETEER_VERSION', nil) || `npm list puppeteer`[/puppeteer@(\d{1,3}(.\d{1,3}){0,2})\n/, 1]
 end
 
 def linux_system?
