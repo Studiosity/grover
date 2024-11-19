@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'combine_pdf'
-
 class Grover
   #
   # Rack middleware for catching PDF requests and returning the upstream HTML as a PDF
@@ -132,10 +130,17 @@ class Grover
     end
 
     def add_cover_content(grover)
+      load_combine_pdf
       pdf = CombinePDF.parse grover.to_pdf
       pdf >> fetch_cover_pdf(grover.front_cover_path) if grover.show_front_cover?
       pdf << fetch_cover_pdf(grover.back_cover_path) if grover.show_back_cover?
       pdf.to_pdf
+    end
+
+    def load_combine_pdf
+      require 'combine_pdf'
+    rescue ::LoadError
+      raise Grover::Error, 'Please add/install the "combine_pdf" gem to use the front/back cover page feature'
     end
 
     def fetch_cover_pdf(path)
