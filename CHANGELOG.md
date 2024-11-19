@@ -3,6 +3,10 @@
 ## Unreleased
 - none
 
+## [1.2.0](releases/tag/v1.2.0) - 2024-11-19
+### Breaking Change
+- [#266](https://github.com/Studiosity/grover/pull/266) Make combine_pdf dependency optional + support Yarn PnP ([@le0pard][])
+
 ## [1.1.11](releases/tag/v1.1.11) - 2024-10-11
 ### Added
 - [#264](https://github.com/Studiosity/grover/pull/264) Add `raise_on_js_error` option ([@abrom][])
@@ -338,3 +342,4 @@
 [@dexterouschen]: https://github.com/dexterouschen
 [@jukra]: https://github.com/jukra
 [@jkowens]: https://github.com/jkowens
+[@le0pard]: https://github.com/le0pard
