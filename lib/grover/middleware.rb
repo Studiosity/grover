@@ -40,9 +40,9 @@ class Grover
 
     private
 
-    PDF_REGEX = /\.pdf$/i.freeze
-    PNG_REGEX = /\.png$/i.freeze
-    JPEG_REGEX = /\.jpe?g$/i.freeze
+    PDF_REGEX = /\.pdf$/i
+    PNG_REGEX = /\.png$/i
+    JPEG_REGEX = /\.jpe?g$/i
 
     attr_reader :pdf_request, :png_request, :jpeg_request
 
