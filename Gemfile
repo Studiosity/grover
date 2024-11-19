@@ -6,6 +6,7 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'childprocess', '~> 5.0'
+gem 'combine_pdf', '~> 1.0'
 gem 'mini_magick', '~> 4.12'
 gem 'pdf-reader', '~> 2.11'
 gem 'puma', '~> 6.4'

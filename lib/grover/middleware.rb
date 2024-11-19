@@ -138,11 +138,9 @@ class Grover
     end
 
     def load_combine_pdf
-      begin
-        require 'combine_pdf'
-      rescue ::LoadError
-        raise Grover::Error, 'Please add/install the "combine_pdf" gem to use the front/back cover page feature'
-      end
+      require 'combine_pdf'
+    rescue ::LoadError
+      raise Grover::Error, 'Please add/install the "combine_pdf" gem to use the front/back cover page feature'
     end
 
     def fetch_cover_pdf(path)

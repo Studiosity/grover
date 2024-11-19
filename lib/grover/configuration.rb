@@ -10,7 +10,7 @@ class Grover
                   :use_jpeg_middleware, :js_runtime_bin,
                   :node_env_vars, :allow_file_uris
 
-    def initialize
+    def initialize # rubocop:disable Metrics/MethodLength
       @options = {}
       @meta_tag_prefix = 'grover-'
       @ignore_path = nil
