@@ -25,27 +25,24 @@ jobs:
           '20.9.0',
           '21.9.0',
           '22.15.0',
-          '23.2.1',
+          '23.8.0',
         ]
         include:
-          - ruby-version: '2.7'
-            node-version: '18'
-            puppeteer-version: '23.2.1'
           - ruby-version: '3.0'
             node-version: '18'
-            puppeteer-version: '23.2.1'
+            puppeteer-version: '23.8.0'
           - ruby-version: '3.1'
             node-version: '18'
-            puppeteer-version: '23.2.1'
+            puppeteer-version: '23.8.0'
           - ruby-version: '3.2'
             node-version: '18'
-            puppeteer-version: '23.2.1'
+            puppeteer-version: '23.8.0'
           - ruby-version: '3.3'
             node-version: '20'
-            puppeteer-version: '23.2.1'
+            puppeteer-version: '23.8.0'
           - ruby-version: '3.3'
             node-version: '22'
-            puppeteer-version: '23.2.1'
+            puppeteer-version: '23.8.0'
 
     steps:
       - uses: actions/checkout@v3
