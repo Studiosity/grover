@@ -174,6 +174,12 @@ by passing it to the `execute_script` option.
 Grover.new(<some url>, execute_script: 'document.getElementsByTagName("footer")[0].innerText = "Hey"').to_pdf
 ```
 
+You can also evaluate JavaScript on the page before any of its scripts is run, by passing it a string to the `evaluate_on_new_document` option. See https://github.com/puppeteer/puppeteer/blob/main/docs/api/puppeteer.page.evaluateonnewdocument.md
+
+```javascript
+Grover.new(<some url>, evaluate_on_new_document: 'window.someConfig = "some value"').to_pdf
+```
+
 #### Basic authentication
 For requesting a page with basic authentication, `username` and `password` options can be provided. Note that this
 only really makes sense if you're calling Grover directly (and not via middleware).
