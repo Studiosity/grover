@@ -584,6 +584,24 @@ describe Grover::Processor do
         end
       end
 
+      context 'when evaluateOnNewDocument option is specified' do
+        let(:url_or_html) do
+          <<-HTML
+            <html>
+              <body>
+                Evaluate on new doc <span id="test">did not run</span>
+                <script type="text/javascript">
+                  document.getElementById("test").innerHTML = window.preEvalContent;
+                </script>
+              </body>
+            </html>
+          HTML
+        end
+        let(:options) { { 'evaluateOnNewDocument' => 'window.preEvalContent = "ran!"' } }
+
+        it { expect(pdf_text_content).to eq 'Evaluate on new doc ran!' }
+      end
+
       context 'when evaluate option is specified' do
         let(:url_or_html) { '<html><body></body></html>' }
         let(:options) { basic_header_footer_options.merge('executeScript' => script) }
