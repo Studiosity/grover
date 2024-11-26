@@ -27,8 +27,6 @@ RSpec.configure do |config|
   include Rack::Test::Methods
 end
 
-MiniMagick.validate_on_create = false
-
 def fixture_path(file)
   File.join(File.expand_path(__dir__), 'fixtures', file)
 end

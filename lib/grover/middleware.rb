@@ -85,7 +85,7 @@ class Grover
     end
 
     def html_content?(headers)
-      headers['Content-Type'] =~ %r{text/html|application/xhtml\+xml}
+      headers['content-type'] =~ %r{text/html|application/xhtml\+xml}
     end
 
     def update_response(response, headers)
@@ -155,11 +155,11 @@ class Grover
 
     def assign_headers(headers, body, content_type)
       # Do not cache results
-      headers.delete 'ETag'
-      headers.delete 'Cache-Control'
+      headers.delete 'etag'
+      headers.delete 'cache-control'
 
-      headers['Content-Length'] = (body.respond_to?(:bytesize) ? body.bytesize : body.size).to_s
-      headers['Content-Type'] = content_type
+      headers['content-length'] = (body.respond_to?(:bytesize) ? body.bytesize : body.size).to_s
+      headers['content-type'] = content_type
     end
 
     def configure_env_for_grover_request(env)
