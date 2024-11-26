@@ -3,6 +3,10 @@
 ## Unreleased
 - none
 
+## [1.2.1](releases/tag/v1.2.1) - 2024-11-26
+### Added
+- [#269](https://github.com/Studiosity/grover/pull/269) Add `evaluate_on_new_document` option ([@rasmus0201][])
+
 ## [1.2.0](releases/tag/v1.2.0) - 2024-11-19
 ### Breaking Change
 - [#266](https://github.com/Studiosity/grover/pull/266) Make combine_pdf dependency optional + support Yarn PnP ([@le0pard][])
@@ -343,3 +347,4 @@
 [@jukra]: https://github.com/jukra
 [@jkowens]: https://github.com/jkowens
 [@le0pard]: https://github.com/le0pard
+[@rasmus0201]: https://github.com/rasmus0201
