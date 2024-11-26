@@ -282,7 +282,7 @@ In respective controller's action use:
 ```ruby
 respond_to do |format|
   format.html do
-    response.headers['Content-Disposition'] = %(attachment; filename="lorem_ipsum.pdf")
+    response.headers['content-disposition'] = %(attachment; filename="lorem_ipsum.pdf")
 
     render layout: 'pdf'
   end
