@@ -547,6 +547,9 @@ N.B.
 * The headless option disabled is not compatible with exporting of the PDF.
 * If showing the devtools, the browser will halt resulting in a navigation timeout
 
+## Troubleshooting
+
+If you're generating files from a web server, starting with puppeteer version 22, chromium automatically upgrades all HTTP requests to HTTPS requests.  If your server is only expecting HTTP requests then adding `launch_args: ['--disable-features=HttpsUpgrades']` will prevent the automatic protocol conversion from occurring.
 
 ## Contributing
 
