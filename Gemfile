@@ -18,5 +18,4 @@ gem 'rubocop', '~> 1.68'
 gem 'rubocop-rake', '~> 0.6'
 gem 'rubocop-rspec', '~> 3.2'
 gem 'sinatra', '~> 4.1'
-# Limit simplecov to 0.17.x due to https://github.com/codeclimate/test-reporter/issues/413
-gem 'simplecov', '~> 0.17', '< 0.18'
+gem 'simplecov', '~> 0.22.0'
