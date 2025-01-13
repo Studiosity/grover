@@ -3,6 +3,10 @@
 ## Unreleased
 - none
 
+## [1.2,2](releases/tag/v1.2.2) - 2025-01-13
+### Added
+- [#275](https://github.com/Studiosity/grover/pull/275) Add support for Ruby 3.4 ([@murajun1978][])
+
 ## [1.2.1](releases/tag/v1.2.1) - 2024-11-26
 ### Added
 - [#269](https://github.com/Studiosity/grover/pull/269) Add `evaluate_on_new_document` option ([@rasmus0201][])
@@ -348,3 +352,4 @@
 [@jkowens]: https://github.com/jkowens
 [@le0pard]: https://github.com/le0pard
 [@rasmus0201]: https://github.com/rasmus0201
+[@murajun1978]: https://github.com/murajun1978
