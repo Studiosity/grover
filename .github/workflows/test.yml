@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [main]
 
+env:
+  CC_TEST_REPORTER_ID: 5cfed40102c670b5c9e509730782b751939ddbe53fc57c317b718f635bab1ce8
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -81,5 +84,3 @@ jobs:
 
       - name: Test & publish code coverage
         uses: paambaati/codeclimate-action@v3.2.0
-        env:
-          CC_TEST_REPORTER_ID: 5cfed40102c670b5c9e509730782b751939ddbe53fc57c317b718f635bab1ce8
