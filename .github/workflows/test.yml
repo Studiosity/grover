@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby-version: ['3.3']
+        ruby-version: ['3.4']
         node-version: ['18']
         puppeteer-version: [
           '18.2.1',
@@ -38,9 +38,12 @@ jobs:
             node-version: '18'
             puppeteer-version: '23.8.0'
           - ruby-version: '3.3'
+            node-version: '18'
+            puppeteer-version: '23.8.0'
+          - ruby-version: '3.4'
             node-version: '20'
             puppeteer-version: '23.8.0'
-          - ruby-version: '3.3'
+          - ruby-version: '3.4'
             node-version: '22'
             puppeteer-version: '23.8.0'
 
