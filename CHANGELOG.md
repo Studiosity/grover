@@ -3,6 +3,10 @@
 ## Unreleased
 - none
 
+## [1.2,3](releases/tag/v1.2.3) - 2025-01-31
+### Fixed
+- [#281](https://github.com/Studiosity/grover/pull/281) Fix regression in middleware to support pre-Rack 3.x header key format ([@abrom][])
+
 ## [1.2,2](releases/tag/v1.2.2) - 2025-01-13
 ### Added
 - [#275](https://github.com/Studiosity/grover/pull/275) Add support for Ruby 3.4 ([@murajun1978][])
