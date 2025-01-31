@@ -85,7 +85,7 @@ class Grover
     end
 
     def html_content?(headers)
-      headers['content-type'] =~ %r{text/html|application/xhtml\+xml}
+      headers[lower_case_headers? ? 'content-type' : 'Content-Type'] =~ %r{text/html|application/xhtml\+xml}
     end
 
     def update_response(response, headers)
@@ -155,11 +155,12 @@ class Grover
 
     def assign_headers(headers, body, content_type)
       # Do not cache results
-      headers.delete 'etag'
-      headers.delete 'cache-control'
+      headers.delete(lower_case_headers? ? 'etag' : 'ETag')
+      headers.delete(lower_case_headers? ? 'cache-control' : 'Cache-Control')
 
-      headers['content-length'] = (body.respond_to?(:bytesize) ? body.bytesize : body.size).to_s
-      headers['content-type'] = content_type
+      headers[lower_case_headers? ? 'content-length' : 'Content-Length'] =
+        (body.respond_to?(:bytesize) ? body.bytesize : body.size).to_s
+      headers[lower_case_headers? ? 'content-type' : 'Content-Type'] = content_type
     end
 
     def configure_env_for_grover_request(env)
@@ -222,6 +223,12 @@ class Grover
       env['rack.input'] = StringIO.new
       env.delete 'CONTENT_LENGTH'
       env.delete 'RAW_POST_DATA'
+    end
+
+    def lower_case_headers?
+      return @lower_case_headers if defined? @lower_case_headers
+
+      @lower_case_headers = Gem::Version.new(Rack.release) >= Gem::Version.new('3')
     end
   end
 end
