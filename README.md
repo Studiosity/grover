@@ -540,12 +540,17 @@ builds: https://chromium.googlesource.com/chromium/src/+/main/docs/security/appa
 
 However, that does point to what solutions might look like.
 
+### Option 1. Use the version of Chrome that your system already allows
 Most systems will likely have an apparmor profile for the system installed Chrome, so the easiest option may be to just
 tell Grover to use that. eg:
 ```ruby
   executable_path: '/opt/google/chrome/chrome' # this path may be different depending on your system
 ```
+The problem with this solution is that puppeteer is somewhat designed to be run with a specific version of Chrome. If
+you use the version installed on your system that may not match the puppeteer version, and as such may have
+incompatibilities.
 
+### Option 2. Tell your system to allow the Puppeteer installed Chrome
 Alternatively, you could create a new apparmor profile for the puppeteer managed version of Chrome. Something like:
 ```shell
 export PUPPETEER_CHROME_PATH=$(node -e "console.log(require('puppeteer').executablePath())")
@@ -568,6 +573,7 @@ will ACTUALLY use `chrome-headless-shell` and not `chrome`
 (both would likely be installed in `~/.cache/puppeteer/` by default when installing the `puppeteer` NPM package).
 See https://pptr.dev/guides/headless-modes
 
+### Option 3. Tell your system to allow the Puppeteer installed headless shell version of Chrome 
 If you prefer not to overload the executable path, you could instead create an apparmor profile for
 `chrome-headless-shell` as such:
 ```shell
