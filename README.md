@@ -531,6 +531,61 @@ the HTML/JS you provide to Grover.
     };
     ```
 
+## "Failed to launch the browser process!" and "No usable sandbox!"
+Errors around no usable sandbox are likely caused by changes to how linux secures itself with apparmor. This restricts
+which applications are allowed to create sandboxes on the system, including and as required by puppeteer.
+
+This resource talks about some of the options available, but note that it is talking in the context of DEVELOPER Chrome
+builds: https://chromium.googlesource.com/chromium/src/+/main/docs/security/apparmor-userns-restrictions.md
+
+However, that does point to what solutions might look like.
+
+Most systems will likely have an apparmor profile for the system installed Chrome, so the easiest option may be to just
+tell Grover to use that. eg:
+```ruby
+  executable_path: '/opt/google/chrome/chrome' # this path may be different depending on your system
+```
+
+Alternatively, you could create a new apparmor profile for the puppeteer managed version of Chrome. Something like:
+```shell
+export PUPPETEER_CHROME_PATH=$(node -e "console.log(require('puppeteer').executablePath())")
+cat | sudo tee /etc/apparmor.d/chrome <<EOF
+abi <abi/4.0>,
+include <tunables/global>
+
+profile chrome $PUPPETEER_CHROME_PATH flags=(unconfined) {
+  userns,
+
+  # Site-specific additions and overrides. See local/README for details.
+  include if exists <local/chrome>
+}
+EOF
+sudo service apparmor reload  # reload AppArmor profiles to include the new one
+```
+However, it is important when using this method to also explicitly set the `executable_path` within your Grover code to
+reference this same Puppeteer Chrome path. By default, if you don't explicitly specify the executable path, Puppeteer
+will ACTUALLY use `chrome-headless-shell` and not `chrome`
+(both would likely be installed in `~/.cache/puppeteer/` by default when installing the `puppeteer` NPM package).
+See https://pptr.dev/guides/headless-modes
+
+If you prefer not to overload the executable path, you could instead create an apparmor profile for
+`chrome-headless-shell` as such:
+```shell
+export CHROME_HEADLESS_SHELL_PATH=$(find ~/.cache/puppeteer/chrome-headless-shell/ -executable -type f -name chrome-headless-shell -print -quit)
+cat | sudo tee /etc/apparmor.d/chrome-headless-shell <<EOF
+abi <abi/4.0>,
+include <tunables/global>
+
+profile chrome-headless-shell $CHROME_HEADLESS_SHELL_PATH flags=(unconfined) {
+  userns,
+
+  # Site-specific additions and overrides. See local/README for details.
+  include if exists <local/chrome>
+}
+EOF
+sudo service apparmor reload  # reload AppArmor profiles to include the new one
+```
+
 ## Debugging
 If you're having trouble with converting the HTML content, you can enable some debugging options to help. These can be
 enabled as global options via `Grover.configure`, by passing through to the Grover initializer, or using meta tag
