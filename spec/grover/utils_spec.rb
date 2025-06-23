@@ -298,12 +298,24 @@ describe Grover::Utils do
       it { is_expected.to eq('fooBar' => 'baz') }
     end
 
-    context 'when key has an acronym in it' do
-      let(:object) { { prefer_css_page_size: true, bypass_csp: false, extra_http_headers: { 'Foo' => 'Bar' } } }
+    context 'when keys have acronyms in them' do
+      let(:object) do
+        {
+          prefer_css_page_size: true,
+          bypass_csp: false,
+          extra_http_headers: { 'Foo' => 'Bar' },
+          raise_on_js_error: true
+        }
+      end
 
       it 'returns the acronym components of the keys uppercase' do
         expect(normalize_object).to(
-          eq('preferCSSPageSize' => true, 'bypassCSP' => false, 'extraHTTPHeaders' => { 'foo' => 'Bar' })
+          eq(
+            'preferCSSPageSize' => true,
+            'bypassCSP' => false,
+            'extraHTTPHeaders' => { 'foo' => 'Bar' },
+            'raiseOnJSError' => true
+          )
         )
       end
 
@@ -312,7 +324,12 @@ describe Grover::Utils do
 
         it 'returns the acronym components of the keys uppercase (but does not transform the extraHTTPHeaders value' do
           expect(normalize_object).to(
-            eq('preferCSSPageSize' => true, 'bypassCSP' => false, 'extraHTTPHeaders' => { 'Foo' => 'Bar' })
+            eq(
+              'preferCSSPageSize' => true,
+              'bypassCSP' => false,
+              'extraHTTPHeaders' => { 'Foo' => 'Bar' },
+              'raiseOnJSError' => true
+            )
           )
         end
       end

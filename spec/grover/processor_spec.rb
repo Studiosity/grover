@@ -58,6 +58,35 @@ describe Grover::Processor do
         end
       end
 
+      context 'when passing through a valid file URL' do
+        let(:url_or_html) { "file://#{fixture_path('test.html')}" }
+        let(:options) { { 'allowFileUri' => true } }
+
+        it { is_expected.to start_with "%PDF-1.4\n" }
+        it { expect(pdf_reader.page_count).to eq 1 }
+        it { expect(pdf_text_content).to include 'Hello World!' }
+      end
+
+      context 'when passing through an invalid file URL' do
+        let(:url_or_html) { 'file:///fake/invalid.html' }
+        let(:options) { { 'allowFileUri' => true } }
+
+        it 'raises a JavaScript error that the file could not be found' do
+          expect do
+            convert
+          end.to raise_error Grover::JavaScript::Error, %r{net::ERR_FILE_NOT_FOUND at file:///fake/invalid.html}
+        end
+      end
+
+      context 'when passing a file URL and allow_file_uri is disabled' do
+        let(:url_or_html) { "file://#{fixture_path('test.html')}" }
+
+        it { is_expected.to start_with "%PDF-1.4\n" }
+        it { expect(pdf_reader.page_count).to eq 1 }
+        it { expect(pdf_text_content).not_to include 'Hello World!' }
+        it { expect(pdf_text_content).to include "file://#{fixture_path('test.html')}" }
+      end
+
       context 'when passing through an empty string' do
         let(:url_or_html) { '' }
 
@@ -227,7 +256,13 @@ describe Grover::Processor do
         context 'when options includes A4 page format' do
           let(:options) { { format: 'A4' } }
           let(:media_box) do
-            puppeteer_version_on_or_after?('21') ? [0, 0, 595.91998, 842.88] : [0, 0, 594.95996, 841.91998]
+            if puppeteer_version_on_or_after?('23.3.1')
+              [0, 0, 595.91998, 841.91998]
+            elsif puppeteer_version_on_or_after?('21')
+              [0, 0, 595.91998, 842.88]
+            else
+              [0, 0, 594.95996, 841.91998]
+            end
           end
 
           it { expect(pdf_reader.pages.first.attributes).to include(MediaBox: media_box) }
@@ -555,6 +590,24 @@ describe Grover::Processor do
         end
       end
 
+      context 'when evaluateOnNewDocument option is specified' do
+        let(:url_or_html) do
+          <<-HTML
+            <html>
+              <body>
+                Evaluate on new doc <span id="test">did not run</span>
+                <script type="text/javascript">
+                  document.getElementById("test").innerHTML = window.preEvalContent;
+                </script>
+              </body>
+            </html>
+          HTML
+        end
+        let(:options) { { 'evaluateOnNewDocument' => 'window.preEvalContent = "ran!"' } }
+
+        it { expect(pdf_text_content).to eq 'Evaluate on new doc ran!' }
+      end
+
       context 'when evaluate option is specified' do
         let(:url_or_html) { '<html><body></body></html>' }
         let(:options) { basic_header_footer_options.merge('executeScript' => script) }
@@ -668,10 +721,15 @@ describe Grover::Processor do
           end
 
           it do
-            expect do
-              convert
-            end.to raise_error Grover::JavaScript::RequestFailedError,
-                               "net::ERR_NAME_NOT_RESOLVED at #{protocol}://foo.bar/baz.img"
+            expect { convert }.to raise_error do |error|
+              expect(error).to be_a Grover::JavaScript::RequestFailedError
+              expect(error.message).to eq "net::ERR_NAME_NOT_RESOLVED at #{protocol}://foo.bar/baz.img"
+              expect(error.error_details).to eq [{
+                url: "#{protocol}://foo.bar/baz.img",
+                reason: 'net::ERR_NAME_NOT_RESOLVED',
+                message: "net::ERR_NAME_NOT_RESOLVED at #{protocol}://foo.bar/baz.img"
+              }]
+            end
           end
         end
 
@@ -686,18 +744,28 @@ describe Grover::Processor do
               </html>
             HTML
           end
-          let(:error_message) do
+          let(:error_details) do
             if puppeteer_version_on_or_after? '22.6.0'
-              'net::ERR_BLOCKED_BY_ORB at https://google.com/404.jpg'
+              {
+                url: 'https://google.com/404.jpg',
+                reason: 'net::ERR_BLOCKED_BY_ORB',
+                message: 'net::ERR_BLOCKED_BY_ORB at https://google.com/404.jpg'
+              }
             else
-              '404 https://google.com/404.jpg'
+              {
+                url: 'https://google.com/404.jpg',
+                status: 404,
+                message: '404 https://google.com/404.jpg'
+              }
             end
           end
 
           it do
-            expect do
-              convert
-            end.to raise_error Grover::JavaScript::RequestFailedError, error_message
+            expect { convert }.to raise_error do |error|
+              expect(error).to be_a Grover::JavaScript::RequestFailedError
+              expect(error.message).to eq error_details[:message]
+              expect(error.error_details).to eq [error_details]
+            end
           end
         end
 
@@ -736,6 +804,68 @@ describe Grover::Processor do
           it do
             _, stream = pdf_reader.pages.first.xobjects.first
             expect(stream.hash[:Subtype]).to eq :Image
+          end
+        end
+      end
+
+      context 'when raise on JS error option is specified' do
+        let(:options) { basic_header_footer_options.merge('raiseOnJSError' => raise_errors) }
+        let(:raise_errors) { true }
+
+        context 'when a failure occurs it raises an error' do
+          let(:url_or_html) do
+            <<-HTML
+              <html>
+                <head><link rel="icon" href="data:;base64,iVBORw0KGgo="></head>
+                <body>
+                  Success?
+                  <script>Something went wrong</script>
+                  <script>throw "Really wrong"</script>
+                </body>
+              </html>
+            HTML
+          end
+
+          if puppeteer_version_on_or_after? '20.0.0'
+            it do
+              expect { convert }.to raise_error do |error|
+                expect(error).to be_a Grover::JavaScript::PageRenderError
+                expect(error.message).to eq "Unexpected identifier 'went'\nReally wrong"
+                expect(error.error_details).to eq [
+                  {
+                    type: 'SyntaxError',
+                    message: "Unexpected identifier 'went'"
+                  },
+                  {
+                    type: 'Error',
+                    message: 'Really wrong'
+                  }
+                ]
+              end
+            end
+          else
+            it do
+              expect { convert }.to raise_error do |error|
+                expect(error).to be_a Grover::JavaScript::PageRenderError
+                expect(error.message).to eq "SyntaxError: Unexpected identifier 'went'\nReally wrong"
+                expect(error.error_details).to eq [
+                  {
+                    type: 'Error',
+                    message: "SyntaxError: Unexpected identifier 'went'"
+                  },
+                  {
+                    type: 'Error',
+                    message: 'Really wrong'
+                  }
+                ]
+              end
+            end
+          end
+
+          context 'when `raiseOnJSError` is disabled' do
+            let(:raise_errors) { false }
+
+            it { expect(pdf_text_content).to eq "#{date} Success? #{protocol}://www.example.net/foo/bar 1/1" }
           end
         end
       end

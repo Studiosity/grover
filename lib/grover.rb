@@ -28,40 +28,40 @@ class Grover
   attr_reader :front_cover_path, :back_cover_path
 
   #
-  # @param [String] url URL of the page to convert
+  # @param [String] uri URI of the page to convert
   # @param [Hash] options Optional parameters to pass to PDF processor
   #   see https://github.com/puppeteer/puppeteer/blob/main/docs/api/puppeteer.pdfoptions.md
   #   and https://github.com/puppeteer/puppeteer/blob/main/docs/api/puppeteer.screenshotoptions.md
   #
-  def initialize(url, **options)
-    @url = url.to_s
-    @options = OptionsBuilder.new(options, @url)
+  def initialize(uri, **options)
+    @uri = uri.to_s
+    @options = OptionsBuilder.new(options, @uri)
     @root_path = @options.delete 'root_path'
     @front_cover_path = @options.delete 'front_cover_path'
     @back_cover_path = @options.delete 'back_cover_path'
   end
 
   #
-  # Request URL with provided options and create PDF
+  # Request URI with provided options and create PDF
   #
   # @param [String] path Optional path to write the PDF to
   # @return [String] The resulting PDF data
   #
   def to_pdf(path = nil)
-    processor.convert :pdf, @url, normalized_options(path: path)
+    processor.convert :pdf, @uri, normalized_options(path: path)
   end
 
   #
-  # Request URL with provided options and render HTML
+  # Request URI with provided options and render HTML
   #
   # @return [String] The resulting HTML string
   #
   def to_html
-    processor.convert :content, @url, normalized_options(path: nil)
+    processor.convert :content, @uri, normalized_options(path: nil)
   end
 
   #
-  # Request URL with provided options and create screenshot
+  # Request URI with provided options and create screenshot
   #
   # @param [String] path Optional path to write the screenshot to
   # @param [String] format Optional format of the screenshot
@@ -70,11 +70,11 @@ class Grover
   def screenshot(path: nil, format: nil)
     options = normalized_options(path: path)
     options['type'] = format if %w[png jpeg].include? format
-    processor.convert :screenshot, @url, options
+    processor.convert :screenshot, @uri, options
   end
 
   #
-  # Request URL with provided options and create PNG
+  # Request URI with provided options and create PNG
   #
   # @param [String] path Optional path to write the screenshot to
   # @return [String] The resulting PNG data
@@ -84,7 +84,7 @@ class Grover
   end
 
   #
-  # Request URL with provided options and create JPEG
+  # Request URI with provided options and create JPEG
   #
   # @param [String] path Optional path to write the screenshot to
   # @return [String] The resulting JPEG data
@@ -116,10 +116,10 @@ class Grover
   #
   def inspect
     format(
-      '#<%<class_name>s:0x%<object_id>p @url="%<url>s">',
+      '#<%<class_name>s:0x%<object_id>p @uri="%<uri>s">',
       class_name: self.class.name,
       object_id: object_id,
-      url: @url
+      uri: @uri
     )
   end
 
@@ -147,6 +147,7 @@ class Grover
   def normalized_options(path:)
     normalized_options = Utils.normalize_object @options, excluding: ['extraHTTPHeaders']
     normalized_options['path'] = path if path.is_a? ::String
+    normalized_options['allowFileUri'] = Grover.configuration.allow_file_uris == true
     normalized_options
   end
 end

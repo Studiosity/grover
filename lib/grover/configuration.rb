@@ -7,9 +7,10 @@ class Grover
   class Configuration
     attr_accessor :options, :meta_tag_prefix, :ignore_path, :ignore_request,
                   :root_url, :use_pdf_middleware, :use_png_middleware,
-                  :use_jpeg_middleware, :node_env_vars
+                  :use_jpeg_middleware, :js_runtime_bin,
+                  :node_env_vars, :allow_file_uris
 
-    def initialize
+    def initialize # rubocop:disable Metrics/MethodLength
       @options = {}
       @meta_tag_prefix = 'grover-'
       @ignore_path = nil
@@ -18,7 +19,9 @@ class Grover
       @use_pdf_middleware = true
       @use_png_middleware = false
       @use_jpeg_middleware = false
+      @js_runtime_bin = ['node']
       @node_env_vars = {}
+      @allow_file_uris = false
     end
   end
 end

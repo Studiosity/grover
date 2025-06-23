@@ -3,6 +3,34 @@
 ## Unreleased
 - none
 
+## [1.2,3](releases/tag/v1.2.3) - 2025-01-31
+### Fixed
+- [#281](https://github.com/Studiosity/grover/pull/281) Fix regression in middleware to support pre-Rack 3.x header key format ([@abrom][])
+
+## [1.2,2](releases/tag/v1.2.2) - 2025-01-13
+### Added
+- [#275](https://github.com/Studiosity/grover/pull/275) Add support for Ruby 3.4 ([@murajun1978][])
+
+## [1.2.1](releases/tag/v1.2.1) - 2024-11-26
+### Added
+- [#269](https://github.com/Studiosity/grover/pull/269) Add `evaluate_on_new_document` option ([@rasmus0201][])
+
+## [1.2.0](releases/tag/v1.2.0) - 2024-11-19
+### Breaking Change
+- [#266](https://github.com/Studiosity/grover/pull/266) Make combine_pdf dependency optional + support Yarn PnP ([@le0pard][])
+
+## [1.1.11](releases/tag/v1.1.11) - 2024-10-11
+### Added
+- [#264](https://github.com/Studiosity/grover/pull/264) Add `raise_on_js_error` option ([@abrom][])
+
+## [1.1.10](releases/tag/v1.1.10) - 2024-09-01
+### Fixed
+- [#258](https://github.com/Studiosity/grover/pull/258) Support for Puppeteer v23.x ([@abrom][])
+
+## [1.1.9](releases/tag/v1.1.9) - 2024-07-02
+### Added
+- [#209](https://github.com/Studiosity/grover/pull/209) Allow loading html from file uri ([@jkowens][])
+
 ## [1.1.8](releases/tag/v1.1.8) - 2024-06-23
 ### Added
 - [#240](https://github.com/Studiosity/grover/pull/240) Enable passing environment variables to the node process ([@jukra][])
@@ -325,3 +353,7 @@
 [@sbounmy]: https://github.com/sbounmy
 [@dexterouschen]: https://github.com/dexterouschen
 [@jukra]: https://github.com/jukra
+[@jkowens]: https://github.com/jkowens
+[@le0pard]: https://github.com/le0pard
+[@rasmus0201]: https://github.com/rasmus0201
+[@murajun1978]: https://github.com/murajun1978

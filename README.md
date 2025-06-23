@@ -162,13 +162,22 @@ The `wait_for_timeout` option can also be used to wait the specified number of m
 The `raise_on_request_failure` option, when enabled, will raise a `Grover::JavaScript::RequestFailedError`
 if the initial content request or any subsequent asset request returns a bad response or times out.
 
+The `raise_on_js_error` option, when enabled, will raise a `Grover::JavaScript::PageRenderError` if any uncaught
+Javascript errors occur when trying to render the page.
+
 The Chrome/Chromium executable path can be overridden with the `executable_path` option.
 
 Supplementary JavaScript can be executed on the page (after render and before conversion to PDF/image)
 by passing it to the `execute_script` option.
 
 ```javascript
-Grover.new(<some url>, { execute_script: 'document.getElementsByTagName("footer")[0].innerText = "Hey"' }).to_pdf
+Grover.new(<some url>, execute_script: 'document.getElementsByTagName("footer")[0].innerText = "Hey"').to_pdf
+```
+
+You can also evaluate JavaScript on the page before any of its scripts is run, by passing it a string to the `evaluate_on_new_document` option. See https://github.com/puppeteer/puppeteer/blob/main/docs/api/puppeteer.page.evaluateonnewdocument.md
+
+```javascript
+Grover.new(<some url>, evaluate_on_new_document: 'window.someConfig = "some value"').to_pdf
 ```
 
 #### Basic authentication
@@ -187,8 +196,7 @@ Chromium with the `browser_ws_endpoint` options.
 For example, to connect to a chrome instance started with docker using `docker run -p 3000:3000 ghcr.io/browserless/chrome:latest`:
 
 ```ruby
-options = {"browser_ws_endpoint": "ws://localhost:3000/chrome"}
-grover = Grover.new("https://mysite.com/path/to/thing", options)
+grover = Grover.new("https://mysite.com/path/to/thing", browser_ws_endpoint: "ws://localhost:3000/chrome")
 File.open("grover.png", "wb") { |f| f << grover.to_png }
 ```
 
@@ -280,7 +288,7 @@ In respective controller's action use:
 ```ruby
 respond_to do |format|
   format.html do
-    response.headers['Content-Disposition'] = %(attachment; filename="lorem_ipsum.pdf")
+    response.headers['content-disposition'] = %(attachment; filename="lorem_ipsum.pdf")
 
     render layout: 'pdf'
   end
@@ -294,6 +302,16 @@ The `node_env_vars` configuration option enables you to set custom environment v
 # config/initializers/grover.rb
 Grover.configure do |config|
   config.node_env_vars = { "LD_PRELOAD" => "" }
+end
+```
+
+#### Yarn PnP strategy
+
+If you are using the Yarn PnP strategy, you can override the run JS runtime for grover:
+
+```ruby
+Grover.configure do |config|
+  config.js_runtime_bin = ['yarn', 'node']
 end
 ```
 
@@ -322,7 +340,7 @@ To enable them, there are configuration options for each image type as well as a
 
 If either of the image handling middleware options are enabled, the [ignore_path](#ignore_path) and/or
 [ignore_request](#ignore_request) should also be configured, otherwise assets are likely to be handled
-which would likely result in 404 responses.  
+which would likely result in 404 responses.
 
 ```ruby
 # config/initializers/grover.rb
@@ -352,7 +370,7 @@ Grover.configure do |config|
 end
 ```
 
-#### ignore_path
+### ignore_path
 The `ignore_path` configuration option can be used to tell Grover's middleware whether it should handle/modify
 the response. There are three ways to set up the `ignore_path`:
  * a `String` which matches the start of the request path.
@@ -378,7 +396,7 @@ Grover.configure do |config|
 end
 ```
 
-#### ignore_request
+### ignore_request
 The `ignore_request` configuration option can be used to tell Grover's middleware whether it should handle/modify
 the response. It should be set with a `Proc` which accepts the request (Rack::Request) as a parameter.
 
@@ -398,6 +416,30 @@ Grover.configure do |config|
 end
 ```
 
+### allow_file_uris
+The `allow_file_uris` option can be used to render an html document from the file system.
+This should be used with *EXTREME CAUTION*. If used improperly it could potentially be manipulated to reveal
+sensitive files on the system. Do not enable if rendering content from outside entities
+(user uploads, external URLs, etc).
+
+It defaults to `false` preventing local system files from being read.
+
+```ruby
+# config/initializers/grover.rb
+Grover.configure do |config|
+  config.allow_file_uris = true
+end
+```
+
+And used as such:
+```ruby
+# Grover.new accepts a file URI and optional parameters for Puppeteer
+grover = Grover.new('file:///some/local/file.html', format: 'A4')
+
+# Get an inline PDF of the local file
+pdf = grover.to_pdf
+```
+
 ## Cover pages
 
 Since the header/footer for Puppeteer is configured globally, displaying of front/back cover
@@ -411,6 +453,8 @@ For direct execution, you can make multiple calls and combine the resulting PDFs
 You can specify relative paths to the cover page contents using the `front_cover_path` and `back_cover_path`
 options either via the global configuration, or via meta tags. These paths (with query parameters) are then
 requested from the downstream app.
+
+Note, to use this functionality you need to add the [combine_pdf](https://rubygems.org/gems/combine_pdf) gem to your app.
 
 The cover pages are converted to PDF in isolation, and then combined together with the original PDF response,
 before being returned back up through the Rack stack.
@@ -487,6 +531,67 @@ the HTML/JS you provide to Grover.
     };
     ```
 
+## "Failed to launch the browser process!" and "No usable sandbox!"
+Errors around no usable sandbox are likely caused by changes to how linux secures itself with apparmor. This restricts
+which applications are allowed to create sandboxes on the system, including and as required by puppeteer.
+
+This resource talks about some of the options available, but note that it is talking in the context of DEVELOPER Chrome
+builds: https://chromium.googlesource.com/chromium/src/+/main/docs/security/apparmor-userns-restrictions.md
+
+However, that does point to what solutions might look like.
+
+### Option 1. Use the version of Chrome that your system already allows
+Most systems will likely have an apparmor profile for the system installed Chrome, so the easiest option may be to just
+tell Grover to use that. eg:
+```ruby
+  executable_path: '/opt/google/chrome/chrome' # this path may be different depending on your system
+```
+The problem with this solution is that puppeteer is somewhat designed to be run with a specific version of Chrome. If
+you use the version installed on your system that may not match the puppeteer version, and as such may have
+incompatibilities.
+
+### Option 2. Tell your system to allow the Puppeteer installed Chrome
+Alternatively, you could create a new apparmor profile for the puppeteer managed version of Chrome. Something like:
+```shell
+export PUPPETEER_CHROME_PATH=$(node -e "console.log(require('puppeteer').executablePath())")
+cat | sudo tee /etc/apparmor.d/chrome <<EOF
+abi <abi/4.0>,
+include <tunables/global>
+
+profile chrome $PUPPETEER_CHROME_PATH flags=(unconfined) {
+  userns,
+
+  # Site-specific additions and overrides. See local/README for details.
+  include if exists <local/chrome>
+}
+EOF
+sudo service apparmor reload  # reload AppArmor profiles to include the new one
+```
+However, it is important when using this method to also explicitly set the `executable_path` within your Grover code to
+reference this same Puppeteer Chrome path. By default, if you don't explicitly specify the executable path, Puppeteer
+will ACTUALLY use `chrome-headless-shell` and not `chrome`
+(both would likely be installed in `~/.cache/puppeteer/` by default when installing the `puppeteer` NPM package).
+See https://pptr.dev/guides/headless-modes
+
+### Option 3. Tell your system to allow the Puppeteer installed headless shell version of Chrome 
+If you prefer not to overload the executable path, you could instead create an apparmor profile for
+`chrome-headless-shell` as such:
+```shell
+export CHROME_HEADLESS_SHELL_PATH=$(find ~/.cache/puppeteer/chrome-headless-shell/ -executable -type f -name chrome-headless-shell -print -quit)
+cat | sudo tee /etc/apparmor.d/chrome-headless-shell <<EOF
+abi <abi/4.0>,
+include <tunables/global>
+
+profile chrome-headless-shell $CHROME_HEADLESS_SHELL_PATH flags=(unconfined) {
+  userns,
+
+  # Site-specific additions and overrides. See local/README for details.
+  include if exists <local/chrome>
+}
+EOF
+sudo service apparmor reload  # reload AppArmor profiles to include the new one
+```
+
 ## Debugging
 If you're having trouble with converting the HTML content, you can enable some debugging options to help. These can be
 enabled as global options via `Grover.configure`, by passing through to the Grover initializer, or using meta tag
@@ -503,6 +608,9 @@ N.B.
 * The headless option disabled is not compatible with exporting of the PDF.
 * If showing the devtools, the browser will halt resulting in a navigation timeout
 
+## Troubleshooting
+
+If you're generating files from a web server, starting with puppeteer version 22, chromium automatically upgrades all HTTP requests to HTTPS requests.  If your server is only expecting HTTP requests then adding `launch_args: ['--disable-features=HttpsUpgrades']` will prevent the automatic protocol conversion from occurring.
 
 ## Contributing
 
@@ -533,7 +641,7 @@ The middleware and HTML preprocessing components were used heavily in the implem
 
 Thanks are also given to the excellent [Schmooze project](https://github.com/Shopify/schmooze).
 The Ruby to NodeJS interface in Grover is heavily based off that work. Grover previously used that gem,
-however migrated away due to differing requirements over persistence/cleanup of the NodeJS worker process.  
+however migrated away due to differing requirements over persistence/cleanup of the NodeJS worker process.
 
 ## License
 

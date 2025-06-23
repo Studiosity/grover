@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'combine_pdf'
-
 class Grover
   #
   # Rack middleware for catching PDF requests and returning the upstream HTML as a PDF
@@ -24,11 +22,14 @@ class Grover
       dup._call(env)
     end
 
-    def _call(env)
+    def _call(env) # rubocop:disable Metrics/MethodLength
       @request = Rack::Request.new(env)
       identify_request_type
 
-      configure_env_for_grover_request(env) if grover_request?
+      if grover_request?
+        check_file_uri_configuration
+        configure_env_for_grover_request(env)
+      end
       status, headers, response = @app.call(env)
       response = update_response response, headers if grover_request? && html_content?(headers)
 
@@ -39,11 +40,19 @@ class Grover
 
     private
 
-    PDF_REGEX = /\.pdf$/i.freeze
-    PNG_REGEX = /\.png$/i.freeze
-    JPEG_REGEX = /\.jpe?g$/i.freeze
+    PDF_REGEX = /\.pdf$/i
+    PNG_REGEX = /\.png$/i
+    JPEG_REGEX = /\.jpe?g$/i
 
     attr_reader :pdf_request, :png_request, :jpeg_request
+
+    def check_file_uri_configuration
+      return unless Grover.configuration.allow_file_uris
+
+      # The combination of middleware and allowing file URLs is exceptionally
+      # unsafe as it can lead to data exfiltration from the host system.
+      raise UnsafeConfigurationError, 'using `allow_file_uris` configuration with middleware is exceptionally unsafe'
+    end
 
     def identify_request_type
       @pdf_request = Grover.configuration.use_pdf_middleware && path_matches?(PDF_REGEX)
@@ -76,7 +85,7 @@ class Grover
     end
 
     def html_content?(headers)
-      headers['Content-Type'] =~ %r{text/html|application/xhtml\+xml}
+      headers[lower_case_headers? ? 'content-type' : 'Content-Type'] =~ %r{text/html|application/xhtml\+xml}
     end
 
     def update_response(response, headers)
@@ -121,10 +130,17 @@ class Grover
     end
 
     def add_cover_content(grover)
+      load_combine_pdf
       pdf = CombinePDF.parse grover.to_pdf
       pdf >> fetch_cover_pdf(grover.front_cover_path) if grover.show_front_cover?
       pdf << fetch_cover_pdf(grover.back_cover_path) if grover.show_back_cover?
       pdf.to_pdf
+    end
+
+    def load_combine_pdf
+      require 'combine_pdf'
+    rescue ::LoadError
+      raise Grover::Error, 'Please add/install the "combine_pdf" gem to use the front/back cover page feature'
     end
 
     def fetch_cover_pdf(path)
@@ -139,11 +155,12 @@ class Grover
 
     def assign_headers(headers, body, content_type)
       # Do not cache results
-      headers.delete 'ETag'
-      headers.delete 'Cache-Control'
+      headers.delete(lower_case_headers? ? 'etag' : 'ETag')
+      headers.delete(lower_case_headers? ? 'cache-control' : 'Cache-Control')
 
-      headers['Content-Length'] = (body.respond_to?(:bytesize) ? body.bytesize : body.size).to_s
-      headers['Content-Type'] = content_type
+      headers[lower_case_headers? ? 'content-length' : 'Content-Length'] =
+        (body.respond_to?(:bytesize) ? body.bytesize : body.size).to_s
+      headers[lower_case_headers? ? 'content-type' : 'Content-Type'] = content_type
     end
 
     def configure_env_for_grover_request(env)
@@ -206,6 +223,12 @@ class Grover
       env['rack.input'] = StringIO.new
       env.delete 'CONTENT_LENGTH'
       env.delete 'RAW_POST_DATA'
+    end
+
+    def lower_case_headers?
+      return @lower_case_headers if defined? @lower_case_headers
+
+      @lower_case_headers = Gem::Version.new(Rack.release) >= Gem::Version.new('3')
     end
   end
 end

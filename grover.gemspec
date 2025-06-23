@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
   SUMMARY
   spec.homepage    = 'https://github.com/Studiosity/grover'
   spec.license     = 'MIT'
-  spec.required_ruby_version = ['>= 2.7.0', '< 3.4.0']
+  spec.required_ruby_version = ['>= 3.0.0', '< 3.5.0']
 
   # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
   # delete this section to allow pushing this gem to any host.
@@ -29,6 +29,5 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'combine_pdf', '~> 1.0'
-  spec.add_dependency 'nokogiri', '~> 1.0'
+  spec.add_dependency 'nokogiri', '~> 1'
 end

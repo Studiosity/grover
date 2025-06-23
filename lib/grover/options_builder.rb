@@ -8,12 +8,12 @@ class Grover
   # Build options from Grover.configuration, meta_options, and passed-in options
   #
   class OptionsBuilder < Hash
-    def initialize(options, url)
+    def initialize(options, uri)
       super()
-      @url = url
+      @uri = uri
       combined = grover_configuration
       Utils.deep_merge! combined, Utils.deep_stringify_keys(options)
-      Utils.deep_merge! combined, meta_options unless url_source?
+      Utils.deep_merge! combined, meta_options unless uri_source?
 
       update OptionsFixer.new(combined).run
     end
@@ -41,11 +41,11 @@ class Grover
     end
 
     def meta_tags
-      Nokogiri::HTML(@url).xpath('//meta')
+      Nokogiri::HTML(@uri).xpath('//meta')
     end
 
-    def url_source?
-      @url.match(/\Ahttp/i)
+    def uri_source?
+      @uri.match?(%r{\A(https?|file)://}i)
     end
   end
 end

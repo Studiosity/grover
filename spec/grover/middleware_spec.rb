@@ -2,6 +2,9 @@
 
 require 'spec_helper'
 
+require 'rack/lint'
+require 'rack/builder'
+
 describe Grover::Middleware do
   subject(:mock_app) do
     builder = Rack::Builder.new
@@ -18,16 +21,16 @@ describe Grover::Middleware do
       @request_env = env.deep_dup
       response_size = 0
       response.each { |part| response_size += part.length }
-      [200, headers.merge('Content-Length' => response_size.to_s), response]
+      [200, headers.merge('content-length' => response_size.to_s), response]
     end
   end
 
   let(:app) { Rack::Lint.new(subject) }
   let(:headers) do
     {
-      'Content-Type' => 'text/html',
-      'ETag' => 'foo',
-      'Cache-Control' => 'max-age=2592000, public'
+      'content-type' => 'text/html',
+      'etag' => 'foo',
+      'cache-control' => 'max-age=2592000, public'
     }
   end
   let(:response) { ['Grover McGroveryface'] }
@@ -39,18 +42,33 @@ describe Grover::Middleware do
       context 'when requesting a PDF' do
         it 'returns PDF content type' do
           get 'http://www.example.org/test.pdf'
-          expect(last_response.headers['Content-Type']).to eq 'application/pdf'
+          expect(last_response.headers['content-type']).to eq 'application/pdf'
           response_size = Grover.new('Grover McGroveryface', display_url: 'http://www.example.org/test').to_pdf.bytesize
           expect(last_response.body.bytesize).to eq response_size
-          expect(last_response.headers['Content-Length']).to eq response_size.to_s
+          expect(last_response.headers['content-length']).to eq response_size.to_s
         end
 
         it 'matches PDF case insensitive' do
           get 'http://www.example.org/test.PDF'
-          expect(last_response.headers['Content-Type']).to eq 'application/pdf'
+          expect(last_response.headers['content-type']).to eq 'application/pdf'
           response_size = Grover.new('Grover McGroveryface', display_url: 'http://www.example.org/test').to_pdf.bytesize
           expect(last_response.body.bytesize).to eq response_size
-          expect(last_response.headers['Content-Length']).to eq response_size.to_s
+          expect(last_response.headers['content-length']).to eq response_size.to_s
+        end
+
+        context 'when `allow_file_uris` configuration option is set' do
+          before { allow(Grover.configuration).to receive(:allow_file_uris).and_return true }
+
+          it 'raises an `UnsafeConfigurationError`' do
+            expect do
+              get 'http://www.example.org/test.PDF'
+            end.to(
+              raise_error(
+                Grover::UnsafeConfigurationError,
+                'using `allow_file_uris` configuration with middleware is exceptionally unsafe'
+              )
+            )
+          end
         end
       end
 
@@ -59,18 +77,33 @@ describe Grover::Middleware do
 
         it 'returns PNG content type' do
           get 'http://www.example.org/test.png'
-          expect(last_response.headers['Content-Type']).to eq 'image/png'
+          expect(last_response.headers['content-type']).to eq 'image/png'
           response_size = Grover.new('Grover McGroveryface').to_png.bytesize
           expect(last_response.body.bytesize).to eq response_size
-          expect(last_response.headers['Content-Length']).to eq response_size.to_s
+          expect(last_response.headers['content-length']).to eq response_size.to_s
         end
 
         it 'matches PNG case insensitive' do
           get 'http://www.example.org/test.PNG'
-          expect(last_response.headers['Content-Type']).to eq 'image/png'
+          expect(last_response.headers['content-type']).to eq 'image/png'
           response_size = Grover.new('Grover McGroveryface').to_png.bytesize
           expect(last_response.body.bytesize).to eq response_size
-          expect(last_response.headers['Content-Length']).to eq response_size.to_s
+          expect(last_response.headers['content-length']).to eq response_size.to_s
+        end
+
+        context 'when `allow_file_uris` configuration option is set' do
+          before { allow(Grover.configuration).to receive(:allow_file_uris).and_return true }
+
+          it 'raises an `UnsafeConfigurationError`' do
+            expect do
+              get 'http://www.example.org/test.PNG'
+            end.to(
+              raise_error(
+                Grover::UnsafeConfigurationError,
+                'using `allow_file_uris` configuration with middleware is exceptionally unsafe'
+              )
+            )
+          end
         end
       end
 
@@ -79,44 +112,70 @@ describe Grover::Middleware do
 
         it 'returns JPEG content type' do
           get 'http://www.example.org/test.jpeg'
-          expect(last_response.headers['Content-Type']).to eq 'image/jpeg'
+          expect(last_response.headers['content-type']).to eq 'image/jpeg'
           response_size = Grover.new('Grover McGroveryface').to_jpeg.bytesize
           expect(last_response.body.bytesize).to eq response_size
-          expect(last_response.headers['Content-Length']).to eq response_size.to_s
+          expect(last_response.headers['content-length']).to eq response_size.to_s
         end
 
         it 'matches JPEG case insensitive' do
           get 'http://www.example.org/test.JPEG'
-          expect(last_response.headers['Content-Type']).to eq 'image/jpeg'
+          expect(last_response.headers['content-type']).to eq 'image/jpeg'
           response_size = Grover.new('Grover McGroveryface').to_jpeg.bytesize
           expect(last_response.body.bytesize).to eq response_size
-          expect(last_response.headers['Content-Length']).to eq response_size.to_s
+          expect(last_response.headers['content-length']).to eq response_size.to_s
         end
 
         it 'matches JPG case insensitive' do
           get 'http://www.example.org/test.JPG'
-          expect(last_response.headers['Content-Type']).to eq 'image/jpeg'
+          expect(last_response.headers['content-type']).to eq 'image/jpeg'
           response_size = Grover.new('Grover McGroveryface').to_jpeg.bytesize
           expect(last_response.body.bytesize).to eq response_size
-          expect(last_response.headers['Content-Length']).to eq response_size.to_s
+          expect(last_response.headers['content-length']).to eq response_size.to_s
+        end
+
+        context 'when `allow_file_uris` configuration option is set' do
+          before { allow(Grover.configuration).to receive(:allow_file_uris).and_return true }
+
+          it 'raises an `UnsafeConfigurationError`' do
+            expect do
+              get 'http://www.example.org/test.JPG'
+            end.to(
+              raise_error(
+                Grover::UnsafeConfigurationError,
+                'using `allow_file_uris` configuration with middleware is exceptionally unsafe'
+              )
+            )
+          end
         end
       end
 
       context 'when request doesnt have an extension' do
         it 'returns the downstream content type' do
           get 'http://www.example.org/test'
-          expect(last_response.headers['Content-Type']).to eq 'text/html'
+          expect(last_response.headers['content-type']).to eq 'text/html'
           expect(last_response.body).to eq 'Grover McGroveryface'
-          expect(last_response.headers['Content-Length']).to eq '20'
+          expect(last_response.headers['content-length']).to eq '20'
+        end
+
+        context 'when `allow_file_uris` configuration option is set' do
+          before { allow(Grover.configuration).to receive(:allow_file_uris).and_return true }
+
+          it 'returns the downstream content and content type' do
+            get 'http://www.example.org/test'
+            expect(last_response.headers['content-type']).to eq 'text/html'
+            expect(last_response.body).to eq 'Grover McGroveryface'
+            expect(last_response.headers['content-length']).to eq '20'
+          end
         end
       end
 
       context 'when request has a non-PDF/PNG/JPEG extension' do
         it 'returns the downstream content type' do
           get 'http://www.example.org/test.html'
-          expect(last_response.headers['Content-Type']).to eq 'text/html'
+          expect(last_response.headers['content-type']).to eq 'text/html'
           expect(last_response.body).to eq 'Grover McGroveryface'
-          expect(last_response.headers['Content-Length']).to eq '20'
+          expect(last_response.headers['content-length']).to eq '20'
         end
       end
     end
@@ -279,8 +338,8 @@ describe Grover::Middleware do
       context 'when requesting a PDF' do
         it 'deletes the cache headers' do
           get 'http://www.example.org/test.pdf'
-          expect(last_response.headers).not_to have_key 'ETag'
-          expect(last_response.headers).not_to have_key 'Cache-Control'
+          expect(last_response.headers).not_to have_key 'etag'
+          expect(last_response.headers).not_to have_key 'cache-control'
         end
 
         context 'when app configuration has PDF middleware disabled' do
@@ -288,8 +347,8 @@ describe Grover::Middleware do
 
           it 'returns the cache headers' do
             get 'http://www.example.org/test.pdf'
-            expect(last_response.headers['ETag']).to eq 'foo'
-            expect(last_response.headers['Cache-Control']).to eq 'max-age=2592000, public'
+            expect(last_response.headers['etag']).to eq 'foo'
+            expect(last_response.headers['cache-control']).to eq 'max-age=2592000, public'
           end
         end
       end
@@ -297,8 +356,8 @@ describe Grover::Middleware do
       context 'when requesting a PNG' do
         it 'returns the cache headers' do
           get 'http://www.example.org/test.png'
-          expect(last_response.headers['ETag']).to eq 'foo'
-          expect(last_response.headers['Cache-Control']).to eq 'max-age=2592000, public'
+          expect(last_response.headers['etag']).to eq 'foo'
+          expect(last_response.headers['cache-control']).to eq 'max-age=2592000, public'
         end
 
         context 'when app configuration has PNG middleware enabled' do
@@ -306,8 +365,8 @@ describe Grover::Middleware do
 
           it 'deletes the cache headers' do
             get 'http://www.example.org/test.png'
-            expect(last_response.headers).not_to have_key 'ETag'
-            expect(last_response.headers).not_to have_key 'Cache-Control'
+            expect(last_response.headers).not_to have_key 'etag'
+            expect(last_response.headers).not_to have_key 'cache-control'
           end
         end
       end
@@ -315,8 +374,8 @@ describe Grover::Middleware do
       context 'when requesting a JPEG' do
         it 'returns the cache headers' do
           get 'http://www.example.org/test.jpeg'
-          expect(last_response.headers['ETag']).to eq 'foo'
-          expect(last_response.headers['Cache-Control']).to eq 'max-age=2592000, public'
+          expect(last_response.headers['etag']).to eq 'foo'
+          expect(last_response.headers['cache-control']).to eq 'max-age=2592000, public'
         end
 
         context 'when app configuration has JPEG middleware enabled' do
@@ -324,14 +383,14 @@ describe Grover::Middleware do
 
           it 'deletes the cache headers for JPEG' do
             get 'http://www.example.org/test.jpeg'
-            expect(last_response.headers).not_to have_key 'ETag'
-            expect(last_response.headers).not_to have_key 'Cache-Control'
+            expect(last_response.headers).not_to have_key 'etag'
+            expect(last_response.headers).not_to have_key 'cache-control'
           end
 
           it 'deletes the cache headers for JPG' do
             get 'http://www.example.org/test.jpg'
-            expect(last_response.headers).not_to have_key 'ETag'
-            expect(last_response.headers).not_to have_key 'Cache-Control'
+            expect(last_response.headers).not_to have_key 'etag'
+            expect(last_response.headers).not_to have_key 'cache-control'
           end
         end
       end
@@ -339,8 +398,8 @@ describe Grover::Middleware do
       context 'when not requesting a PDF, PNG or JPEG' do
         it 'returns the cache headers' do
           get 'http://www.example.org/test'
-          expect(last_response.headers['ETag']).to eq 'foo'
-          expect(last_response.headers['Cache-Control']).to eq 'max-age=2592000, public'
+          expect(last_response.headers['etag']).to eq 'foo'
+          expect(last_response.headers['cache-control']).to eq 'max-age=2592000, public'
         end
       end
     end
@@ -351,7 +410,7 @@ describe Grover::Middleware do
 
         it 'returns response as PDF' do
           get 'http://www.example.org/test.pdf'
-          expect(last_response.headers['Content-Type']).to eq 'application/pdf'
+          expect(last_response.headers['content-type']).to eq 'application/pdf'
           expect(last_response.body.bytesize).to(
             eq(Grover.new('Rackalicious', display_url: 'http://www.example.org/test').to_pdf.bytesize)
           )
@@ -362,14 +421,14 @@ describe Grover::Middleware do
 
           it 'returns response as text (original)' do
             get 'http://www.example.org/test.pdf'
-            expect(last_response.headers['Content-Type']).to eq 'text/html'
+            expect(last_response.headers['content-type']).to eq 'text/html'
             expect(last_response.body).to eq 'Rackalicious'
           end
         end
 
         it 'returns PNG response as text (original)' do
           get 'http://www.example.org/test.png'
-          expect(last_response.headers['Content-Type']).to eq 'text/html'
+          expect(last_response.headers['content-type']).to eq 'text/html'
           expect(last_response.body).to eq 'Rackalicious'
         end
 
@@ -378,20 +437,20 @@ describe Grover::Middleware do
 
           it 'returns response as PNG' do
             get 'http://www.example.org/test.png'
-            expect(last_response.headers['Content-Type']).to eq 'image/png'
+            expect(last_response.headers['content-type']).to eq 'image/png'
             expect(last_response.body.bytesize).to eq Grover.new('Rackalicious').to_png.bytesize
           end
         end
 
         it 'returns JPEG response as text (original)' do
           get 'http://www.example.org/test.jpeg'
-          expect(last_response.headers['Content-Type']).to eq 'text/html'
+          expect(last_response.headers['content-type']).to eq 'text/html'
           expect(last_response.body).to eq 'Rackalicious'
         end
 
         it 'returns JPG response as text (original)' do
           get 'http://www.example.org/test.jpg'
-          expect(last_response.headers['Content-Type']).to eq 'text/html'
+          expect(last_response.headers['content-type']).to eq 'text/html'
           expect(last_response.body).to eq 'Rackalicious'
         end
 
@@ -400,13 +459,13 @@ describe Grover::Middleware do
 
           it 'returns response as JPEG' do
             get 'http://www.example.org/test.jpeg'
-            expect(last_response.headers['Content-Type']).to eq 'image/jpeg'
+            expect(last_response.headers['content-type']).to eq 'image/jpeg'
             expect(last_response.body.bytesize).to eq Grover.new('Rackalicious').to_jpeg.bytesize
           end
 
           it 'returns response as JPG' do
             get 'http://www.example.org/test.jpg'
-            expect(last_response.headers['Content-Type']).to eq 'image/jpeg'
+            expect(last_response.headers['content-type']).to eq 'image/jpeg'
             expect(last_response.body.bytesize).to eq Grover.new('Rackalicious').to_jpeg.bytesize
           end
         end
@@ -417,7 +476,7 @@ describe Grover::Middleware do
 
         it 'returns response as PDF' do
           get 'http://www.example.org/test.pdf'
-          expect(last_response.headers['Content-Type']).to eq 'application/pdf'
+          expect(last_response.headers['content-type']).to eq 'application/pdf'
           expect(last_response.body.bytesize).to(
             eq(Grover.new('Part 1Part 2', display_url: 'http://www.example.org/test').to_pdf.bytesize)
           )
@@ -541,7 +600,10 @@ describe Grover::Middleware do
             and_return(grover)
         )
         allow(grover).to receive(:to_pdf).with(no_args).and_return 'A converted PDF'
-        expect(Grover).to receive(:new).with('Grover McGroveryface', display_url: 'http://www.example.org/test')
+        expect(Grover).to(
+          receive(:new).
+            with('Grover McGroveryface', display_url: 'http://www.example.org/test')
+        )
         expect(grover).to receive(:to_pdf).with(no_args)
         get 'http://www.example.org/test.pdf'
         expect(last_response.body).to eq 'A converted PDF'
@@ -596,7 +658,10 @@ describe Grover::Middleware do
               and_return(grover)
           )
           allow(grover).to receive(:to_png).with(no_args).and_return 'A converted PNG'
-          expect(Grover).to receive(:new).with('Grover McGroveryface', display_url: 'http://www.example.org/test')
+          expect(Grover).to(
+            receive(:new).
+              with('Grover McGroveryface', display_url: 'http://www.example.org/test')
+          )
           expect(grover).to receive(:to_png).with(no_args)
           get 'http://www.example.org/test.png'
           expect(last_response.body).to eq 'A converted PNG'
@@ -623,7 +688,10 @@ describe Grover::Middleware do
               and_return(grover)
           )
           allow(grover).to receive(:to_jpeg).with(no_args).and_return 'A converted JPEG'
-          expect(Grover).to receive(:new).with('Grover McGroveryface', display_url: 'http://www.example.org/test')
+          expect(Grover).to(
+            receive(:new).
+              with('Grover McGroveryface', display_url: 'http://www.example.org/test')
+          )
           expect(grover).to receive(:to_jpeg).with(no_args)
           get 'http://www.example.org/test.jpeg'
           expect(last_response.body).to eq 'A converted JPEG'
@@ -668,7 +736,7 @@ describe Grover::Middleware do
                 HTML
               end
 
-            [200, headers.merge('Content-Length' => response.length.to_s), [response]]
+            [200, headers.merge('content-length' => response.length.to_s), [response]]
           end
         end
 
@@ -707,7 +775,7 @@ describe Grover::Middleware do
                 HTML
               end
 
-            [200, headers.merge('Content-Length' => response.length.to_s), [response]]
+            [200, headers.merge('content-length' => response.length.to_s), [response]]
           end
         end
 
@@ -948,7 +1016,7 @@ describe Grover::Middleware do
             else 'Default page contents'
             end
 
-          [200, headers.merge('Content-Length' => response.length.to_s), [response]]
+          [200, headers.merge('content-length' => response.length.to_s), [response]]
         end
       end
 

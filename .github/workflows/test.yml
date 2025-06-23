@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [main]
 
+env:
+  CC_TEST_REPORTER_ID: 5cfed40102c670b5c9e509730782b751939ddbe53fc57c317b718f635bab1ce8
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -17,35 +20,35 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby-version: ['3.3']
+        ruby-version: ['3.4']
         node-version: ['18']
         puppeteer-version: [
-          '17.1.3',
           '18.2.1',
           '19.11.1',
           '20.9.0',
           '21.9.0',
-          '22.12.0'
+          '22.15.0',
+          '23.8.0',
         ]
         include:
-          - ruby-version: '2.7'
-            node-version: '18'
-            puppeteer-version: '22.12.0'
           - ruby-version: '3.0'
             node-version: '18'
-            puppeteer-version: '22.12.0'
+            puppeteer-version: '23.8.0'
           - ruby-version: '3.1'
             node-version: '18'
-            puppeteer-version: '22.12.0'
+            puppeteer-version: '23.8.0'
           - ruby-version: '3.2'
             node-version: '18'
-            puppeteer-version: '22.12.0'
+            puppeteer-version: '23.8.0'
           - ruby-version: '3.3'
+            node-version: '18'
+            puppeteer-version: '23.8.0'
+          - ruby-version: '3.4'
             node-version: '20'
-            puppeteer-version: '22.12.0'
-          - ruby-version: '3.3'
+            puppeteer-version: '23.8.0'
+          - ruby-version: '3.4'
             node-version: '22'
-            puppeteer-version: '22.12.0'
+            puppeteer-version: '23.8.0'
 
     steps:
       - uses: actions/checkout@v3
@@ -64,16 +67,21 @@ jobs:
       - name: Install Puppeteer
         run: npm install puppeteer@${{ matrix.puppeteer-version }}
 
+      - name: Install Imagemagick
+        uses: mfinelli/setup-imagemagick@v5
+
       - name: Lint code - Rubocop
         run: bundle exec rubocop
 
       - name: Run tests
         run: bundle exec rspec
+        env:
+          GROVER_NO_SANDBOX: true
 
       - name: Run tests with remote browser
         run: bundle exec rspec --tag remote_browser
+        env:
+          GROVER_NO_SANDBOX: true
 
       - name: Test & publish code coverage
         uses: paambaati/codeclimate-action@v3.2.0
-        env:
-          CC_TEST_REPORTER_ID: 5cfed40102c670b5c9e509730782b751939ddbe53fc57c317b718f635bab1ce8
