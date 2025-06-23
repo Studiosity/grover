@@ -24,7 +24,6 @@ RSpec.configure do |config|
     config.default_sleep_interval = 1
   end
 
-
   config.before(:suite) do
     TestServer.start
   end
