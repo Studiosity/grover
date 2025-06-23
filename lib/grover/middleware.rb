@@ -8,6 +8,13 @@ class Grover
   # @see https://github.com/pdfkit/pdfkit
   #
   class Middleware # rubocop:disable Metrics/ClassLength
+    PDF_REGEX = /\.pdf$/i
+    private_constant :PDF_REGEX
+    PNG_REGEX = /\.png$/i
+    private_constant :PNG_REGEX
+    JPEG_REGEX = /\.jpe?g$/i
+    private_constant :JPEG_REGEX
+
     def initialize(app, *args)
       @app = app
       @pdf_request = false
@@ -39,10 +46,6 @@ class Grover
     end
 
     private
-
-    PDF_REGEX = /\.pdf$/i
-    PNG_REGEX = /\.png$/i
-    JPEG_REGEX = /\.jpe?g$/i
 
     attr_reader :pdf_request, :png_request, :jpeg_request
 
