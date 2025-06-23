@@ -76,11 +76,13 @@ jobs:
       - name: Run tests
         run: bundle exec rspec
         env:
+          PUPPETEER_VERSION: ${{ matrix.puppeteer-version }}
           GROVER_NO_SANDBOX: true
 
       - name: Run tests with remote browser
         run: bundle exec rspec --tag remote_browser
         env:
+          PUPPETEER_VERSION: ${{ matrix.puppeteer-version }}
           GROVER_NO_SANDBOX: true
 
       - name: Test & publish code coverage
