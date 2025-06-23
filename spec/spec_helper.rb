@@ -21,7 +21,7 @@ RSpec.configure do |config|
     # Retry
     config.verbose_retry = true
     config.default_retry_count = 2
-    config.default_sleep_interval = 1
+    config.default_sleep_interval = 5
   end
 
   config.before(:suite) do
