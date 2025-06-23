@@ -40,7 +40,7 @@ end
 def puppeteer_version
   @puppeteer_version ||= begin
     version = `node -p "require('puppeteer/package.json').version"`.strip
-    version if version.match?(/\A\d+\.\d+\.\d+\z/)
+    version.match?(/\A\d+\.\d+\.\d+\z/) ? version : ENV.fetch('PUPPETEER_VERSION', '')
   end
 end
 
