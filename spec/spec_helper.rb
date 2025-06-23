@@ -6,6 +6,7 @@ SimpleCov.start
 $LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 require 'grover'
 
+require 'rspec/retry'
 require 'rack/test'
 require 'stringio'
 require 'pdf-reader'
@@ -15,6 +16,14 @@ require_relative 'support/test_server'
 RSpec.configure do |config|
   config.order = 'random'
   config.filter_run_excluding remote_browser: true
+
+  if ENV['CI'] == 'true'
+    # Retry
+    config.verbose_retry = true
+    config.default_retry_count = 2
+    config.default_sleep_interval = 1
+  end
+
 
   config.before(:suite) do
     TestServer.start
