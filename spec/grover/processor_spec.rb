@@ -1085,6 +1085,15 @@ describe Grover::Processor do
           end
         end
       end
+
+      context 'when specifying Firefox browser' do
+        let(:options) { { browser: 'firefox' } }
+        let(:url_or_html) { 'http://localhost:4567/headers' }
+
+        it { expect(pdf_text_content).to match(/Request contained \d+ headers/) }
+        it { expect(pdf_text_content).to include '1. host localhost:4567' }
+        it { expect(pdf_text_content).to match(/\d\. user-agent Mozilla\/5.0 .* Firefox\//) }
+      end
     end
 
     context 'when converting to an image' do
