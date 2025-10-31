@@ -72,7 +72,7 @@ jobs:
 
       - name: Install Firefox
         uses: browser-actions/setup-firefox@v1
-        run: firefox --version
+      - run: firefox --version
 
       - name: Install Imagemagick
         uses: mfinelli/setup-imagemagick@v5
