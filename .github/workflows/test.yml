@@ -71,7 +71,7 @@ jobs:
         run: npm install puppeteer@${{ matrix.puppeteer-version }}
 
       - name: Install Firefox
-        run: npx puppeteer browsers install firefox
+        run: npx puppeteer browsers install firefox@stable
 
       - name: Install Imagemagick
         uses: mfinelli/setup-imagemagick@v5
