@@ -50,3 +50,7 @@ end
 get '/cat' do
   '<html><body><img src="/cat.png" alt="Cat"></body></html>'
 end
+
+get '/304' do
+  redirect to('/cat.png'), 304
+end

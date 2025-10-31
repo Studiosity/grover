@@ -776,7 +776,7 @@ describe Grover::Processor do
                 <head><link rel="icon" href="data:;base64,iVBORw0KGgo="></head>
                 <body>
                   Hey there
-                  <img src="https://httpstat.us/304" />
+                  <img src="http://localhost:4567/304" />
                 </body>
               </html>
             HTML
