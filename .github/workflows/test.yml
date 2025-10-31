@@ -49,6 +49,9 @@ jobs:
           - ruby-version: '3.4'
             node-version: '24'
             puppeteer-version: '24.10.2'
+          - ruby-version: '3.5.0-preview1'
+            node-version: '24'
+            puppeteer-version: '24.10.2'
 
     steps:
       - uses: actions/checkout@v3
