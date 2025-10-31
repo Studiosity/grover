@@ -168,13 +168,13 @@ The Chrome/Chromium executable path can be overridden with the `executable_path`
 Supplementary JavaScript can be executed on the page (after render and before conversion to PDF/image)
 by passing it to the `execute_script` option.
 
-```javascript
+```ruby
 Grover.new(<some url>, execute_script: 'document.getElementsByTagName("footer")[0].innerText = "Hey"').to_pdf
 ```
 
 You can also evaluate JavaScript on the page before any of its scripts is run, by passing it a string to the `evaluate_on_new_document` option. See https://github.com/puppeteer/puppeteer/blob/main/docs/api/puppeteer.page.evaluateonnewdocument.md
 
-```javascript
+```ruby
 Grover.new(<some url>, evaluate_on_new_document: 'window.someConfig = "some value"').to_pdf
 ```
 
@@ -184,6 +184,14 @@ only really makes sense if you're calling Grover directly (and not via middlewar
 
 ```ruby
 Grover.new('<some URI with basic authentication', username: 'the username', password: 'super secret').to_pdf
+```
+
+#### Firefox
+
+Grover can drive Firefox by specifying the `browser` option
+
+```ruby
+Grover.new('<some URI>', browser: 'firefox').to_pdf
 ```
 
 #### Remote Chromium
