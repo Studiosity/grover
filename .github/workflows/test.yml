@@ -25,7 +25,7 @@ jobs:
         puppeteer-version: [
           '22.15.0',
           '23.11.1',
-          '24.10.2',
+          '24.27.0',
         ]
         include:
           - ruby-version: '3.0'
@@ -71,6 +71,7 @@ jobs:
         run: npm install puppeteer@${{ matrix.puppeteer-version }}
 
       - name: Install Firefox
+        if: ${{ matrix.puppeteer-version != '22.15.0' }}
         run: npx puppeteer browsers install firefox@stable
 
       - name: Install Imagemagick

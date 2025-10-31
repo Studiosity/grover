@@ -1086,13 +1086,17 @@ describe Grover::Processor do
         end
       end
 
-      context 'when specifying Firefox browser' do
-        let(:options) { { browser: 'firefox' } }
-        let(:url_or_html) { 'http://localhost:4567/headers' }
+      # < v23 of puppeteer has issues installing the latest firefox versions (bz2 vs xz compression used for packaging)
+      if puppeteer_version_on_or_after? '23'
+        context 'when specifying Firefox browser' do
+          let(:options) { { browser: 'firefox', executable_path: firefox_path } }
+          let(:firefox_path) { Dir["#{ENV['HOME']}/.cache/puppeteer/firefox/**/firefox"].last }
+          let(:url_or_html) { 'http://localhost:4567/headers' }
 
-        it { expect(pdf_text_content).to match(/Request contained \d+ headers/) }
-        it { expect(pdf_text_content).to include '1. host localhost:4567' }
-        it { expect(pdf_text_content).to match %r{\d\. user-agent Mozilla/5.0 .* Firefox/} }
+          it { expect(pdf_text_content).to match(/Request contained \d+ headers/) }
+          it { expect(pdf_text_content).to include '1. host localhost:4567' }
+          it { expect(pdf_text_content).to match %r{\d\. user-agent Mozilla/5.0 .* Firefox/} }
+        end
       end
     end
 
