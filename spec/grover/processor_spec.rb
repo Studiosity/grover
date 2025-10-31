@@ -903,7 +903,7 @@ describe Grover::Processor do
             <<-HTML
               <html>
                 <head><link rel='icon' href='data:;base64,iVBORw0KGgo='></head>
-              #{'  '}
+
                 <body>
                   <p id="loading">Loading</p>
                   <p id="content" style="display: none">Loaded</p>
@@ -1103,7 +1103,14 @@ describe Grover::Processor do
         # don't really want to rely on pixel testing the website screenshot
         # so we'll check it's mean colour is roughly what we expect
         it do
-          pixel_mean = puppeteer_version_on_or_after?('22.9.0') ? 140.925 : 161.497
+          pixel_mean =
+            if puppeteer_version_on_or_after?('24.0.0')
+              169.444
+            elsif puppeteer_version_on_or_after?('22.9.0')
+              140.925
+            else
+              161.497
+            end
 
           expect(image.data.dig('imageStatistics', MiniMagick.imagemagick7? ? 'Overall' : 'all', 'mean').to_f).
             to be_within(10).of(pixel_mean)
