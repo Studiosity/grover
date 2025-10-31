@@ -87,6 +87,3 @@ jobs:
         env:
           PUPPETEER_VERSION: ${{ matrix.puppeteer-version }}
           GROVER_NO_SANDBOX: true
-
-      - name: Test & publish code coverage
-        uses: paambaati/codeclimate-action@v3.2.0
