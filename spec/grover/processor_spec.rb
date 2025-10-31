@@ -1092,7 +1092,7 @@ describe Grover::Processor do
 
         it { expect(pdf_text_content).to match(/Request contained \d+ headers/) }
         it { expect(pdf_text_content).to include '1. host localhost:4567' }
-        it { expect(pdf_text_content).to match(/\d\. user-agent Mozilla\/5.0 .* Firefox\//) }
+        it { expect(pdf_text_content).to match %r{\d\. user-agent Mozilla/5.0 .* Firefox/} }
       end
     end
 
