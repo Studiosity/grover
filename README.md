@@ -1,6 +1,4 @@
 [![Test Build Status](https://github.com/Studiosity/grover/actions/workflows/test.yml/badge.svg)](https://github.com/Studiosity/grover/actions/workflows/test.yml)
-[![Maintainability](https://api.codeclimate.com/v1/badges/37609653789bcf2c8d94/maintainability)](https://codeclimate.com/github/Studiosity/grover/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/37609653789bcf2c8d94/test_coverage)](https://codeclimate.com/github/Studiosity/grover/test_coverage)
 [![Gem Version](https://badge.fury.io/rb/grover.svg)](https://badge.fury.io/rb/grover)
 
 # Grover
