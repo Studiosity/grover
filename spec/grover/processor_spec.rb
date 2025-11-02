@@ -1093,6 +1093,8 @@ describe Grover::Processor do
           let(:firefox_path) { Dir[File.expand_path('~/.cache/puppeteer/firefox/**/firefox')].last }
           let(:url_or_html) { 'http://localhost:4567/headers' }
 
+          before { puts "FF path: #{firefox_path}" }
+
           it { expect(pdf_text_content).to match(/Request contained \d+ headers/) }
           it { expect(pdf_text_content).to include '1. host localhost:4567' }
           it { expect(pdf_text_content).to match %r{\d\. user-agent Mozilla/5.0 .* Firefox/} }
