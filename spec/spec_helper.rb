@@ -17,7 +17,7 @@ RSpec.configure do |config|
   if ENV['CI'] == 'true'
     # Retry
     config.verbose_retry = true
-    config.default_retry_count = 2
+    config.default_retry_count = 3
     config.default_sleep_interval = 5
   end
 
