@@ -1089,13 +1089,13 @@ describe Grover::Processor do
       # < v23 of puppeteer has issues installing the latest firefox versions (bz2 vs xz compression used for packaging)
       if puppeteer_version_on_or_after? '23'
         context 'when specifying Firefox browser' do
-          let(:options) { { browser: 'firefox', executable_path: firefox_path } }
+          let(:options) { { 'browser' => 'firefox', 'executablePath' => firefox_path } }
           let(:firefox_path) { Dir[File.expand_path('~/.cache/puppeteer/firefox/**/firefox')].last }
           let(:url_or_html) { 'http://localhost:4567/headers' }
 
           before do
             puts "FF path: #{firefox_path}"
-            before { allow(Grover.configuration).to receive(:node_env_vars).and_return 'DEBUG' => 'puppeteer:*' }
+            allow(Grover.configuration).to receive(:node_env_vars).and_return 'DEBUG' => 'puppeteer:*'
           end
 
           it { expect(pdf_text_content).to match(/Request contained \d+ headers/) }
