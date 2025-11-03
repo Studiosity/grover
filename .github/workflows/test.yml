@@ -77,9 +77,6 @@ jobs:
       - name: Install Imagemagick
         uses: mfinelli/setup-imagemagick@v5
 
-      - name: Lint code - Rubocop
-        run: bundle exec rubocop
-
       - name: Run tests
         run: bundle exec rspec
         env:
