@@ -85,18 +85,6 @@ class Grover
 
       status, message, error_class, errors = JSON.parse(input)
 
-      if options['browser'] == 'firefox'
-        err = ''
-        begin
-          while e = stderr.read_nonblock(100)
-            print '.'
-            err += e
-          end
-        rescue IO::EAGAINWaitReadable
-        end
-        puts "Std err:\n#{err}"
-      end
-
       if status == 'ok'
         message
       elsif error_class.nil?
