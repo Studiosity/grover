@@ -3,6 +3,13 @@
 ## Unreleased
 - none
 
+## [1.2,4](releases/tag/v1.2.4) - 2025-11-04
+### Added
+- [#297](https://github.com/Studiosity/grover/pull/297) Add support for browser option (Firefox) ([@abrom][])
+
+### Fixed
+- [#294](https://github.com/Studiosity/grover/pull/294) Handle deprecations in setCookie API ([@brendon][])
+
 ## [1.2,3](releases/tag/v1.2.3) - 2025-01-31
 ### Fixed
 - [#281](https://github.com/Studiosity/grover/pull/281) Fix regression in middleware to support pre-Rack 3.x header key format ([@abrom][])
@@ -357,3 +364,4 @@
 [@le0pard]: https://github.com/le0pard
 [@rasmus0201]: https://github.com/rasmus0201
 [@murajun1978]: https://github.com/murajun1978
+[@brendon]: https://github.com/brendon
