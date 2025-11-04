@@ -21,37 +21,27 @@ jobs:
       fail-fast: false
       matrix:
         ruby-version: ['3.4']
-        node-version: ['18']
+        node-version: ['20']
         puppeteer-version: [
-          '22.15.0',
           '23.11.1',
-          '24.10.2',
+          '24.28.0',
         ]
         include:
-          - ruby-version: '3.0'
-            node-version: '18'
-            puppeteer-version: '24.10.2'
-          - ruby-version: '3.1'
-            node-version: '18'
-            puppeteer-version: '24.10.2'
           - ruby-version: '3.2'
-            node-version: '18'
-            puppeteer-version: '24.10.2'
-          - ruby-version: '3.3'
-            node-version: '18'
-            puppeteer-version: '24.10.2'
-          - ruby-version: '3.4'
             node-version: '20'
-            puppeteer-version: '24.10.2'
+            puppeteer-version: '24.28.0'
+          - ruby-version: '3.3'
+            node-version: '20'
+            puppeteer-version: '24.28.0'
           - ruby-version: '3.4'
             node-version: '22'
-            puppeteer-version: '24.10.2'
+            puppeteer-version: '24.28.0'
           - ruby-version: '3.4'
             node-version: '24'
-            puppeteer-version: '24.10.2'
+            puppeteer-version: '24.28.0'
           - ruby-version: '3.5.0-preview1'
             node-version: '24'
-            puppeteer-version: '24.10.2'
+            puppeteer-version: '24.28.0'
 
     steps:
       - uses: actions/checkout@v3
@@ -71,7 +61,6 @@ jobs:
         run: npm install puppeteer@${{ matrix.puppeteer-version }}
 
       - name: Install Firefox
-        if: ${{ matrix.puppeteer-version != '22.15.0' }}
         run: npx puppeteer browsers install firefox@stable
 
       - name: Install Imagemagick
