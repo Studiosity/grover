@@ -1,7 +1,8 @@
 # Changelog
 
 ## Unreleased
-- none
+### Added
+- Add support for Ruby 4.0
 
 ## [1.2,4](releases/tag/v1.2.4) - 2025-11-04
 ### Added

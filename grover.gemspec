@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
   SUMMARY
   spec.homepage    = 'https://github.com/Studiosity/grover'
   spec.license     = 'MIT'
-  spec.required_ruby_version = ['>= 3.0.0', '< 3.5.0']
+  spec.required_ruby_version = ['>= 3.0.0', '< 4.1.0']
 
   # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
   # delete this section to allow pushing this gem to any host.
