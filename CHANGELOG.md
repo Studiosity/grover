@@ -1,7 +1,8 @@
 # Changelog
 
 ## Unreleased
-- none
+### Added
+- Add support for Ruby 4
 
 ## [1.2,4](releases/tag/v1.2.4) - 2025-11-04
 ### Added
@@ -268,7 +269,7 @@
 - Ability to pass through options via meta tags (for use in middleware requests) ([@abrom][])
 
 ### Fixed
-- Issue with `pdf_reader` on TravisCI parsing the headers/footers incorrectly (font size) ([@abrom][])  
+- Issue with `pdf_reader` on TravisCI parsing the headers/footers incorrectly (font size) ([@abrom][])
 
 ## [0.3.1](releases/tag/v0.3.1) - 2018-08-25
 ### Added
