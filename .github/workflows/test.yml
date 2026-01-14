@@ -24,24 +24,24 @@ jobs:
         node-version: ['20']
         puppeteer-version: [
           '23.11.1',
-          '24.28.0',
+          '24.35.0',
         ]
         include:
           - ruby-version: '3.2'
             node-version: '20'
-            puppeteer-version: '24.28.0'
+            puppeteer-version: '24.35.0'
           - ruby-version: '3.3'
             node-version: '20'
-            puppeteer-version: '24.28.0'
+            puppeteer-version: '24.35.0'
           - ruby-version: '3.4'
             node-version: '20'
-            puppeteer-version: '24.28.0'
+            puppeteer-version: '24.35.0'
           - ruby-version: '4.0'
             node-version: '22'
-            puppeteer-version: '24.28.0'
+            puppeteer-version: '24.35.0'
           - ruby-version: '4.0'
             node-version: '24'
-            puppeteer-version: '24.28.0'
+            puppeteer-version: '24.35.0'
 
     steps:
       - uses: actions/checkout@v3
