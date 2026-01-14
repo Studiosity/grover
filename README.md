@@ -447,14 +447,14 @@ pdf = grover.to_pdf
 ```
 
 ### allow_local_network_access
-The `allow_local_network_access` option, when enabled, will allow Grover to make web requests to localhost. Note, this
-feature was added in Puppeteer [v24.16.0](https://github.com/puppeteer/puppeteer/releases/tag/puppeteer-v24.16.0) with
-the release of Chrome 139.
+The `allow_local_network_access` option, when enabled, will allow Grover to make web requests to localhost.
+
+Note, this feature was added in Puppeteer
+[v24.16.0](https://github.com/puppeteer/puppeteer/releases/tag/puppeteer-v24.16.0) with the release of Chrome 139.
 
 It defaults to `false` preventing Puppeteer v24.16.0+ (Chrome 139+) from accessing localhost pages and assets.
-The requests will not be made, but instead error. If you try to make requests to localhost with
-Puppeteer v24.16.0+ (Chrome 139+) . If you have the `raise_on_request_failure` option enabled, the requests will raise a
-`Grover::JavaScript::RequestFailedError` with the reason `net::ERR_FAILED`.
+Requests for localhost pages/assets will not be made, but instead error. If you have the `raise_on_request_failure`
+option enabled, the requests will raise a `Grover::JavaScript::RequestFailedError` with the reason `net::ERR_FAILED`.
 
 ```ruby
 # config/initializers/grover.rb
