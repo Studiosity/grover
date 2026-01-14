@@ -3,6 +3,10 @@
 ## Unreleased
 - none
 
+## [1.2,6](releases/tag/v1.2.6) - 2026-01-14
+### Added
+- [#299](https://github.com/Studiosity/grover/pull/299) Add support for `allow_local_network_access` configuration option ([@abrom][])
+
 ## [1.2,5](releases/tag/v1.2.5) - 2026-01-14
 ### Added
 - [#300](https://github.com/Studiosity/grover/pull/300) Add support for Ruby 4.0 ([@gs-deliverists-io][])
