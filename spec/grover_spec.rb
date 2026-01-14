@@ -51,10 +51,13 @@ describe Grover do
     it 'calls to Grover::Processor' do
       allow(processor).to(
         receive(:convert).
-          with(:pdf, url_or_html, { 'allowFileUri' => false }).
+          with(:pdf, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }).
           and_return('some PDF content')
       )
-      expect(processor).to receive(:convert).with(:pdf, url_or_html, { 'allowFileUri' => false })
+      expect(processor).to(
+        receive(:convert).
+          with(:pdf, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false })
+      )
       expect(to_pdf).to eq 'some PDF content'
     end
 
@@ -66,12 +69,20 @@ describe Grover do
       it 'calls to Grover::Processor with the path specified' do
         allow(processor).to(
           receive(:convert).
-            with(:pdf, url_or_html, { 'path' => '/foo/bar', 'allowFileUri' => false }).
+            with(
+              :pdf,
+              url_or_html,
+              { 'path' => '/foo/bar', 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+            ).
             and_return('some PDF content')
         )
         expect(processor).to(
           receive(:convert).
-            with(:pdf, url_or_html, { 'path' => '/foo/bar', 'allowFileUri' => false })
+            with(
+              :pdf,
+              url_or_html,
+              { 'path' => '/foo/bar', 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+            )
         )
         expect(to_pdf).to eq 'some PDF content'
       end
@@ -82,10 +93,13 @@ describe Grover do
         it 'calls to Grover::Processor without the path specified' do
           allow(processor).to(
             receive(:convert).
-              with(:pdf, url_or_html, { 'allowFileUri' => false }).
+              with(:pdf, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }).
               and_return('some PDF content')
           )
-          expect(processor).to receive(:convert).with(:pdf, url_or_html, { 'allowFileUri' => false })
+          expect(processor).to(
+            receive(:convert).
+              with(:pdf, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false })
+          )
           expect(to_pdf).to eq 'some PDF content'
         end
       end
@@ -98,11 +112,14 @@ describe Grover do
         allow(Grover::Processor).to receive(:new).with('foo/bar/baz').and_return processor
         allow(processor).to(
           receive(:convert).
-            with(:pdf, url_or_html, { 'allowFileUri' => false }).
+            with(:pdf, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }).
             and_return('some PDF content')
         )
         expect(Grover::Processor).to receive(:new).with('foo/bar/baz')
-        expect(processor).to receive(:convert).with(:pdf, url_or_html, { 'allowFileUri' => false })
+        expect(processor).to(
+          receive(:convert).
+            with(:pdf, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false })
+        )
         expect(to_pdf).to eq 'some PDF content'
       end
     end
@@ -115,12 +132,20 @@ describe Grover do
       it 'builds options and passes them through to the processor' do
         allow(processor).to(
           receive(:convert).
-            with(:pdf, url_or_html, { 'headerTemplate' => 'Some header', 'allowFileUri' => false }).
+            with(
+              :pdf,
+              url_or_html,
+              { 'headerTemplate' => 'Some header', 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+            ).
             and_return('some PDF content')
         )
         expect(processor).to(
           receive(:convert).
-            with(:pdf, url_or_html, { 'headerTemplate' => 'Some header', 'allowFileUri' => false })
+            with(
+              :pdf,
+              url_or_html,
+              { 'headerTemplate' => 'Some header', 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+            )
         )
         expect(to_pdf).to eq 'some PDF content'
       end
@@ -131,10 +156,13 @@ describe Grover do
         it 'excludes front and back cover paths from options passed to processor' do
           allow(processor).to(
             receive(:convert).
-              with(:pdf, url_or_html, { 'allowFileUri' => false }).
+              with(:pdf, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }).
               and_return('some PDF content')
           )
-          expect(processor).to receive(:convert).with(:pdf, url_or_html, { 'allowFileUri' => false })
+          expect(processor).to(
+            receive(:convert).
+              with(:pdf, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false })
+          )
           expect(to_pdf).to eq 'some PDF content'
           expect(grover.front_cover_path).to eq '/front'
           expect(grover.back_cover_path).to eq '/back'
@@ -153,7 +181,8 @@ describe Grover do
                 {
                   'headerTemplate' => 'instance header',
                   'footerTemplate' => 'instance footer',
-                  'allowFileUri' => false
+                  'allowFileUri' => false,
+                  'allowLocalNetworkAccess' => false
                 }
               ).
               and_return('some PDF content')
@@ -166,7 +195,8 @@ describe Grover do
                 {
                   'headerTemplate' => 'instance header',
                   'footerTemplate' => 'instance footer',
-                  'allowFileUri' => false
+                  'allowFileUri' => false,
+                  'allowLocalNetworkAccess' => false
                 }
               )
           )
@@ -181,10 +211,13 @@ describe Grover do
       it 'excludes front and back cover paths from options passed to processor' do
         allow(processor).to(
           receive(:convert).
-            with(:pdf, url_or_html, { 'allowFileUri' => false }).
+            with(:pdf, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }).
             and_return('some PDF content')
         )
-        expect(processor).to receive(:convert).with(:pdf, url_or_html, { 'allowFileUri' => false })
+        expect(processor).to(
+          receive(:convert).
+            with(:pdf, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false })
+        )
         expect(to_pdf).to eq 'some PDF content'
         expect(grover.front_cover_path).to eq '/front'
         expect(grover.back_cover_path).to eq '/back'
@@ -214,7 +247,8 @@ describe Grover do
               url_or_html,
               {
                 'footerTemplate' => "<div class='text'>Footer with \"quotes\" in it</div>",
-                'allowFileUri' => false
+                'allowFileUri' => false,
+                'allowLocalNetworkAccess' => false
               }
             ).
             and_return('some PDF content')
@@ -226,7 +260,8 @@ describe Grover do
               url_or_html,
               {
                 'footerTemplate' => "<div class='text'>Footer with \"quotes\" in it</div>",
-                'allowFileUri' => false
+                'allowFileUri' => false,
+                'allowLocalNetworkAccess' => false
               }
             )
         )
@@ -248,12 +283,20 @@ describe Grover do
       it 'builds options and passes them through to the processor' do
         allow(processor).to(
           receive(:convert).
-            with(:pdf, url_or_html, { 'launchArgs' => ['--disable-speech-api'], 'allowFileUri' => false }).
+            with(
+              :pdf,
+              url_or_html,
+              { 'launchArgs' => ['--disable-speech-api'], 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+            ).
             and_return('some PDF content')
         )
         expect(processor).to(
           receive(:convert).
-            with(:pdf, url_or_html, { 'launchArgs' => ['--disable-speech-api'], 'allowFileUri' => false })
+            with(
+              :pdf,
+              url_or_html,
+              { 'launchArgs' => ['--disable-speech-api'], 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+            )
         )
         expect(to_pdf).to eq 'some PDF content'
       end
@@ -273,12 +316,20 @@ describe Grover do
       it 'builds options and passes them through to the processor' do
         allow(processor).to(
           receive(:convert).
-            with(:pdf, url_or_html, { 'displayHeaderFooter' => false, 'allowFileUri' => false }).
+            with(
+              :pdf,
+              url_or_html,
+              { 'displayHeaderFooter' => false, 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+            ).
             and_return('some PDF content')
         )
         expect(processor).to(
           receive(:convert).
-            with(:pdf, url_or_html, { 'displayHeaderFooter' => false, 'allowFileUri' => false })
+            with(
+              :pdf,
+              url_or_html,
+              { 'displayHeaderFooter' => false, 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+            )
         )
         expect(to_pdf).to eq 'some PDF content'
       end
@@ -298,13 +349,17 @@ describe Grover do
         HTML
       end
 
-      it 'builds options and passes them through to the processor' do
+      it 'builds options and passes them through to the processor' do # rubocop:disable RSpec/ExampleLength
         allow(processor).to(
           receive(:convert).
             with(
               :pdf,
               url_or_html,
-              { 'viewport' => { 'height' => 100, 'width' => 200, 'deviceScaleFactor' => 2.5 }, 'allowFileUri' => false }
+              {
+                'viewport' => { 'height' => 100, 'width' => 200, 'deviceScaleFactor' => 2.5 },
+                'allowFileUri' => false,
+                'allowLocalNetworkAccess' => false
+              }
             ).
             and_return('some PDF content')
         )
@@ -313,7 +368,11 @@ describe Grover do
             with(
               :pdf,
               url_or_html,
-              { 'viewport' => { 'height' => 100, 'width' => 200, 'deviceScaleFactor' => 2.5 }, 'allowFileUri' => false }
+              {
+                'viewport' => { 'height' => 100, 'width' => 200, 'deviceScaleFactor' => 2.5 },
+                'allowFileUri' => false,
+                'allowLocalNetworkAccess' => false
+              }
             )
         )
         expect(to_pdf).to eq 'some PDF content'
@@ -323,13 +382,17 @@ describe Grover do
     context 'when passing extra HTTP headers' do
       let(:options) { { extra_http_headers: { 'Foo' => 'Bar', 'baz' => 'Qux' } } }
 
-      it 'does not transform the header keys' do
+      it 'does not transform the header keys' do # rubocop:disable RSpec/ExampleLength
         allow(processor).to(
           receive(:convert).
             with(
               :pdf,
               url_or_html,
-              { 'extraHTTPHeaders' => { 'Foo' => 'Bar', 'baz' => 'Qux' }, 'allowFileUri' => false }
+              {
+                'extraHTTPHeaders' => { 'Foo' => 'Bar', 'baz' => 'Qux' },
+                'allowFileUri' => false,
+                'allowLocalNetworkAccess' => false
+              }
             ).
             and_return('some PDF content')
         )
@@ -338,7 +401,11 @@ describe Grover do
             with(
               :pdf,
               url_or_html,
-              { 'extraHTTPHeaders' => { 'Foo' => 'Bar', 'baz' => 'Qux' }, 'allowFileUri' => false }
+              {
+                'extraHTTPHeaders' => { 'Foo' => 'Bar', 'baz' => 'Qux' },
+                'allowFileUri' => false,
+                'allowLocalNetworkAccess' => false
+              }
             )
         )
         expect(to_pdf).to eq 'some PDF content'
@@ -351,10 +418,13 @@ describe Grover do
       it 'does not overload `allowFileUri` option' do
         allow(processor).to(
           receive(:convert).
-            with(:pdf, url_or_html, { 'allowFileUri' => false }).
+            with(:pdf, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }).
             and_return('some PDF content')
         )
-        expect(processor).to receive(:convert).with(:pdf, url_or_html, { 'allowFileUri' => false })
+        expect(processor).to(
+          receive(:convert).
+            with(:pdf, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false })
+        )
         expect(to_pdf).to eq 'some PDF content'
       end
     end
@@ -365,10 +435,13 @@ describe Grover do
       it 'does not overload `allowFileUri` option' do
         allow(processor).to(
           receive(:convert).
-            with(:pdf, url_or_html, { 'allowFileUri' => false }).
+            with(:pdf, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }).
             and_return('some PDF content')
         )
-        expect(processor).to receive(:convert).with(:pdf, url_or_html, { 'allowFileUri' => false })
+        expect(processor).to(
+          receive(:convert).
+            with(:pdf, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false })
+        )
         expect(to_pdf).to eq 'some PDF content'
       end
     end
@@ -379,10 +452,64 @@ describe Grover do
       it 'overloads `allowFileUri` option' do
         allow(processor).to(
           receive(:convert).
-            with(:pdf, url_or_html, { 'allowFileUri' => true }).
+            with(:pdf, url_or_html, { 'allowFileUri' => true, 'allowLocalNetworkAccess' => false }).
             and_return('some PDF content')
         )
-        expect(processor).to receive(:convert).with(:pdf, url_or_html, { 'allowFileUri' => true })
+        expect(processor).to(
+          receive(:convert).
+            with(:pdf, url_or_html, { 'allowFileUri' => true, 'allowLocalNetworkAccess' => false })
+        )
+        expect(to_pdf).to eq 'some PDF content'
+      end
+    end
+
+    context 'when providing `allow_local_network_access` option inline' do
+      let(:options) { { allow_local_network_access: true } }
+
+      it 'does not overload `allowLocalNetworkAccess` option' do
+        allow(processor).to(
+          receive(:convert).
+            with(:pdf, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }).
+            and_return('some PDF content')
+        )
+        expect(processor).to(
+          receive(:convert).
+            with(:pdf, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false })
+        )
+        expect(to_pdf).to eq 'some PDF content'
+      end
+    end
+
+    context 'when providing `allow_local_network_access` option through global options' do
+      let(:global_config) { { allow_local_network_access: true } }
+
+      it 'does not overload `allowLocalNetworkAccess` option' do
+        allow(processor).to(
+          receive(:convert).
+            with(:pdf, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }).
+            and_return('some PDF content')
+        )
+        expect(processor).to(
+          receive(:convert).
+            with(:pdf, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false })
+        )
+        expect(to_pdf).to eq 'some PDF content'
+      end
+    end
+
+    context 'when `allow_local_network_access` configuration is enabled' do
+      before { allow(described_class.configuration).to receive(:allow_local_network_access).and_return true }
+
+      it 'overloads `allowLocalNetworkAccess` option' do
+        allow(processor).to(
+          receive(:convert).
+            with(:pdf, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => true }).
+            and_return('some PDF content')
+        )
+        expect(processor).to(
+          receive(:convert).
+            with(:pdf, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => true })
+        )
         expect(to_pdf).to eq 'some PDF content'
       end
     end
@@ -398,10 +525,13 @@ describe Grover do
     it 'calls to Grover::Processor' do
       allow(processor).to(
         receive(:convert).
-          with(:screenshot, url_or_html, { 'allowFileUri' => false }).
+          with(:screenshot, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }).
           and_return('some image content')
       )
-      expect(processor).to receive(:convert).with(:screenshot, url_or_html, { 'allowFileUri' => false })
+      expect(processor).to(
+        receive(:convert).
+          with(:screenshot, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false })
+      )
       expect(screenshot).to eq 'some image content'
     end
 
@@ -411,12 +541,20 @@ describe Grover do
       it 'calls to Grover::Processor with the path specified' do
         allow(processor).to(
           receive(:convert).
-            with(:screenshot, url_or_html, { 'path' => '/foo/bar', 'allowFileUri' => false }).
+            with(
+              :screenshot,
+              url_or_html,
+              { 'path' => '/foo/bar', 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+            ).
             and_return('some image content')
         )
         expect(processor).to(
           receive(:convert).
-            with(:screenshot, url_or_html, { 'path' => '/foo/bar', 'allowFileUri' => false })
+            with(
+              :screenshot,
+              url_or_html,
+              { 'path' => '/foo/bar', 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+            )
         )
         expect(screenshot).to eq 'some image content'
       end
@@ -431,12 +569,20 @@ describe Grover do
         it 'calls to Grover::Processor with the type specified' do
           allow(processor).to(
             receive(:convert).
-              with(:screenshot, url_or_html, { 'type' => 'png', 'allowFileUri' => false }).
+              with(
+                :screenshot,
+                url_or_html,
+                { 'type' => 'png', 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+              ).
               and_return('some image content')
           )
           expect(processor).to(
             receive(:convert).
-              with(:screenshot, url_or_html, { 'type' => 'png', 'allowFileUri' => false })
+              with(
+                :screenshot,
+                url_or_html,
+                { 'type' => 'png', 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+              )
           )
           expect(screenshot).to eq 'some image content'
         end
@@ -448,12 +594,20 @@ describe Grover do
         it 'calls to Grover::Processor with the type specified' do
           allow(processor).to(
             receive(:convert).
-              with(:screenshot, url_or_html, { 'type' => 'jpeg', 'allowFileUri' => false }).
+              with(
+                :screenshot,
+                url_or_html,
+                { 'type' => 'jpeg', 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+              ).
               and_return('some image content')
           )
           expect(processor).to(
             receive(:convert).
-              with(:screenshot, url_or_html, { 'type' => 'jpeg', 'allowFileUri' => false })
+              with(
+                :screenshot,
+                url_or_html,
+                { 'type' => 'jpeg', 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+              )
           )
           expect(screenshot).to eq 'some image content'
         end
@@ -465,10 +619,13 @@ describe Grover do
         it 'calls to Grover::Processor without the type specified' do
           allow(processor).to(
             receive(:convert).
-              with(:screenshot, url_or_html, { 'allowFileUri' => false }).
+              with(:screenshot, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }).
               and_return('some image content')
           )
-          expect(processor).to receive(:convert).with(:screenshot, url_or_html, { 'allowFileUri' => false })
+          expect(processor).to(
+            receive(:convert).
+              with(:screenshot, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false })
+          )
           expect(screenshot).to eq 'some image content'
         end
       end
@@ -481,11 +638,14 @@ describe Grover do
         allow(Grover::Processor).to receive(:new).with('foo/bar/baz').and_return processor
         allow(processor).to(
           receive(:convert).
-            with(:screenshot, url_or_html, { 'allowFileUri' => false }).
+            with(:screenshot, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }).
             and_return('some image content')
         )
         expect(Grover::Processor).to receive(:new).with('foo/bar/baz')
-        expect(processor).to receive(:convert).with(:screenshot, url_or_html, { 'allowFileUri' => false })
+        expect(processor).to(
+          receive(:convert).
+            with(:screenshot, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false })
+        )
         expect(screenshot).to eq 'some image content'
       end
     end
@@ -498,12 +658,20 @@ describe Grover do
       it 'builds options and passes them through to the processor' do
         allow(processor).to(
           receive(:convert).
-            with(:screenshot, url_or_html, { 'headerTemplate' => 'Some header', 'allowFileUri' => false }).
+            with(
+              :screenshot,
+              url_or_html,
+              { 'headerTemplate' => 'Some header', 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+            ).
             and_return('some image content')
         )
         expect(processor).to(
           receive(:convert).
-            with(:screenshot, url_or_html, { 'headerTemplate' => 'Some header', 'allowFileUri' => false })
+            with(
+              :screenshot,
+              url_or_html,
+              { 'headerTemplate' => 'Some header', 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+            )
         )
         expect(screenshot).to eq 'some image content'
       end
@@ -514,10 +682,13 @@ describe Grover do
         it 'excludes front and back cover paths from options passed to processor' do
           allow(processor).to(
             receive(:convert).
-              with(:screenshot, url_or_html, { 'allowFileUri' => false }).
+              with(:screenshot, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }).
               and_return('some image content')
           )
-          expect(processor).to receive(:convert).with(:screenshot, url_or_html, { 'allowFileUri' => false })
+          expect(processor).to(
+            receive(:convert).
+              with(:screenshot, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false })
+          )
           expect(screenshot).to eq 'some image content'
           expect(grover.front_cover_path).to eq '/front'
           expect(grover.back_cover_path).to eq '/back'
@@ -536,7 +707,8 @@ describe Grover do
                 {
                   'headerTemplate' => 'instance header',
                   'footerTemplate' => 'instance footer',
-                  'allowFileUri' => false
+                  'allowFileUri' => false,
+                  'allowLocalNetworkAccess' => false
                 }
               ).
               and_return('some image content')
@@ -549,7 +721,8 @@ describe Grover do
                 {
                   'headerTemplate' => 'instance header',
                   'footerTemplate' => 'instance footer',
-                  'allowFileUri' => false
+                  'allowFileUri' => false,
+                  'allowLocalNetworkAccess' => false
                 }
               )
           )
@@ -564,10 +737,13 @@ describe Grover do
       it 'excludes front and back cover paths from options passed to processor' do
         allow(processor).to(
           receive(:convert).
-            with(:screenshot, url_or_html, { 'allowFileUri' => false }).
+            with(:screenshot, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }).
             and_return('some image content')
         )
-        expect(processor).to receive(:convert).with(:screenshot, url_or_html, { 'allowFileUri' => false })
+        expect(processor).to(
+          receive(:convert).
+            with(:screenshot, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false })
+        )
         expect(screenshot).to eq 'some image content'
         expect(grover.front_cover_path).to eq '/front'
         expect(grover.back_cover_path).to eq '/back'
@@ -588,13 +764,17 @@ describe Grover do
         HTML
       end
 
-      it 'builds options and passes them through to the processor' do
+      it 'builds options and passes them through to the processor' do # rubocop:disable RSpec/ExampleLength
         allow(processor).to(
           receive(:convert).
             with(
               :screenshot,
               url_or_html,
-              { 'viewport' => { 'height' => 100, 'width' => 200, 'deviceScaleFactor' => 2.5 }, 'allowFileUri' => false }
+              {
+                'viewport' => { 'height' => 100, 'width' => 200, 'deviceScaleFactor' => 2.5 },
+                'allowFileUri' => false,
+                'allowLocalNetworkAccess' => false
+              }
             ).
             and_return('some image content')
         )
@@ -603,7 +783,11 @@ describe Grover do
             with(
               :screenshot,
               url_or_html,
-              { 'viewport' => { 'height' => 100, 'width' => 200, 'deviceScaleFactor' => 2.5 }, 'allowFileUri' => false }
+              {
+                'viewport' => { 'height' => 100, 'width' => 200, 'deviceScaleFactor' => 2.5 },
+                'allowFileUri' => false,
+                'allowLocalNetworkAccess' => false
+              }
             )
         )
         expect(screenshot).to eq 'some image content'
@@ -616,10 +800,13 @@ describe Grover do
       it 'does not overload `allowFileUri` option' do
         allow(processor).to(
           receive(:convert).
-            with(:screenshot, url_or_html, { 'allowFileUri' => false }).
+            with(:screenshot, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }).
             and_return('some image content')
         )
-        expect(processor).to receive(:convert).with(:screenshot, url_or_html, { 'allowFileUri' => false })
+        expect(processor).to(
+          receive(:convert).
+            with(:screenshot, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false })
+        )
         expect(screenshot).to eq 'some image content'
       end
     end
@@ -630,10 +817,13 @@ describe Grover do
       it 'does not overload `allowFileUri` option' do
         allow(processor).to(
           receive(:convert).
-            with(:screenshot, url_or_html, { 'allowFileUri' => false }).
+            with(:screenshot, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }).
             and_return('some image content')
         )
-        expect(processor).to receive(:convert).with(:screenshot, url_or_html, { 'allowFileUri' => false })
+        expect(processor).to(
+          receive(:convert).
+            with(:screenshot, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false })
+        )
         expect(screenshot).to eq 'some image content'
       end
     end
@@ -644,10 +834,17 @@ describe Grover do
       it 'overloads `allowFileUri` option' do
         allow(processor).to(
           receive(:convert).
-            with(:screenshot, url_or_html, { 'allowFileUri' => true }).
+            with(
+              :screenshot,
+              url_or_html,
+              { 'allowFileUri' => true, 'allowLocalNetworkAccess' => false }
+            ).
             and_return('some image content')
         )
-        expect(processor).to receive(:convert).with(:screenshot, url_or_html, { 'allowFileUri' => true })
+        expect(processor).to(
+          receive(:convert).
+            with(:screenshot, url_or_html, { 'allowFileUri' => true, 'allowLocalNetworkAccess' => false })
+        )
         expect(screenshot).to eq 'some image content'
       end
     end
@@ -663,12 +860,20 @@ describe Grover do
     it 'calls to Grover::Processor' do
       allow(processor).to(
         receive(:convert).
-          with(:screenshot, url_or_html, { 'type' => 'png', 'allowFileUri' => false }).
+          with(
+            :screenshot,
+            url_or_html,
+            { 'type' => 'png', 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+          ).
           and_return('some PNG content')
       )
       expect(processor).to(
         receive(:convert).
-          with(:screenshot, url_or_html, { 'type' => 'png', 'allowFileUri' => false })
+          with(
+            :screenshot,
+            url_or_html,
+            { 'type' => 'png', 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+          )
       )
       expect(to_png).to eq 'some PNG content'
     end
@@ -679,12 +884,20 @@ describe Grover do
       it 'calls to Grover::Processor with the path specified' do
         allow(processor).to(
           receive(:convert).
-            with(:screenshot, url_or_html, { 'path' => '/foo/bar', 'type' => 'png', 'allowFileUri' => false }).
+            with(
+              :screenshot,
+              url_or_html,
+              { 'path' => '/foo/bar', 'type' => 'png', 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+            ).
             and_return('some PNG content')
         )
         expect(processor).to(
           receive(:convert).
-            with(:screenshot, url_or_html, { 'path' => '/foo/bar', 'type' => 'png', 'allowFileUri' => false })
+            with(
+              :screenshot,
+              url_or_html,
+              { 'path' => '/foo/bar', 'type' => 'png', 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+            )
         )
         expect(to_png).to eq 'some PNG content'
       end
@@ -696,12 +909,20 @@ describe Grover do
       it 'does not overload `allowFileUri` option' do
         allow(processor).to(
           receive(:convert).
-            with(:screenshot, url_or_html, { 'type' => 'png', 'allowFileUri' => false }).
+            with(
+              :screenshot,
+              url_or_html,
+              { 'type' => 'png', 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+            ).
             and_return('some PNG content')
         )
         expect(processor).to(
           receive(:convert).
-            with(:screenshot, url_or_html, { 'type' => 'png', 'allowFileUri' => false })
+            with(
+              :screenshot,
+              url_or_html,
+              { 'type' => 'png', 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+            )
         )
         expect(to_png).to eq 'some PNG content'
       end
@@ -713,12 +934,20 @@ describe Grover do
       it 'does not overload `allowFileUri` option' do
         allow(processor).to(
           receive(:convert).
-            with(:screenshot, url_or_html, { 'type' => 'png', 'allowFileUri' => false }).
+            with(
+              :screenshot,
+              url_or_html,
+              { 'type' => 'png', 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+            ).
             and_return('some PNG content')
         )
         expect(processor).to(
           receive(:convert).
-            with(:screenshot, url_or_html, { 'type' => 'png', 'allowFileUri' => false })
+            with(
+              :screenshot,
+              url_or_html,
+              { 'type' => 'png', 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+            )
         )
         expect(to_png).to eq 'some PNG content'
       end
@@ -730,12 +959,20 @@ describe Grover do
       it 'overloads `allowFileUri` option' do
         allow(processor).to(
           receive(:convert).
-            with(:screenshot, url_or_html, { 'type' => 'png', 'allowFileUri' => true }).
+            with(
+              :screenshot,
+              url_or_html,
+              { 'type' => 'png', 'allowFileUri' => true, 'allowLocalNetworkAccess' => false }
+            ).
             and_return('some PNG content')
         )
         expect(processor).to(
           receive(:convert).
-            with(:screenshot, url_or_html, { 'type' => 'png', 'allowFileUri' => true })
+            with(
+              :screenshot,
+              url_or_html,
+              { 'type' => 'png', 'allowFileUri' => true, 'allowLocalNetworkAccess' => false }
+            )
         )
         expect(to_png).to eq 'some PNG content'
       end
@@ -752,12 +989,20 @@ describe Grover do
     it 'calls to Grover::Processor' do
       allow(processor).to(
         receive(:convert).
-          with(:screenshot, url_or_html, { 'type' => 'jpeg', 'allowFileUri' => false }).
+          with(
+            :screenshot,
+            url_or_html,
+            { 'type' => 'jpeg', 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+          ).
           and_return('some JPG content')
       )
       expect(processor).to(
         receive(:convert).
-          with(:screenshot, url_or_html, { 'type' => 'jpeg', 'allowFileUri' => false })
+          with(
+            :screenshot,
+            url_or_html,
+            { 'type' => 'jpeg', 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+          )
       )
 
       expect(to_jpeg).to eq 'some JPG content'
@@ -769,12 +1014,20 @@ describe Grover do
       it 'calls to Grover::Processor with the path specified' do
         allow(processor).to(
           receive(:convert).
-            with(:screenshot, url_or_html, { 'path' => '/foo/bar', 'type' => 'jpeg', 'allowFileUri' => false }).
+            with(
+              :screenshot,
+              url_or_html,
+              { 'path' => '/foo/bar', 'type' => 'jpeg', 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+            ).
             and_return('some JPG content')
         )
         expect(processor).to(
           receive(:convert).
-            with(:screenshot, url_or_html, { 'path' => '/foo/bar', 'type' => 'jpeg', 'allowFileUri' => false })
+            with(
+              :screenshot,
+              url_or_html,
+              { 'path' => '/foo/bar', 'type' => 'jpeg', 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+            )
         )
         expect(to_jpeg).to eq 'some JPG content'
       end
@@ -786,12 +1039,20 @@ describe Grover do
       it 'does not overload `allowFileUri` option' do
         allow(processor).to(
           receive(:convert).
-            with(:screenshot, url_or_html, { 'type' => 'jpeg', 'allowFileUri' => false }).
+            with(
+              :screenshot,
+              url_or_html,
+              { 'type' => 'jpeg', 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+            ).
             and_return('some JPG content')
         )
         expect(processor).to(
           receive(:convert).
-            with(:screenshot, url_or_html, { 'type' => 'jpeg', 'allowFileUri' => false })
+            with(
+              :screenshot,
+              url_or_html,
+              { 'type' => 'jpeg', 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+            )
         )
 
         expect(to_jpeg).to eq 'some JPG content'
@@ -804,12 +1065,20 @@ describe Grover do
       it 'does not overload `allowFileUri` option' do
         allow(processor).to(
           receive(:convert).
-            with(:screenshot, url_or_html, { 'type' => 'jpeg', 'allowFileUri' => false }).
+            with(
+              :screenshot,
+              url_or_html,
+              { 'type' => 'jpeg', 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+            ).
             and_return('some JPG content')
         )
         expect(processor).to(
           receive(:convert).
-            with(:screenshot, url_or_html, { 'type' => 'jpeg', 'allowFileUri' => false })
+            with(
+              :screenshot,
+              url_or_html,
+              { 'type' => 'jpeg', 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+            )
         )
 
         expect(to_jpeg).to eq 'some JPG content'
@@ -822,12 +1091,20 @@ describe Grover do
       it 'overloads `allowFileUri` option' do
         allow(processor).to(
           receive(:convert).
-            with(:screenshot, url_or_html, { 'type' => 'jpeg', 'allowFileUri' => true }).
+            with(
+              :screenshot,
+              url_or_html,
+              { 'type' => 'jpeg', 'allowFileUri' => true, 'allowLocalNetworkAccess' => false }
+            ).
             and_return('some JPG content')
         )
         expect(processor).to(
           receive(:convert).
-            with(:screenshot, url_or_html, { 'type' => 'jpeg', 'allowFileUri' => true })
+            with(
+              :screenshot,
+              url_or_html,
+              { 'type' => 'jpeg', 'allowFileUri' => true, 'allowLocalNetworkAccess' => false }
+            )
         )
 
         expect(to_jpeg).to eq 'some JPG content'
@@ -846,10 +1123,13 @@ describe Grover do
     it 'calls to Grover::Processor' do
       allow(processor).to(
         receive(:convert).
-          with(:content, url_or_html, { 'allowFileUri' => false }).
+          with(:content, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }).
           and_return(expected_html)
       )
-      expect(processor).to receive(:convert).with(:content, url_or_html, { 'allowFileUri' => false })
+      expect(processor).to(
+        receive(:convert).
+          with(:content, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false })
+      )
       expect(to_html).to eq expected_html
     end
 
@@ -859,10 +1139,13 @@ describe Grover do
       it 'does not overload `allowFileUri` option' do
         allow(processor).to(
           receive(:convert).
-            with(:content, url_or_html, { 'allowFileUri' => false }).
+            with(:content, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }).
             and_return(expected_html)
         )
-        expect(processor).to receive(:convert).with(:content, url_or_html, { 'allowFileUri' => false })
+        expect(processor).to(
+          receive(:convert).
+            with(:content, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false })
+        )
         expect(to_html).to eq expected_html
       end
     end
@@ -873,10 +1156,13 @@ describe Grover do
       it 'does not overload `allowFileUri` option' do
         allow(processor).to(
           receive(:convert).
-            with(:content, url_or_html, { 'allowFileUri' => false }).
+            with(:content, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }).
             and_return(expected_html)
         )
-        expect(processor).to receive(:convert).with(:content, url_or_html, { 'allowFileUri' => false })
+        expect(processor).to(
+          receive(:convert).
+            with(:content, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false })
+        )
         expect(to_html).to eq expected_html
       end
     end
@@ -887,10 +1173,13 @@ describe Grover do
       it 'overloads `allowFileUri` option' do
         allow(processor).to(
           receive(:convert).
-            with(:content, url_or_html, { 'allowFileUri' => true }).
+            with(:content, url_or_html, { 'allowFileUri' => true, 'allowLocalNetworkAccess' => false }).
             and_return(expected_html)
         )
-        expect(processor).to receive(:convert).with(:content, url_or_html, { 'allowFileUri' => true })
+        expect(processor).to(
+          receive(:convert).
+            with(:content, url_or_html, { 'allowFileUri' => true, 'allowLocalNetworkAccess' => false })
+        )
         expect(to_html).to eq expected_html
       end
     end

@@ -8,7 +8,7 @@ class Grover
     attr_accessor :options, :meta_tag_prefix, :ignore_path, :ignore_request,
                   :root_url, :use_pdf_middleware, :use_png_middleware,
                   :use_jpeg_middleware, :js_runtime_bin,
-                  :node_env_vars, :allow_file_uris
+                  :node_env_vars, :allow_file_uris, :allow_local_network_access
 
     def initialize # rubocop:disable Metrics/MethodLength
       @options = {}
@@ -22,6 +22,7 @@ class Grover
       @js_runtime_bin = ['node']
       @node_env_vars = {}
       @allow_file_uris = false
+      @allow_local_network_access = false
     end
   end
 end
