@@ -109,4 +109,16 @@ describe Grover::Configuration do
       it { is_expected.to be true }
     end
   end
+
+  describe '#allow_local_network_access' do
+    subject(:allow_local_network_access) { configuration.allow_local_network_access }
+
+    it { is_expected.to be false }
+
+    context 'when configured differently' do
+      before { configuration.allow_local_network_access = true }
+
+      it { is_expected.to be true }
+    end
+  end
 end

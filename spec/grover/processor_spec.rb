@@ -12,10 +12,17 @@ describe Grover::Processor do
     let(:options) { {} }
     let(:date) do
       # New version of Chromium (v93) that comes with v10.2.0 of puppeteer uses a different date format
-      date_format = puppeteer_version_on_or_after?('10.2.0') ? '%-m/%-d/%y, %-l:%M %p' : '%-m/%-d/%Y'
+      date_format =
+        if puppeteer_version_on_or_after?('10.2.0')
+          # AU locale uses a different date format
+          locale == 'en_AU.UTF-8' ? '%-d/%m/%Y, %-k:%M' : '%-m/%-d/%y, %-l:%M %p'
+        else
+          '%-m/%-d/%Y'
+        end
       Time.now.strftime date_format
     end
     let(:protocol) { puppeteer_version_on_or_after?('21') ? 'https' : 'http' }
+    let(:locale) { `locale`[/LC_TIME="([^"]+)"/, 1] || 'en_US.UTF-8' }
 
     context 'when converting to PDF' do
       let(:method) { :pdf }
@@ -706,7 +713,11 @@ describe Grover::Processor do
       end
 
       context 'when raise on request failure option is specified' do
-        let(:options) { basic_header_footer_options.merge('raiseOnRequestFailure' => true) }
+        let(:options) do
+          basic_header_footer_options.
+            merge('raiseOnRequestFailure' => true, 'allowLocalNetworkAccess' => allow_local_network_access)
+        end
+        let(:allow_local_network_access) { true }
 
         context 'when a failure occurs it raises an error' do
           let(:url_or_html) do
@@ -776,13 +787,25 @@ describe Grover::Processor do
                 <head><link rel="icon" href="data:;base64,iVBORw0KGgo="></head>
                 <body>
                   Hey there
-                  <img src="http://localhost:4567/304" />
+                  <img src="http://127.0.0.1:4567/304" />
                 </body>
               </html>
             HTML
           end
 
           it { expect(pdf_text_content).to include 'Hey there' }
+
+          if puppeteer_version_on_or_after? '24.16.0'
+            context 'when local network access is not allowed (default)' do
+              let(:allow_local_network_access) { false }
+
+              it 'raises a RequestFailedError' do
+                expect { convert }.to(
+                  raise_error(Grover::JavaScript::RequestFailedError, 'net::ERR_FAILED at http://127.0.0.1:4567/304')
+                )
+              end
+            end
+          end
         end
 
         context 'when assets have redirects PDFs are generated successfully' do
@@ -795,7 +818,7 @@ describe Grover::Processor do
               <html>
                 <head><link rel='icon' href='data:;base64,iVBORw0KGgo='></head>
                 <body>
-                  <img src="http://localhost:4567/cat.png" />
+                  <img src="http://127.0.0.1:4567/cat.png" />
                 </body>
               </html>
             HTML
@@ -804,6 +827,21 @@ describe Grover::Processor do
           it do
             _, stream = pdf_reader.pages.first.xobjects.first
             expect(stream.hash[:Subtype]).to eq :Image
+          end
+
+          if puppeteer_version_on_or_after? '24.16.0'
+            context 'when local network access is not allowed (default)' do
+              let(:allow_local_network_access) { false }
+
+              it 'raises a RequestFailedError' do
+                expect { convert }.to(
+                  raise_error(
+                    Grover::JavaScript::RequestFailedError,
+                    'net::ERR_FAILED at http://127.0.0.1:4567/cat.png'
+                  )
+                )
+              end
+            end
           end
         end
       end
@@ -1117,7 +1155,7 @@ describe Grover::Processor do
         # so we'll check it's mean colour is roughly what we expect
         it do
           pixel_mean =
-            if puppeteer_version_on_or_after?('24.0.0')
+            if puppeteer_version_on_or_after?('24.0.0') && puppeteer_version_on_or_before?('24.15.0')
               169.444
             elsif puppeteer_version_on_or_after?('22.9.0')
               140.925

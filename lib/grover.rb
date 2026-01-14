@@ -148,6 +148,7 @@ class Grover
     normalized_options = Utils.normalize_object @options, excluding: ['extraHTTPHeaders']
     normalized_options['path'] = path if path.is_a? ::String
     normalized_options['allowFileUri'] = Grover.configuration.allow_file_uris == true
+    normalized_options['allowLocalNetworkAccess'] = Grover.configuration.allow_local_network_access == true
     normalized_options
   end
 end

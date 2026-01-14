@@ -423,7 +423,7 @@ end
 ```
 
 ### allow_file_uris
-The `allow_file_uris` option can be used to render an html document from the file system.
+The `allow_file_uris` option can be used to render an HTML document from the file system.
 This should be used with *EXTREME CAUTION*. If used improperly it could potentially be manipulated to reveal
 sensitive files on the system. Do not enable if rendering content from outside entities
 (user uploads, external URLs, etc).
@@ -444,6 +444,23 @@ grover = Grover.new('file:///some/local/file.html', format: 'A4')
 
 # Get an inline PDF of the local file
 pdf = grover.to_pdf
+```
+
+### allow_local_network_access
+The `allow_local_network_access` option, when enabled, will allow Grover to make web requests to localhost.
+
+Note, this feature was added in Puppeteer
+[v24.16.0](https://github.com/puppeteer/puppeteer/releases/tag/puppeteer-v24.16.0) with the release of Chrome 139.
+
+It defaults to `false` preventing Puppeteer v24.16.0+ (Chrome 139+) from accessing localhost pages and assets.
+Requests for localhost pages/assets will not be made, but instead error. If you have the `raise_on_request_failure`
+option enabled, the requests will raise a `Grover::JavaScript::RequestFailedError` with the reason `net::ERR_FAILED`.
+
+```ruby
+# config/initializers/grover.rb
+Grover.configure do |config|
+  config.allow_local_network_access = true
+end
 ```
 
 ## Cover pages
