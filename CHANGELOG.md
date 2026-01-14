@@ -1,8 +1,11 @@
 # Changelog
 
 ## Unreleased
+- none
+
+## [1.2,5](releases/tag/v1.2.5) - 2026-01-14
 ### Added
-- Add support for Ruby 4.0
+- [#300](https://github.com/Studiosity/grover/pull/300) Add support for Ruby 4.0 ([@gs-deliverists-io][])
 
 ## [1.2,4](releases/tag/v1.2.4) - 2025-11-04
 ### Added
@@ -366,3 +369,4 @@
 [@rasmus0201]: https://github.com/rasmus0201
 [@murajun1978]: https://github.com/murajun1978
 [@brendon]: https://github.com/brendon
+[@gs-deliverists-io]: https://github.com/gs-deliverists-io
