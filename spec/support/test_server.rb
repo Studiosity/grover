@@ -52,7 +52,7 @@ class TestServer
 
   def logging_thread
     @logging_thread ||= Thread.new do
-      loop { print @read_io.readpartial(8192) }
+      loop { print @read_io.readpartial(8192) } # rubocop:disable RSpec/Output
     rescue EOFError
       logger.warn 'Server process has terminated'
     end

@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby-version: ['3.4']
+        ruby-version: ['4.0']
         node-version: ['18']
         puppeteer-version: [
           '22.15.0',
@@ -41,15 +41,15 @@ jobs:
             node-version: '18'
             puppeteer-version: '24.10.2'
           - ruby-version: '3.4'
+            node-version: '18'
+            puppeteer-version: '24.10.2'
+          - ruby-version: '4.0'
             node-version: '20'
             puppeteer-version: '24.10.2'
-          - ruby-version: '3.4'
+          - ruby-version: '4.0'
             node-version: '22'
             puppeteer-version: '24.10.2'
-          - ruby-version: '3.4'
-            node-version: '24'
-            puppeteer-version: '24.10.2'
-          - ruby-version: '3.5.0-preview1'
+          - ruby-version: '4.0'
             node-version: '24'
             puppeteer-version: '24.10.2'
 
