@@ -48,6 +48,7 @@ class Grover
   # @return [String] The resulting PDF data
   #
   def to_pdf(path = nil)
+    @processor = nil # Flush out the processor from any previous use
     processor.convert :pdf, @uri, normalized_options(path: path)
   end
 
@@ -57,6 +58,7 @@ class Grover
   # @return [String] The resulting HTML string
   #
   def to_html
+    @processor = nil # Flush out the processor from any previous use
     processor.convert :content, @uri, normalized_options(path: nil)
   end
 
@@ -68,6 +70,7 @@ class Grover
   # @return [String] The resulting image data
   #
   def screenshot(path: nil, format: nil)
+    @processor = nil # Flush out the processor from any previous use
     options = normalized_options(path: path)
     options['type'] = format if %w[png jpeg].include? format
     processor.convert :screenshot, @uri, options
@@ -111,6 +114,10 @@ class Grover
     back_cover_path.is_a?(::String) && back_cover_path.start_with?('/')
   end
 
+  def debug_output
+    processor.debug_output
+  end
+
   #
   # Instance inspection
   #
@@ -141,7 +148,7 @@ class Grover
   end
 
   def processor
-    Processor.new(root_path)
+    @processor ||= Processor.new(root_path)
   end
 
   def normalized_options(path:)
