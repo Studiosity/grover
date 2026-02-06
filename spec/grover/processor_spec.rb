@@ -54,9 +54,9 @@ describe Grover::Processor do
           env_args = puppeteer_version == '' ? '' : " PUPPETEER_VERSION: '#{puppeteer_version}' "
 
           expect(debug_output[0]).to match Regexp.new(<<~REGEX.delete("\n"))
-            \\A#{timestamp_regex} puppeteer:browsers:launcher Launching .*chrome.* about:blank #{sandbox_args}
-            --remote-debugging-port=0 \\{ detached: true, env: \\{#{env_args}\\}, stdio: \\[ 'pipe', 'pipe', 'pipe' \\]
-             \\}\\z
+            \\A#{timestamp_regex.gsub('\\', '\\\\')} puppeteer:browsers:launcher Launching .*chrome.*
+             about:blank #{sandbox_args}--remote-debugging-port=0
+             \\{ detached: true, env: \\{#{env_args}\\}, stdio: \\[ 'pipe', '(pipe|ignore)', 'pipe' \\] \\}\\z
           REGEX
           expect(debug_output[1]).to match(/\A#{timestamp_regex} puppeteer:browsers:launcher Launched \d{2,6}\z/)
           expect(debug_output[2]).to(
