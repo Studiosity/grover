@@ -3,26 +3,30 @@
 ## Unreleased
 - none
 
-## [1.2,6](releases/tag/v1.2.6) - 2026-01-14
+## [1.2.7](releases/tag/v1.2.7) - 2026-02-06
+### Added
+- [#302](https://github.com/Studiosity/grover/pull/302) Capture/expose Puppeteer DevTools debug output ([@abrom][])
+
+## [1.2.6](releases/tag/v1.2.6) - 2026-01-14
 ### Added
 - [#299](https://github.com/Studiosity/grover/pull/299) Add support for `allow_local_network_access` configuration option ([@abrom][])
 
-## [1.2,5](releases/tag/v1.2.5) - 2026-01-14
+## [1.2.5](releases/tag/v1.2.5) - 2026-01-14
 ### Added
 - [#300](https://github.com/Studiosity/grover/pull/300) Add support for Ruby 4.0 ([@gs-deliverists-io][])
 
-## [1.2,4](releases/tag/v1.2.4) - 2025-11-04
+## [1.2.4](releases/tag/v1.2.4) - 2025-11-04
 ### Added
 - [#297](https://github.com/Studiosity/grover/pull/297) Add support for browser option (Firefox) ([@abrom][])
 
 ### Fixed
 - [#294](https://github.com/Studiosity/grover/pull/294) Handle deprecations in setCookie API ([@brendon][])
 
-## [1.2,3](releases/tag/v1.2.3) - 2025-01-31
+## [1.2.3](releases/tag/v1.2.3) - 2025-01-31
 ### Fixed
 - [#281](https://github.com/Studiosity/grover/pull/281) Fix regression in middleware to support pre-Rack 3.x header key format ([@abrom][])
 
-## [1.2,2](releases/tag/v1.2.2) - 2025-01-13
+## [1.2.2](releases/tag/v1.2.2) - 2025-01-13
 ### Added
 - [#275](https://github.com/Studiosity/grover/pull/275) Add support for Ruby 3.4 ([@murajun1978][])
 
