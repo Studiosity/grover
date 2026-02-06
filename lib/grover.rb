@@ -10,6 +10,7 @@ require 'grover/html_preprocessor'
 require 'grover/middleware'
 require 'grover/configuration'
 require 'grover/options_builder'
+require 'grover/dev_tools_parser'
 require 'grover/processor'
 
 require 'nokogiri'
@@ -48,6 +49,7 @@ class Grover
   # @return [String] The resulting PDF data
   #
   def to_pdf(path = nil)
+    @processor = nil # Flush out the processor from any previous use
     processor.convert :pdf, @uri, normalized_options(path: path)
   end
 
@@ -57,6 +59,7 @@ class Grover
   # @return [String] The resulting HTML string
   #
   def to_html
+    @processor = nil # Flush out the processor from any previous use
     processor.convert :content, @uri, normalized_options(path: nil)
   end
 
@@ -68,6 +71,7 @@ class Grover
   # @return [String] The resulting image data
   #
   def screenshot(path: nil, format: nil)
+    @processor = nil # Flush out the processor from any previous use
     options = normalized_options(path: path)
     options['type'] = format if %w[png jpeg].include? format
     processor.convert :screenshot, @uri, options
@@ -112,6 +116,15 @@ class Grover
   end
 
   #
+  # Returns the debug output from the conversion process.
+  #
+  # @return [Array<String>, nil] An array of DevTools log output, or `nil` if DEBUG env var is not enabled
+  #
+  def debug_output
+    processor.debug_output
+  end
+
+  #
   # Instance inspection
   #
   def inspect
@@ -141,7 +154,7 @@ class Grover
   end
 
   def processor
-    Processor.new(root_path)
+    @processor ||= Processor.new(root_path)
   end
 
   def normalized_options(path:)

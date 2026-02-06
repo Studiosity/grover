@@ -631,6 +631,32 @@ N.B.
 * The headless option disabled is not compatible with exporting of the PDF.
 * If showing the devtools, the browser will halt resulting in a navigation timeout
 
+### Debugging DevTools protocol traffic
+If the above fails, you may consider digging into the DevTools protocol traffic. It includes all info passed to and from
+the browser, so it's a little verbose.
+
+```ruby
+Grover.configuration.node_env_vars = { 'DEBUG' => "puppeteer:*" }
+
+grover = Grover.new('Hello World')
+grover.to_pdf
+grover.debug_output
+=> [
+  "2026-02-04T14:51:42.783Z puppeteer:browsers:launcher Launching <path to Chrome> <various Chrome options>",
+  "2026-02-04T14:51:42.786Z puppeteer:browsers:launcher Launched <Chrome PID>",
+  "2026-02-04T14:51:43.323Z puppeteer:protocol:SEND ► [ '{\"method\":\"Target.setDiscoverTargets\",\"params\":{\"discover\":true,\"filter\":[{}]},\"id\":1}' ]",
+  ...
+  "2026-02-04T14:51:44.366Z puppeteer:browsers:launcher Browser process <Chrome PID> onExit"  
+]
+```
+
+`Grover#debug_output` will only be populated if the `DEBUG` Node env var is set, it will otherwise be `nil`.
+
+See the [Puppeteer devtools debugging documentation](https://pptr.dev/guides/debugging#log-devtools-protocol-traffic)
+for more details on how to apply the DEBUG env flags. 
+
+*Note*, the DEBUG option should definitely not be used/left on by default. The output captured may include sensitive information. 
+
 ## Troubleshooting
 
 If you're generating files from a web server, starting with puppeteer version 22, chromium automatically upgrades all HTTP requests to HTTPS requests.  If your server is only expecting HTTP requests then adding `launch_args: ['--disable-features=HttpsUpgrades']` will prevent the automatic protocol conversion from occurring.

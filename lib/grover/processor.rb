@@ -26,6 +26,8 @@ class Grover
       cleanup_process if stdin
     end
 
+    attr_reader :debug_output
+
     private
 
     attr_reader :app_root, :stdin, :stdout, :stderr, :wait_thr
@@ -83,6 +85,8 @@ class Grover
       input = stdout.gets
       raise Errno::EPIPE, "Can't read from worker" if input.nil?
 
+      capture_debug_output if node_debug_enabled?
+
       status, message, error_class, errors = JSON.parse(input)
 
       if status == 'ok'
@@ -97,6 +101,18 @@ class Grover
     rescue Errno::EPIPE, IOError
       raise Grover::Error, "Worker process failed:\n#{stderr.read}"
     end
+
+    def capture_debug_output
+      error_output = ''
+      begin
+        loop { error_output += stderr.read_nonblock(4096).force_encoding('UTF-8') }
+      rescue IO::WaitReadable
+        nil
+      end
+      @debug_output = Grover::DevToolsParser.parse(error_output)
+    end
+
+    def node_debug_enabled? = Grover.configuration.node_env_vars.keys.include?('DEBUG')
 
     def cleanup_process
       stdin.close

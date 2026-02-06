@@ -6,11 +6,18 @@ class Grover
   #
   # Heavily based on the Schmooze library https://github.com/Shopify/schmooze
   #
-  Error = Class.new(StandardError)
-  DependencyError = Class.new(Error)
+  class Error < StandardError
+  end
+
+  class DependencyError < Error
+  end
+
   module JavaScript # rubocop:disable Style/Documentation
-    Error = Class.new(::Grover::Error)
-    UnknownError = Class.new(Error)
+    class Error < ::Grover::Error
+    end
+
+    class UnknownError < Error
+    end
 
     ErrorWithDetails = Class.new(Error) do
       def initialize(name, error_details)
@@ -20,12 +27,17 @@ class Grover
 
       attr_reader :error_details
     end
-    RequestFailedError = Class.new(ErrorWithDetails)
-    PageRenderError = Class.new(ErrorWithDetails)
+    class RequestFailedError < ErrorWithDetails
+    end
+
+    class PageRenderError < ErrorWithDetails
+    end
 
     def self.const_missing(name)
       const_set name, Class.new(Error)
     end
   end
-  UnsafeConfigurationError = Class.new(Error)
+
+  class UnsafeConfigurationError < Error
+  end
 end

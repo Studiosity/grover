@@ -24,6 +24,48 @@ describe Grover::Processor do
     let(:protocol) { puppeteer_version_on_or_after?('21') ? 'https' : 'http' }
     let(:locale) { `locale`[/LC_TIME="([^"]+)"/, 1] || 'en_US.UTF-8' }
 
+    shared_examples 'assigns @debug_output' do
+      context 'when DEBUG option is not set' do
+        it 'does not assign @debug_output' do
+          expect do
+            convert
+          end.not_to change { processor.instance_variable_get :@debug_output }.from nil
+        end
+      end
+
+      context 'when DEBUG option is set' do
+        let(:timestamp_regex) { '20\d{2}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z' }
+
+        before do
+          allow(Grover.configuration).to(
+            receive(:node_env_vars).
+              and_return('DEBUG' => 'puppeteer:*,-puppeteer:protocol:*')
+          )
+        end
+
+        it 'assigns @debug_output to include DevTools protocol traffic' do
+          convert
+          debug_output = processor.instance_variable_get :@debug_output
+          expect(debug_output).to be_an Array
+          expect(debug_output.length).to eq 3
+
+          sandbox_args = ENV['GROVER_NO_SANDBOX'] == 'true' ? '--no-sandbox --disable-setuid-sandbox ' : ''
+          puppeteer_version = ENV.fetch('PUPPETEER_VERSION', '')
+          env_args = puppeteer_version == '' ? '' : " PUPPETEER_VERSION: '#{puppeteer_version}' "
+
+          expect(debug_output[0]).to match Regexp.new(<<~REGEX.delete("\n"))
+            \\A#{timestamp_regex.gsub('\\', '\\\\')} puppeteer:browsers:launcher Launching .*chrome.*
+             about:blank #{sandbox_args}--remote-debugging-port=0
+             \\{ detached: true, env: \\{#{env_args}\\}, stdio: \\[ 'pipe', '(pipe|ignore)', 'pipe' \\] \\}\\z
+          REGEX
+          expect(debug_output[1]).to match(/\A#{timestamp_regex} puppeteer:browsers:launcher Launched \d{2,6}\z/)
+          expect(debug_output[2]).to(
+            match(/\A#{timestamp_regex} puppeteer:browsers:launcher Browser process \d{2,6} onExit\z/)
+          )
+        end
+      end
+    end
+
     context 'when converting to PDF' do
       let(:method) { :pdf }
 
@@ -46,6 +88,8 @@ describe Grover::Processor do
       it 'cleans up the worker process' do
         expect { convert }.not_to(change { `ps | grep node | grep -v 'grep node' | wc -l` })
       end
+
+      it_behaves_like 'assigns @debug_output'
 
       context 'when passing through a valid URL' do
         let(:url_or_html) { 'http://localhost:4567' }
@@ -1166,6 +1210,8 @@ describe Grover::Processor do
           expect(image.data.dig('imageStatistics', MiniMagick.imagemagick7? ? 'Overall' : 'all', 'mean').to_f).
             to be_within(10).of(pixel_mean)
         end
+
+        it_behaves_like 'assigns @debug_output'
       end
 
       context 'when passing through HTML' do
@@ -1175,6 +1221,8 @@ describe Grover::Processor do
         it { expect(image.type).to eq 'PNG' }
         it { expect(image.dimensions).to eq [800, 600] }
         it { expect(mean_colour_statistics(image)).to eq %w[0 0 255] }
+
+        it_behaves_like 'assigns @debug_output'
       end
 
       context 'when using remote browser option with HTML', :remote_browser do
@@ -1342,6 +1390,18 @@ describe Grover::Processor do
           )
         )
       end
+    end
+  end
+
+  describe '#debug_output' do
+    subject(:debug_output) { processor.debug_output }
+
+    it { is_expected.to be_nil }
+
+    context 'when there is debug output assigned' do
+      before { processor.instance_variable_set :@debug_output, ['interesting result'] }
+
+      it { is_expected.to eq ['interesting result'] }
     end
   end
 end
