@@ -51,7 +51,7 @@ describe Grover::Processor do
 
           sandbox_args = ENV['GROVER_NO_SANDBOX'] == 'true' ? '--no-sandbox --disable-setuid-sandbox ' : ''
           puppeteer_version = ENV.fetch('PUPPETEER_VERSION', '')
-          env_args = puppeteer_version != '' ? " PUPPETEER_VERSION: '#{puppeteer_version}' " : ''
+          env_args = puppeteer_version == '' ? '' : " PUPPETEER_VERSION: '#{puppeteer_version}' "
 
           expect(debug_output[0]).to match Regexp.new(<<~REGEX.delete("\n"))
             \\A#{timestamp_regex} puppeteer:browsers:launcher Launching .*chrome.* about:blank #{sandbox_args}
