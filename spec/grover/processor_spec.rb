@@ -47,7 +47,6 @@ describe Grover::Processor do
           convert
           debug_output = processor.instance_variable_get :@debug_output
           expect(debug_output).to be_an Array
-          puts "DEBUG OUTPUT:\n#{debug_output.join("\n")}" # rubocop:disable RSpec/Output
           expect(debug_output.length).to eq 3
           # rubocop:disable Layout/LineLength
           expect(debug_output[0]).to match(/\A#{timestamp_regex} puppeteer:browsers:launcher Launching .*chrome.* about:blank --remote-debugging-port=0 \{ detached: true, env: \{\}, stdio: \[ 'pipe', 'pipe', 'pipe' \] \}\z/)

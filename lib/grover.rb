@@ -10,6 +10,7 @@ require 'grover/html_preprocessor'
 require 'grover/middleware'
 require 'grover/configuration'
 require 'grover/options_builder'
+require 'grover/dev_tools_parser'
 require 'grover/processor'
 
 require 'nokogiri'

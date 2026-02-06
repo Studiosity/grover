@@ -109,19 +109,7 @@ class Grover
       rescue IO::WaitReadable
         nil
       end
-      @debug_output = simplify_debug_output(error_output.split("\n"))
-    end
-
-    def simplify_debug_output(lines)
-      simplified_output = []
-      while lines.any?
-        if lines.length >= 3 && lines[0].end_with?(' [') && lines[1].start_with?("  '") && lines[2] == ']'
-          simplified_output.push "#{lines.shift}#{lines.shift[1..]} #{lines.shift}"
-        else
-          simplified_output.push lines.shift
-        end
-      end
-      simplified_output
+      @debug_output = Grover::DevToolsParser.parse(error_output)
     end
 
     def node_debug_enabled? = Grover.configuration.node_env_vars.keys.include?('DEBUG')
