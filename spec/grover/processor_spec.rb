@@ -48,11 +48,20 @@ describe Grover::Processor do
           debug_output = processor.instance_variable_get :@debug_output
           expect(debug_output).to be_an Array
           expect(debug_output.length).to eq 3
-          # rubocop:disable Layout/LineLength
-          expect(debug_output[0]).to match(/\A#{timestamp_regex} puppeteer:browsers:launcher Launching .*chrome.* about:blank --remote-debugging-port=0 \{ detached: true, env: \{\}, stdio: \[ 'pipe', 'pipe', 'pipe' \] \}\z/)
+
+          sandbox_args = ENV['GROVER_NO_SANDBOX'] == 'true' ? '--no-sandbox --disable-setuid-sandbox ' : ''
+          puppeteer_version = ENV.fetch('PUPPETEER_VERSION', '')
+          env_args = puppeteer_version != '' ? " PUPPETEER_VERSION: '#{puppeteer_version}' " : ''
+
+          expect(debug_output[0]).to match Regexp.new(<<~REGEX.delete("\n"))
+            \\A#{timestamp_regex} puppeteer:browsers:launcher Launching .*chrome.* about:blank #{sandbox_args}
+            --remote-debugging-port=0 \\{ detached: true, env: \\{#{env_args}\\}, stdio: \\[ 'pipe', 'pipe', 'pipe' \\]
+             \\}\\z
+          REGEX
           expect(debug_output[1]).to match(/\A#{timestamp_regex} puppeteer:browsers:launcher Launched \d{2,6}\z/)
-          expect(debug_output[2]).to match(/\A#{timestamp_regex} puppeteer:browsers:launcher Browser process \d{2,6} onExit\z/)
-          # rubocop:enable Layout/LineLength
+          expect(debug_output[2]).to(
+            match(/\A#{timestamp_regex} puppeteer:browsers:launcher Browser process \d{2,6} onExit\z/)
+          )
         end
       end
     end
