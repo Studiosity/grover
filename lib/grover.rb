@@ -114,6 +114,11 @@ class Grover
     back_cover_path.is_a?(::String) && back_cover_path.start_with?('/')
   end
 
+  #
+  # Returns the debug output from the conversion process.
+  #
+  # @return [Array<String>, nil] An array of DevTools log output, or `nil` if DEBUG env var is not enabled
+  #
   def debug_output
     processor.debug_output
   end

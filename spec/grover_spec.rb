@@ -45,6 +45,7 @@ describe Grover do
     subject(:to_pdf) { grover.to_pdf }
 
     let(:processor) { instance_double Grover::Processor }
+    let(:processor2) { instance_double Grover::Processor }
 
     before { allow(Grover::Processor).to receive(:new).with(Dir.pwd).and_return processor }
 
@@ -59,6 +60,19 @@ describe Grover do
           with(:pdf, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false })
       )
       expect(to_pdf).to eq 'some PDF content'
+    end
+
+    it 'uses a fresh Grover::Processor for subsequent calls (but memoizes the processor for each call)' do
+      allow(Grover::Processor).to receive(:new).with(Dir.pwd).and_return processor, processor2
+      expect(Grover::Processor).to receive(:new).twice
+
+      expect(processor).to receive(:convert).once
+      expect(processor2).to receive(:convert).once
+
+      grover.to_pdf
+      expect(grover.send(:processor)).to eq processor
+      grover.to_pdf
+      expect(grover.send(:processor)).to eq processor2
     end
 
     context 'when path option is specified' do
@@ -519,6 +533,7 @@ describe Grover do
     subject(:screenshot) { grover.screenshot }
 
     let(:processor) { instance_double Grover::Processor }
+    let(:processor2) { instance_double Grover::Processor }
 
     before { allow(Grover::Processor).to receive(:new).with(Dir.pwd).and_return processor }
 
@@ -533,6 +548,19 @@ describe Grover do
           with(:screenshot, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false })
       )
       expect(screenshot).to eq 'some image content'
+    end
+
+    it 'uses a fresh Grover::Processor for subsequent calls (but memoizes the processor for each call)' do
+      allow(Grover::Processor).to receive(:new).with(Dir.pwd).and_return processor, processor2
+      expect(Grover::Processor).to receive(:new).twice
+
+      expect(processor).to receive(:convert).once
+      expect(processor2).to receive(:convert).once
+
+      grover.screenshot
+      expect(grover.send(:processor)).to eq processor
+      grover.screenshot
+      expect(grover.send(:processor)).to eq processor2
     end
 
     context 'when path option is specified' do
@@ -1116,6 +1144,7 @@ describe Grover do
     subject(:to_html) { grover.to_html }
 
     let(:processor) { instance_double Grover::Processor }
+    let(:processor2) { instance_double Grover::Processor }
     let(:expected_html) { '<html><body>Some HTML</body></html>' }
 
     before { allow(Grover::Processor).to receive(:new).with(Dir.pwd).and_return processor }
@@ -1131,6 +1160,19 @@ describe Grover do
           with(:content, url_or_html, { 'allowFileUri' => false, 'allowLocalNetworkAccess' => false })
       )
       expect(to_html).to eq expected_html
+    end
+
+    it 'uses a fresh Grover::Processor for subsequent calls (but memoizes the processor for each call)' do
+      allow(Grover::Processor).to receive(:new).with(Dir.pwd).and_return processor, processor2
+      expect(Grover::Processor).to receive(:new).twice
+
+      expect(processor).to receive(:convert).once
+      expect(processor2).to receive(:convert).once
+
+      grover.to_html
+      expect(grover.send(:processor)).to eq processor
+      grover.to_html
+      expect(grover.send(:processor)).to eq processor2
     end
 
     context 'when providing `allow_file_uri` option inline' do
@@ -1290,6 +1332,29 @@ describe Grover do
       let(:options) { { back_cover_path: 'http://example.com/baz' } }
 
       it { is_expected.to be false }
+    end
+  end
+
+  describe '#debug_output' do
+    subject(:debug_output) { grover.debug_output }
+
+    let(:processor) { instance_double Grover::Processor }
+
+    before { allow(Grover::Processor).to receive(:new).with(Dir.pwd).and_return processor }
+
+    it 'returns debug_output from Grover::Processor' do
+      allow(processor).to receive(:debug_output).and_return ['Interesting DevTools logs']
+      expect(processor).to receive(:debug_output)
+
+      expect(debug_output).to eq ['Interesting DevTools logs']
+    end
+
+    it 'uses a memoized Grover::Processor' do
+      allow(Grover::Processor).to receive(:new).with(Dir.pwd).and_return processor
+      expect(Grover::Processor).to receive(:new).once
+      expect(processor).to receive(:debug_output).twice
+
+      2.times { grover.debug_output }
     end
   end
 
