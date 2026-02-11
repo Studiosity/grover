@@ -41,7 +41,8 @@ class Grover
 
     def fix_integer_options!
       fix_options!(
-        'viewport.height', 'viewport.width', 'wait_for_timeout',
+        'viewport.height', 'viewport.width',
+        'timeout', 'launch_timeout', 'request_timeout', 'convert_timeout', 'wait_for_timeout',
         &:to_i
       )
     end

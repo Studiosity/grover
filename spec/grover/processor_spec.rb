@@ -1076,6 +1076,28 @@ describe Grover::Processor do
         end
       end
 
+      context 'when launchTimeout option is specified' do
+        let(:options) { basic_header_footer_options.merge('launchTimeout' => launch_timeout) }
+        let(:launch_timeout) { nil }
+
+        context 'when the launch timeout is short' do
+          let(:launch_timeout) { 1 }
+
+          it do
+            expect { convert }.to raise_error(
+              Grover::JavaScript::TimeoutError,
+              'Timed out after 1 ms while waiting for the WS endpoint URL to appear in stdout!'
+            )
+          end
+        end
+
+        context 'when the launch timeout is long' do
+          let(:launch_timeout) { 10_000 }
+
+          it { is_expected.to start_with "%PDF-1.4\n" }
+        end
+      end
+
       context 'when requestTimeout option is specified' do
         let(:options) { basic_header_footer_options.merge('requestTimeout' => request_timeout, 'timeout' => timeout) }
         let(:timeout) { nil }
