@@ -1051,7 +1051,7 @@ describe Grover::Processor do
             expect { convert }.to raise_error Grover::JavaScript::TimeoutError, 'Navigation timeout of 1 ms exceeded'
           end
         else
-          it do
+          it 'times out when launching the browser' do
             expect { convert }.to raise_error(
               Grover::JavaScript::TimeoutError,
               'Navigation Timeout Exceeded: 1ms exceeded'

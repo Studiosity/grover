@@ -3,6 +3,10 @@
 ## Unreleased
 - none
 
+## [1.2.8](releases/tag/v1.2.8) - 2026-02-12
+### Added
+- [#303](https://github.com/Studiosity/grover/pull/303) Allow overriding of browser launch timeout ([@abrom][])
+
 ## [1.2.7](releases/tag/v1.2.7) - 2026-02-06
 ### Added
 - [#302](https://github.com/Studiosity/grover/pull/302) Capture/expose Puppeteer DevTools debug output ([@abrom][])
