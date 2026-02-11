@@ -485,6 +485,27 @@ describe Grover::Processor do
           end
         end
 
+        context 'when options include ignoreDefaultArgs' do
+          context 'when --disable-component-update is provided' do
+            let(:options) { { 'ignoreDefaultArgs' => ['--disable-component-update'] } }
+            let(:url_or_html) do
+              <<-HTML
+            <html>
+              <body lang="de" style="font-family: 'DejaVu Sans'; font-size: 10px; width: 100px; hyphens: auto;">
+              <p>
+                Testgetriebene Entwicklung ist eine Methode.
+              </p>
+              </body>
+            </html>
+              HTML
+            end
+
+            it do
+              expect(pdf_text_content).to eq 'Testgetriebene Ent‐ wicklung ist eine Methode.'
+            end
+          end
+        end
+
         context 'when requesting a URI requiring basic authentication' do
           let(:url_or_html) { 'http://localhost:4567/auth' }
 
