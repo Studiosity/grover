@@ -114,6 +114,7 @@ Grover.configure do |config|
     hover: '#another-element',
     cache: false,
     timeout: 0, # Timeout in ms. A value of `0` means 'no timeout'
+    launch_timeout: 3000, # Timeout when launching the browser
     request_timeout: 1000, # Timeout when fetching the content (overloads the `timeout` option)
     convert_timeout: 2000, # Timeout when converting the content (overloads the `timeout` option, only applies to PDF conversion)
     launch_args: ['--font-render-hinting=medium'],
