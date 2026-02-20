@@ -35,7 +35,7 @@ class Grover
       fix_options!(
         'display_header_footer', 'full_page', 'landscape', 'omit_background', 'prefer_css_page_size',
         'print_background', 'viewport.has_touch', 'viewport.is_landscape', 'viewport.is_mobile', 'bypass_csp',
-        'raise_on_request_failure', 'raise_on_js_error'
+        'raise_on_request_failure', 'raise_on_js_error', 'java_script_enabled'
       ) { |value| !FALSE_VALUES.include?(value) }
     end
 

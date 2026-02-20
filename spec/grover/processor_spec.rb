@@ -1190,6 +1190,35 @@ describe Grover::Processor do
         end
       end
 
+      context 'when javaScriptEnabled option is set' do
+        let(:options) { basic_header_footer_options.merge('javaScriptEnabled' => enabled) }
+
+        let(:url_or_html) do
+          <<-HTML
+            <html>
+              <body>
+                <script>document.write('output from script tag')</script>
+                <noscript>output from noscript tag</noscript>
+              </body>
+            </html>
+          HTML
+        end
+
+        context 'when it is true' do
+          let(:enabled) { true }
+
+          it { expect(pdf_text_content).to include 'output from script tag' }
+          it { expect(pdf_text_content).not_to include 'output from noscript tag' }
+        end
+
+        context 'when it is false' do
+          let(:enabled) { false }
+
+          it { expect(pdf_text_content).not_to include 'output from script tag' }
+          it { expect(pdf_text_content).to include 'output from noscript tag' }
+        end
+      end
+
       # < v23 of puppeteer has issues installing the latest firefox versions (bz2 vs xz compression used for packaging)
       if puppeteer_version_on_or_after? '23'
         context 'when specifying Firefox browser' do
