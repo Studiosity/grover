@@ -9,6 +9,9 @@ class Grover
   class OptionsFixer
     FALSE_VALUES = [nil, false, 0, '0', 'f', 'F', 'false', 'FALSE', 'off', 'OFF'].freeze
 
+    JAVASCRIPT_OPTIONS = %w[evaluate_on_new_document execute_script script_tag_options wait_for_function].freeze
+    private_constant :JAVASCRIPT_OPTIONS
+
     def initialize(options)
       @options = options
     end
@@ -18,6 +21,7 @@ class Grover
       fix_integer_options!
       fix_float_options!
       fix_array_options!
+      disable_javascript_options!
       @options
     end
 
@@ -59,6 +63,21 @@ class Grover
       fix_options!('launch_args') do |value|
         value.is_a?(String) ? YAML.safe_load(value) : value
       end
+    end
+
+    def disable_javascript_options!
+      return if @options['javascript_enabled'] != false
+
+      JAVASCRIPT_OPTIONS.each do |option|
+        disable_javascript_option!(option)
+      end
+    end
+
+    def disable_javascript_option!(option)
+      return unless @options.key?(option)
+
+      @options.delete(option)
+      warn "#{self.class}: option #{option} has been disabled because javascript_enabled is set to false"
     end
   end
 end

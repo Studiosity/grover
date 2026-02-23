@@ -118,8 +118,7 @@ Grover.configure do |config|
     request_timeout: 1000, # Timeout when fetching the content (overloads the `timeout` option)
     convert_timeout: 2000, # Timeout when converting the content (overloads the `timeout` option, only applies to PDF conversion)
     launch_args: ['--font-render-hinting=medium'],
-    wait_until: 'domcontentloaded',
-    javascript_enabled: false
+    wait_until: 'domcontentloaded'
   }
 end
 ```

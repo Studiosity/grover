@@ -109,4 +109,40 @@ describe Grover::OptionsFixer do
       expect(fixed_options['launch_args']).to eq ['--some-option']
     end
   end
+
+  context 'when javascript_enabled option is set' do
+    let(:options) do
+      {
+        'javascript_enabled' => enabled,
+        'evaluate_on_new_document' => 'test 1',
+        'execute_script' => 'test 2',
+        'script_tag_options' => 'test 3',
+        'wait_for_function' => 'test 4'
+      }
+    end
+
+    context 'when it is true' do
+      let(:enabled) { 'true' }
+
+      it 'keep javascript options' do
+        expect(fixed_options['javascript_enabled']).to be true
+        expect(fixed_options['evaluate_on_new_document']).to eq 'test 1'
+        expect(fixed_options['execute_script']).to eq 'test 2'
+        expect(fixed_options['script_tag_options']).to eq 'test 3'
+        expect(fixed_options['wait_for_function']).to eq 'test 4'
+      end
+    end
+
+    context 'when it is false' do
+      let(:enabled) { 'false' }
+
+      it 'disable javascript options' do
+        expect(fixed_options['javascript_enabled']).to be false
+        expect(fixed_options['evaluate_on_new_document']).to be_nil
+        expect(fixed_options['execute_script']).to be_nil
+        expect(fixed_options['script_tag_options']).to be_nil
+        expect(fixed_options['wait_for_function']).to be_nil
+      end
+    end
+  end
 end
