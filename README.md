@@ -119,7 +119,7 @@ Grover.configure do |config|
     convert_timeout: 2000, # Timeout when converting the content (overloads the `timeout` option, only applies to PDF conversion)
     launch_args: ['--font-render-hinting=medium'],
     wait_until: 'domcontentloaded',
-    java_script_enabled: false
+    javascript_enabled: false
   }
 end
 ```
@@ -165,7 +165,7 @@ if the initial content request or any subsequent asset request returns a bad res
 The `raise_on_js_error` option, when enabled, will raise a `Grover::JavaScript::PageRenderError` if any uncaught
 Javascript errors occur when trying to render the page.
 
-The `java_script_enabled` option can be used to disable JavaScript. See https://github.com/puppeteer/puppeteer/blob/main/docs/api/puppeteer.page.setjavascriptenabled.md
+The `javascript_enabled` option can be used to disable JavaScript. See https://github.com/puppeteer/puppeteer/blob/main/docs/api/puppeteer.page.setjavascriptenabled.md
 
 The Chrome/Chromium executable path can be overridden with the `executable_path` option.
 

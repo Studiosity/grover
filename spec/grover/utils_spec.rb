@@ -304,7 +304,8 @@ describe Grover::Utils do
           prefer_css_page_size: true,
           bypass_csp: false,
           extra_http_headers: { 'Foo' => 'Bar' },
-          raise_on_js_error: true
+          raise_on_js_error: true,
+          javascript_enabled: false
         }
       end
 
@@ -314,7 +315,8 @@ describe Grover::Utils do
             'preferCSSPageSize' => true,
             'bypassCSP' => false,
             'extraHTTPHeaders' => { 'foo' => 'Bar' },
-            'raiseOnJSError' => true
+            'raiseOnJSError' => true,
+            'javaScriptEnabled' => false
           )
         )
       end
@@ -328,7 +330,8 @@ describe Grover::Utils do
               'preferCSSPageSize' => true,
               'bypassCSP' => false,
               'extraHTTPHeaders' => { 'Foo' => 'Bar' },
-              'raiseOnJSError' => true
+              'raiseOnJSError' => true,
+              'javaScriptEnabled' => false
             )
           )
         end

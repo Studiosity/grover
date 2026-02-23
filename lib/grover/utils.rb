@@ -9,7 +9,8 @@ class Grover
       'css' => 'CSS',
       'csp' => 'CSP',
       'http' => 'HTTP',
-      'js' => 'JS'
+      'js' => 'JS',
+      'javascript' => 'JavaScript'
     }.freeze
     private_constant :ACRONYMS
 
@@ -94,9 +95,9 @@ class Grover
     # Regex sourced from ActiveSupport camelize
     #
     def self.normalize_key(key)
-      key.to_s.downcase.gsub(%r{(?:_|(/))([a-z\d]*)}) do
+      key.to_s.downcase.gsub(%r{(?:^|_|(/))([a-z\d]*)}) do
         "#{Regexp.last_match(1)}#{ACRONYMS[Regexp.last_match(2)] || Regexp.last_match(2).capitalize}"
-      end
+      end.sub(/^[[:alpha:]]/, &:downcase)
     end
     private_class_method :normalize_key
   end
