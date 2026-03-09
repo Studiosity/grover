@@ -31,7 +31,7 @@ class Object
   end
 end
 
-class Method
+class Method # rubocop:disable Style/OneClassPerFile
   # Methods are not duplicable:
   #
   #  method(:puts).duplicable? # => false
@@ -41,7 +41,7 @@ class Method
   end
 end
 
-class UnboundMethod
+class UnboundMethod # rubocop:disable Style/OneClassPerFile
   # Unbound methods are not duplicable:
   #
   #  method(:puts).unbind.duplicable? # => false
