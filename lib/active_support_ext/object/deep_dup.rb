@@ -20,7 +20,7 @@ class Object
   end
 end
 
-class Array
+class Array # rubocop:disable Style/OneClassPerFile
   # Returns a deep copy of array.
   #
   #   array = [1, [2, 3]]
@@ -34,7 +34,7 @@ class Array
   end
 end
 
-class Hash
+class Hash # rubocop:disable Style/OneClassPerFile
   # Returns a deep copy of hash.
   #
   #   hash = { a: { b: 'b' } }
