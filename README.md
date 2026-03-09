@@ -164,6 +164,8 @@ if the initial content request or any subsequent asset request returns a bad res
 The `raise_on_js_error` option, when enabled, will raise a `Grover::JavaScript::PageRenderError` if any uncaught
 Javascript errors occur when trying to render the page.
 
+The `javascript_enabled` option can be used to disable JavaScript. See https://github.com/puppeteer/puppeteer/blob/main/docs/api/puppeteer.page.setjavascriptenabled.md
+
 The Chrome/Chromium executable path can be overridden with the `executable_path` option.
 
 Supplementary JavaScript can be executed on the page (after render and before conversion to PDF/image)
