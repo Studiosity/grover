@@ -3,6 +3,10 @@
 ## Unreleased
 - none
 
+## [1.2.9](releases/tag/v1.2.9) - 2026-03-09
+### Added
+- [#304](https://github.com/Studiosity/grover/pull/304) Add javascript_enabled option ([@vakuum][])
+
 ## [1.2.8](releases/tag/v1.2.8) - 2026-02-12
 ### Added
 - [#303](https://github.com/Studiosity/grover/pull/303) Allow overriding of browser launch timeout ([@abrom][])
@@ -382,3 +386,4 @@
 [@murajun1978]: https://github.com/murajun1978
 [@brendon]: https://github.com/brendon
 [@gs-deliverists-io]: https://github.com/gs-deliverists-io
+[@vakuum]: https://github.com/vakuum
