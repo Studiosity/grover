@@ -1045,16 +1045,19 @@ describe Grover::Processor do
         end
       end
 
-      shared_examples 'raises navigation timeout error' do
+      shared_examples 'raises navigation timeout error' do |timeout: 1|
         if puppeteer_version_on_or_after? '2.0.0'
           it do
-            expect { convert }.to raise_error Grover::JavaScript::TimeoutError, 'Navigation timeout of 1 ms exceeded'
+            expect { convert }.to raise_error(
+              Grover::JavaScript::TimeoutError,
+              "Navigation timeout of #{timeout} ms exceeded"
+            )
           end
         else
           it 'times out when launching the browser' do
             expect { convert }.to raise_error(
               Grover::JavaScript::TimeoutError,
-              'Navigation Timeout Exceeded: 1ms exceeded'
+              "Navigation Timeout Exceeded: #{timeout}ms exceeded"
             )
           end
         end
@@ -1073,6 +1076,36 @@ describe Grover::Processor do
           let(:timeout) { 10_000 }
 
           it { is_expected.to start_with "%PDF-1.4\n" }
+        end
+
+        context 'when the waitForSelector option is provided' do
+          let(:url_or_html) do
+            <<-HTML
+              <html>
+                <body></body>
+
+                <script>
+                  setTimeout(function() {
+                    document.body.innerHTML = '<h1>Hey there</h1>';
+                  }, 200);
+                </script>
+              </html>
+            HTML
+          end
+          let(:options) { basic_header_footer_options.merge('timeout' => timeout, 'waitForSelector' => 'h1') }
+
+          context 'when the timeout is less than the page content load' do
+            let(:timeout) { 100 }
+
+            it_behaves_like 'raises navigation timeout error', timeout: 100
+          end
+
+          context 'when the timeout is greater than the page content load' do
+            let(:timeout) { 2000 }
+
+            it { is_expected.to start_with "%PDF-1.4\n" }
+            it { expect(pdf_text_content).to eq "#{date} Hey there #{protocol}://www.example.net/foo/bar 1/1" }
+          end
         end
       end
 
