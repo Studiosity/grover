@@ -570,6 +570,48 @@ describe Grover::Processor do
         end
       end
 
+      context 'when using a persistent remote browser, sessions are isolated between requests' do
+        let(:url_or_html) { '<html><body><script>document.write(document.cookie || "no cookies")</script></body></html>' }
+
+        around do |example|
+          # Launch a persistent Chrome instance and get its WS endpoint. We own
+          # this browser, so cookies in the default context persist across
+          # connections.
+          chrome_io = nil
+          args_json = ENV['GROVER_NO_SANDBOX'] == 'true' ? '["--no-sandbox","--disable-setuid-sandbox"]' : '[]'
+          js = <<~JS
+            const puppeteer = require('puppeteer');
+            puppeteer.launch({ args: #{args_json} }).then(browser => {
+              process.stdout.write(browser.wsEndpoint() + '\\n');
+              process.on('SIGTERM', () => browser.close().then(() => process.exit(0)));
+            });
+          JS
+          chrome_io = IO.popen(['node', '-e', js], err: File::NULL)
+          @browser_ws_endpoint = chrome_io.gets.strip
+          example.run
+        ensure
+          Process.kill('TERM', chrome_io.pid) rescue nil
+          chrome_io.close rescue nil
+        end
+
+        it 'does not leak cookies from one request into the next' do
+          # First request sets a cookie via evaluateOnNewDocument (runs in the page JS context
+          # before the page's own scripts, works in both default and incognito contexts)
+          first_result = processor.convert(
+            method, url_or_html,
+            'browserWsEndpoint' => @browser_ws_endpoint,
+            'evaluateOnNewDocument' => "document.cookie = 'session-secret=abc123'"
+          )
+          first_text = Grover::Utils.squish(PDF::Reader.new(StringIO.new(first_result)).pages.first.text)
+          expect(first_text).to include 'session-secret=abc123'
+
+          # Second request — the cookie from request 1 must not be visible
+          result = processor.convert method, url_or_html, 'browserWsEndpoint' => @browser_ws_endpoint
+          text = Grover::Utils.squish(PDF::Reader.new(StringIO.new(result)).pages.first.text)
+          expect(text).to eq 'no cookies'
+        end
+      end
+
       unless linux_system? # It looks like the way a connection failure is handled is different on Linux systems
         context 'when passing through WS launch params without a remote browser' do
           let(:options) { { 'browserWsEndpoint' => 'ws://localhost:3000/' } }
