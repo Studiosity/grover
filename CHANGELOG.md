@@ -3,6 +3,10 @@
 ## Unreleased
 - none
 
+## [1.2.10](releases/tag/v1.2.10) - 2026-04-03
+### Fixed
+- [#305](https://github.com/Studiosity/grover/pull/305) Fix session isolation for remote browser WebSocket connections ([@wooly][])
+
 ## [1.2.9](releases/tag/v1.2.9) - 2026-03-09
 ### Added
 - [#304](https://github.com/Studiosity/grover/pull/304) Add javascript_enabled option ([@vakuum][])
@@ -387,3 +391,4 @@
 [@brendon]: https://github.com/brendon
 [@gs-deliverists-io]: https://github.com/gs-deliverists-io
 [@vakuum]: https://github.com/vakuum
+[@wooly]: https://github.com/wooly
