@@ -64,7 +64,7 @@ jobs:
         run: npx puppeteer browsers install firefox@stable
 
       - name: Install Imagemagick
-        uses: mfinelli/setup-imagemagick@v5
+        uses: mfinelli/setup-imagemagick@v8
 
       - name: Lint code - Rubocop
         run: bundle exec rubocop
