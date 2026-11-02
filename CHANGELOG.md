@@ -1,7 +1,13 @@
 # Changelog
 
 ## Unreleased
-- none
+### Security
+- [GHSA-q887-vm59-mm98] Restrict HTML meta-tag options to a presentation-only allowlist to prevent option injection from untrusted page content
+
+  Previously, any `<meta name="grover-*">` tag in the rendered HTML could set **any** Grover option, including process-level ones (`executable_path`, `launch_args`, `browser_ws_endpoint`, `path`, `root_path`, `front_cover_path`/`back_cover_path`, `display_url`, `cookies`, credentials). Untrusted HTML could therefore achieve remote code execution, arbitrary file writes, cookie/data exfiltration and SSRF. Meta tags now only accept layout/presentation options; the prefix match is also anchored and escaped. ([@agent3137][])
+
+### Breaking
+- Options other than the presentation allowlist can no longer be set via HTML meta tags (notably `launch_args` and the `front_cover_path`/`back_cover_path` cover-page options) without setting `Grover.configuration.allow_restricted_meta_option` See [Restricted meta tag options](https://github.com/Studiosity/grover/#restricted-meta-tag-options). Set these in Ruby via `Grover.configure` or `Grover.new(html, ...)` instead - behaviour is unchanged when configured in code.
 
 ## [1.2.10](releases/tag/v1.2.10) - 2026-04-03
 ### Fixed
@@ -392,3 +398,4 @@
 [@gs-deliverists-io]: https://github.com/gs-deliverists-io
 [@vakuum]: https://github.com/vakuum
 [@wooly]: https://github.com/wooly
+[@agent3137]: https://github.com/agent3137

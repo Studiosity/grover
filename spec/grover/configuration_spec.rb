@@ -50,6 +50,36 @@ describe Grover::Configuration do
     end
   end
 
+  describe '#ignore_request' do
+    subject(:ignore_request) { configuration.ignore_request }
+
+    it { is_expected.to be_nil }
+
+    context 'when configured differently' do
+      before { configuration.ignore_request = ->(req) { req.path == '/foo/bar' } }
+
+      it { is_expected.to be_a Proc }
+    end
+  end
+
+  describe '#allow_restricted_meta_option' do
+    subject(:allow_restricted_meta_option) { configuration.allow_restricted_meta_option }
+
+    it { is_expected.to be false }
+
+    context 'when configured with a boolean' do
+      before { configuration.allow_restricted_meta_option = true }
+
+      it { is_expected.to be true }
+    end
+
+    context 'when configured with a proc' do
+      before { configuration.allow_restricted_meta_option = ->(tag_name, value) { tag_name == 'a' && value == 'b' } }
+
+      it { is_expected.to be_a Proc }
+    end
+  end
+
   describe '#use_pdf_middleware' do
     subject(:use_pdf_middleware) { configuration.use_pdf_middleware }
 

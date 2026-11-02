@@ -288,19 +288,20 @@ describe Grover do
         Grover::Utils.squish(<<-HTML)
         <html>
           <head>
+            <meta name="grover-format" content="A4" />
             <meta name="grover-launch_args" content="['--disable-speech-api']" />
           </head>
         </html>
         HTML
       end
 
-      it 'builds options and passes them through to the processor' do
+      it 'builds options and passes them through to the processor (excluding unsafe ones)' do
         allow(processor).to(
           receive(:convert).
             with(
               :pdf,
               url_or_html,
-              { 'launchArgs' => ['--disable-speech-api'], 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+              { 'format' => 'A4', 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
             ).
             and_return('some PDF content')
         )
@@ -309,7 +310,7 @@ describe Grover do
             with(
               :pdf,
               url_or_html,
-              { 'launchArgs' => ['--disable-speech-api'], 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
+              { 'format' => 'A4', 'allowFileUri' => false, 'allowLocalNetworkAccess' => false }
             )
         )
         expect(to_pdf).to eq 'some PDF content'

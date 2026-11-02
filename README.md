@@ -8,6 +8,11 @@ and [Chromium](https://www.chromium.org/Home).
 
 ![Grover](/Grover.jpg "Grover")
 
+## ⚠️⚠️ Upgrading to v2.0+ ⚠️⚠️
+There are breaking changes in v2 made to how Grover parses meta tag options to protect against abuse (RCE).
+This means that only "presentation" configurations can be provided via meta tags.
+For further information see [Meta tag option safety](#meta-tag-option-safety)
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -131,7 +136,6 @@ the image size using the `clip` options, or capture the entire page with `full_p
 For `viewport` options, see https://github.com/puppeteer/puppeteer/blob/main/docs/api/puppeteer.page.setviewport.md#remarks
 
 For `launch_args` options, see http://peter.sh/experiments/chromium-command-line-switches/
-Launch parameter args can also be provided using a meta tag:
 
 For `timezone` IDs see [ICUs metaZones.txt](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1).
 Passing `nil` disables timezone emulation.
@@ -144,10 +148,6 @@ The `focus` option takes a CSS selector and will focus on the first matching ele
 
 The `hover` option takes a CSS selector and will hover on the first matching element after rendering is complete
 (including waiting for the specified `wait_for_selector`).
-
-```html
-<meta name="grover-launch_args" content="['--disable-speech-api']" />
-```
 
 For `wait_until` option, default for URLs is `networkidle2` and for HTML content `networkidle0`.
 For available options see https://github.com/puppeteer/puppeteer/blob/main/docs/api/puppeteer.page.goto.md#remarks
@@ -504,6 +504,74 @@ Or via the meta tags in the original response:
   </head>
   ...
 </html>
+```
+
+#### Meta tag option safety
+Note, from v2.0 onwards, meta tag options are restricted to "presentation" options. This is because a nefarious actor
+could use the meta options to supply dangerous configurations allowing for RCE, server filesystem manipulation and data
+exfiltration. It's likely that this change will not affect normal usage of Grover in any way, and to be vulnerable it
+requires injection of meta tags into the rendered page, so well implemented user input sanitisation will prevent this.
+
+This is obviously a breaking change for anyone trying to pass "control" options through via meta tags. These should
+never be provided or managed via user input. If you are providing these options via meta tags you will need to look at
+alternate solutions, such as managing these control options in your controller action and rendering the Grover result
+directly using instance options, rather than through the middleware.
+
+The list of allowed meta tag options are:
+* capture_beyond_viewport
+* clip
+* display_header_footer
+* emulate_media
+* focus
+* footer_template
+* format
+* full_page
+* geolocation
+* header_template
+* height
+* hover
+* landscape
+* margin -> includes all margin sub-options eg `grover-margin-top`
+* media_features
+* omit_background
+* outline
+* page_ranges
+* prefer_css_page_size
+* print_background
+* quality
+* scale
+* tagged
+* timezone
+* viewport -> includes all viewport sub-options eg `grover-viewport-height`
+* vision_deficiency
+* width
+* front_cover_path (by default disallowed, see below)
+* back_cover_path (by default disallowed, see below)
+
+#### Restricted meta tag options
+Note, from v2.0 onwards, when supplying `front_cover_path` or `back_cover_path` via a meta tag option you *must* also
+configure `Grover.configuration.allow_restricted_meta_option`. By default, this behaviour is disabled due to the
+potential for a nefarious actor to inject un-sanitised meta tags into the rendered body and expose endpoints that might
+otherwise be filtered by your WAF.
+
+If you don't filter request paths prior to your application, you can enable with:
+
+```ruby
+# config/initializers/grover.rb
+Grover.configure do |config|
+  config.allow_restricted_meta_option = true
+end
+```
+
+If you do filter request paths prior to your application, you can manage allowing this dynamically with
+(in this case to only allow the `front_cover_path` configuration, and only if it matches the supplied pattern):
+```ruby
+# config/initializers/grover.rb
+Grover.configure do |config|
+  config.allow_restricted_meta_option = ->(tag_name, value) do
+     tag_name == 'front_cover_path' && value.start_with?('/some/path/that/my/waf/allows')
+  end
+end
 ```
 
 ### Direct execution
