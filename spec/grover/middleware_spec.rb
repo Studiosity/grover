@@ -703,6 +703,7 @@ describe Grover::Middleware do
       let(:pdf_reader) { PDF::Reader.new pdf_io }
       let(:pdf_io) { StringIO.new last_response.body }
 
+      before { allow(Grover.configuration).to receive(:allow_restricted_meta_option).and_return true }
       before { get 'http://www.example.org/test.pdf' }
 
       context 'when the downstream response includes front cover page configuration' do
