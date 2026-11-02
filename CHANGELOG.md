@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased
+- None
+
+## [2.0.0](releases/tag/v2.0.0) - 2026-11-02
 ### Security
 - [GHSA-q887-vm59-mm98] Restrict HTML meta-tag options to a presentation-only allowlist to prevent option injection from untrusted page content
 
