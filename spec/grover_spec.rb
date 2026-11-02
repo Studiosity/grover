@@ -1260,7 +1260,13 @@ describe Grover do
         HTML
       end
 
-      it { is_expected.to eq '/meta/path' }
+      it { is_expected.to be_nil }
+
+      context 'when restricted meta options are enabled' do
+        before { allow(Grover.configuration).to receive(:allow_restricted_meta_option).and_return true }
+
+        it { is_expected.to eq '/meta/path' }
+      end
     end
   end
 
@@ -1296,7 +1302,13 @@ describe Grover do
         HTML
       end
 
-      it { is_expected.to eq '/meta/path' }
+      it { is_expected.to be_nil }
+
+      context 'when restricted meta options are enabled' do
+        before { allow(Grover.configuration).to receive(:allow_restricted_meta_option).and_return true }
+
+        it { is_expected.to eq '/meta/path' }
+      end
     end
   end
 
