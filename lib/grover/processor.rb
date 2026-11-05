@@ -81,7 +81,9 @@ class Grover
     end
 
     def call_js_method(method, url_or_html, options) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+      url_or_html = sanitize_unicode_control_characters url_or_html
       stdin.puts JSON.dump([method, url_or_html, options])
+
       input = stdout.gets
       raise Errno::EPIPE, "Can't read from worker" if input.nil?
 
@@ -119,6 +121,11 @@ class Grover
       stdout.close
       stderr.close
       wait_thr.join
+    end
+
+    # The line/paragraph separator characters break the JS JSON parser, so replace them with regular newlines
+    def sanitize_unicode_control_characters(html)
+      html.gsub(%r{[\u{2028}\u{2029}]}, "\n")
     end
   end
 end

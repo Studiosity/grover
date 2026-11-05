@@ -146,6 +146,14 @@ describe Grover::Processor do
         it { expect(pdf_text_content).to eq '' }
       end
 
+      context 'when passing through content that contains unicode line/paragraph separators' do
+        let(:url_or_html) { "This content contains unicode line \u2028 and paragraph \u2029 separators" }
+
+        it { is_expected.to start_with "%PDF-1.4\n" }
+        it { expect(pdf_reader.page_count).to eq 1 }
+        it { expect(pdf_text_content).to eq 'This content contains unicode line and paragraph separators' }
+      end
+
       context 'when puppeteer / puppeteer-core package is not installed' do
         # Temporarily move the node puppeteer folder
         before do
