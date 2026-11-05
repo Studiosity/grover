@@ -3,6 +3,10 @@
 ## Unreleased
 - None
 
+## [2.0.1](releases/tag/v2.0.1) - 2026-11-05
+### Fixed
+- [#313](https://github.com/Studiosity/grover/pull/313) Remove Unicode line/paragraph control chars before conversion ([@abrom][])
+
 ## [2.0.0](releases/tag/v2.0.0) - 2026-11-02
 ### Security
 - [GHSA-q887-vm59-mm98] Restrict HTML meta-tag options to a presentation-only allowlist to prevent option injection from untrusted page content
