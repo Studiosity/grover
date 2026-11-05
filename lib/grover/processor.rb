@@ -125,7 +125,7 @@ class Grover
 
     # The line/paragraph separator characters break the JS JSON parser, so replace them with regular newlines
     def sanitize_unicode_control_characters(html)
-      html.gsub(%r{[\u{2028}\u{2029}]}, "\n")
+      html.gsub(/[\u{2028}\u{2029}]/, "\n")
     end
   end
 end
