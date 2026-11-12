@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [main]
 
-env:
-  CC_TEST_REPORTER_ID: 5cfed40102c670b5c9e509730782b751939ddbe53fc57c317b718f635bab1ce8
-
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -25,23 +22,24 @@ jobs:
         puppeteer-version: [
           '23.11.1',
           '24.35.0',
+          '25.17.0',
         ]
         include:
           - ruby-version: '3.2'
             node-version: '20'
-            puppeteer-version: '24.35.0'
+            puppeteer-version: '25.17.0'
           - ruby-version: '3.3'
             node-version: '20'
-            puppeteer-version: '24.35.0'
+            puppeteer-version: '25.17.0'
           - ruby-version: '3.4'
             node-version: '20'
-            puppeteer-version: '24.35.0'
+            puppeteer-version: '25.17.0'
           - ruby-version: '4.0'
             node-version: '22'
-            puppeteer-version: '24.35.0'
+            puppeteer-version: '25.17.0'
           - ruby-version: '4.0'
             node-version: '24'
-            puppeteer-version: '24.35.0'
+            puppeteer-version: '25.17.0'
 
     steps:
       - uses: actions/checkout@v3
