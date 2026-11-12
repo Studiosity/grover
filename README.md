@@ -74,7 +74,7 @@ absolute_html = Grover::HTMLPreprocessor.process relative_html, 'http://my.serve
 ```
 
 This is important because Chromium will try and resolve any relative paths via the display url host. If not provided,
-the display URL defaults to `http://example.com`.
+the display URL defaults to `https://example.com`.
 
 #### Why would you pre-process the HTML rather than just use the `display_url`
 There are many scenarios where specifying a different host of relative paths would be preferred. For example, your
@@ -272,6 +272,20 @@ script_tag_options = [
 ]
 Grover.new('<html><body><h1>Heading</h1></body></html>', script_tag_options: script_tag_options).to_pdf
 ```
+
+
+#### HTTPS Upgrade
+From Puppeteer v25.17.0 HTTP requests will be automatically upgraded to HTTPS. In general this is a good thing as it
+protects the safety, privacy and integrity of data exchanged between your computer and the requested website, however
+there may be situations where you absolutely must use HTTP. If you find yourself in that situation you can use the
+following Chromium launch arguments to continue using HTTP:
+```ruby
+Grover.new(
+  'http://my.insecure.site/',
+  launch_args: ['--disable-features=HttpsUpgrades,HttpsFirstBalancedModeAutoEnable']
+).to_pdf
+```
+However, this should absolutely be your last resort!
 
 
 #### Page URL for middleware requests (or passing through raw HTML)
